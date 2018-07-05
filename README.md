@@ -1,6 +1,12 @@
 ## [QingWuFong](http://qingwufong.cn/)
 
 ## 2018
+### July
+* July 05, 2018 **»** [D3.js数据可视化实践（精简）](https://github.com/MGTfang/MGTfang.github.io/issues/10)
+### June
+* June 29, 2018 **»** [D3.js数据可视化实践（讲义）](https://github.com/MGTfang/MGTfang.github.io/issues/9)
+* June 27, 2018 **»** [《D3.js in Action Data visualization with JavaScript(2nd)》部分章节摘要](https://github.com/MGTfang/MGTfang.github.io/issues/8)
+* June 08, 2018 **»** [HTTPS证书及Nginx配置相关](https://github.com/MGTfang/MGTfang.github.io/issues/7)
 ### May
 * May 17, 2018 **»** [从接口调用安全考虑](https://github.com/MGTfang/MGTfang.github.io/issues/6)
 
@@ -13,13 +19,3 @@
 * July 31, 2017 **»** [基于VUE+VUEX+ELEMENT-UI的项目结构](https://github.com/MGTfang/MGTfang.github.io/issues/3)
 * July 31, 2017 **»** [webpack中文文档摘要](https://github.com/MGTfang/MGTfang.github.io/issues/2)
 * July 25, 2017 **»** [利用travis自动化部署博客项目](https://github.com/MGTfang/MGTfang.github.io/issues/1)
-
-## 2018
-### May
-* May 17, 2018 **»** [从接口调用安全考虑](https://github.com/MGTfang/MGTfang.github.io/issues/6)
-### June
-* June 08, 2018 **»** [HTTPS证书及Nginx配置相关](https://github.com/MGTfang/MGTfang.github.io/issues/7)
-* June 27, 2018 **»** [《D3.js in Action Data visualization with JavaScript(2nd)》部分章节摘要](https://github.com/MGTfang/MGTfang.github.io/issues/8)
-* June 29, 2018 **»** [D3.js数据可视化实践（讲义）](https://github.com/MGTfang/MGTfang.github.io/issues/9)
-### July
-* July 05, 2018 **»** [D3.js数据可视化实践（精简）](https://github.com/MGTfang/MGTfang.github.io/issues/10)
