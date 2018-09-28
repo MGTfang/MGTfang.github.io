@@ -1,1 +1,6 @@
-theme: jekyll-theme-cayman
+# Deployment
+## Docs: https://hexo.io/docs/deployment.html
+deploy: 
+  type: git
+  repo: https://github.com/MGTfang/MGTfang.github.io.git
+  branch: master
