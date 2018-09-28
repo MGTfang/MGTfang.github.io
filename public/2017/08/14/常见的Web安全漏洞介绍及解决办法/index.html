@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>常见的Web安全漏洞介绍及解决办法 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="本文对常见的Web漏洞的原因、关注点、解决办法做简要介绍，整理自Web安全培训笔记。 SQL注入解决办法：参数化查询 失效的身份认证和会话管理 原因：Session相关的数据没有被完整替换导致的安全问题   关注点：Login通过后，立刻把当前Session（包含Session、Cache、Cookie）失效掉，把需要保持到Session的value重新开一个Session保存；Logout功能中">
+<meta name="keywords" content="Web安全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常见的Web安全漏洞介绍及解决办法">
+<meta property="og:url" content="http://yoursite.com/2017/08/14/常见的Web安全漏洞介绍及解决办法/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="本文对常见的Web漏洞的原因、关注点、解决办法做简要介绍，整理自Web安全培训笔记。 SQL注入解决办法：参数化查询 失效的身份认证和会话管理 原因：Session相关的数据没有被完整替换导致的安全问题   关注点：Login通过后，立刻把当前Session（包含Session、Cache、Cookie）失效掉，把需要保持到Session的value重新开一个Session保存；Logout功能中">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-09-28T03:29:11.722Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="常见的Web安全漏洞介绍及解决办法">
+<meta name="twitter:description" content="本文对常见的Web漏洞的原因、关注点、解决办法做简要介绍，整理自Web安全培训笔记。 SQL注入解决办法：参数化查询 失效的身份认证和会话管理 原因：Session相关的数据没有被完整替换导致的安全问题   关注点：Login通过后，立刻把当前Session（包含Session、Cache、Cookie）失效掉，把需要保持到Session的value重新开一个Session保存；Logout功能中">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-常见的Web安全漏洞介绍及解决办法" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/08/14/常见的Web安全漏洞介绍及解决办法/" class="article-date">
+  <time datetime="2017-08-14T10:01:00.000Z" itemprop="datePublished">2017-08-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Web安全/">Web安全</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      常见的Web安全漏洞介绍及解决办法
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文对常见的Web漏洞的原因、关注点、解决办法做简要介绍，整理自Web安全培训笔记。</p>
+<h3 id="SQL注入"><a href="#SQL注入" class="headerlink" title="SQL注入"></a>SQL注入</h3><p>解决办法：参数化查询</p>
+<h3 id="失效的身份认证和会话管理"><a href="#失效的身份认证和会话管理" class="headerlink" title="失效的身份认证和会话管理"></a>失效的身份认证和会话管理</h3><ul>
+<li>原因：Session相关的数据没有被完整替换导致的安全问题  </li>
+<li>关注点：Login通过后，立刻把当前Session（包含Session、Cache、Cookie）失效掉，把需要保持到Session的value重新开一个Session保存；Logout功能中，除了把当前Session失效掉外，还要把Session相关的Cache也remove掉。  </li>
+<li>登录: 登录验证通过后，要把Session.Abort()，再保存新值</li>
+<li>注销：Session要Abort，相关缓存要clear，额外的cookie也有被clear |  </li>
+</ul>
+<h3 id="XSS（跨站脚本）"><a href="#XSS（跨站脚本）" class="headerlink" title="XSS（跨站脚本）"></a>XSS（跨站脚本）</h3><ul>
+<li>简介：XSS是指攻击者利用网站程序对用户输入过滤不足，输入可以显示子在页面上对其他用户造成影响的HTML代码，从而盗取用户资料、利用用户身份进行某种动作或者对访问者进行病毒侵害的一种攻击方式。</li>
+<li>关注点：HTML输入输出编码、JavaScript的编码、URL的编码</li>
+<li>解决办法：对用户输出的数据要过滤特殊字符，对输出到客户端的数据也要过滤特殊字符。HTML、js、URL过滤方法不同。js中使用escape函数来过滤特殊字符，包括元素value、元素Attribute，都有encode起来，相关函数有escape、encodeURI、encodeURIComponent。PHP中有htmlspecialchars 函数。下面是js中特殊字符编码的一种写法：<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">escapeHtml</span>(<span class="params">text</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> map = &#123;</span><br><span class="line">    <span class="string">'&amp;'</span>: <span class="string">'&amp;amp;'</span>,</span><br><span class="line">    <span class="string">'&lt;'</span>: <span class="string">'&amp;lt;'</span>,</span><br><span class="line">    <span class="string">'&gt;'</span>: <span class="string">'&amp;gt;'</span>,</span><br><span class="line">    <span class="string">'"'</span>: <span class="string">'&amp;quot;'</span>,</span><br><span class="line">    <span class="string">"'"</span>: <span class="string">'&amp;#039;'</span></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> text.replace(<span class="regexp">/[&amp;&lt;&gt;"']/g</span>, <span class="function"><span class="keyword">function</span>(<span class="params">m</span>) </span>&#123; <span class="keyword">return</span> map[m]; &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>另外一种办法是增加cookie安全：启用httponly和secure</p>
+<blockquote>
+<p>secure属性是防止信息在传递的过程中被监听捕获后信息泄漏。当设置为true时，表示创建的cookie会被以安全的形式向服务器传输，也就是只能在HTTPS连接中被浏览器传递到服务器端进行会话验证，如果是HTTP连接则不会传递该信息，所以不会被窃取到cookie的具体内容。<br>HttpOnly属性不允许通过脚本访问cookie，只能用于传输，目的是防止程序获取cookie后进行攻击。</p>
+</blockquote>
+<h3 id="敏感数据暴露"><a href="#敏感数据暴露" class="headerlink" title="敏感数据暴露"></a>敏感数据暴露</h3><ul>
+<li>原因：敏感信息需要加密保存（内存、数据库、客户端中）+加密传输（HTTPS）+不缓存（只是尽量，看情况）</li>
+<li>解决关注点：登录、付款这样的页面要用HTTPS保护传输。密码可采用单向加密，信用卡账号采用可逆的加密方式。</li>
+<li>Base64算法：Base64只是一种编码方式，并不是一种加密算法，不要使用Base64来加密数据。</li>
+<li>Hash算法：具有不可逆性是一种单向密码体制，只能加密不能解密，可以用来加密用户登录密码等凭证。有的开源项目采用md5加盐的方式加密如<code>md5(md5(pwd)+salt)</code>，但是不建议使用MD5等算法，MD5可用因子碰撞暴力破解，建议采用SHA-256算法。不要使用哈希函数作为对称加密算法的签名，字符串串接后再做哈希要注意（URL签名）。</li>
+<li>对称加密：加解密使用同一个密钥，计算耗时短，通常用来加密数据。推荐使用AES算法</li>
+<li>非对称加密：加解密使用不同的密钥，计算耗时长，通常利用来加密密钥。注意密钥长度不要低于512，建议2048位的密钥长度。<blockquote>
+<p>为了确保安全性，有时多种加密算法混合使用。如非对称-&gt;hash-&gt;对称</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="CSRF（跨站请求伪造）"><a href="#CSRF（跨站请求伪造）" class="headerlink" title="CSRF（跨站请求伪造）"></a>CSRF（跨站请求伪造）</h3><p>利用合法用户的身份，在合法用户的终端调用请求。<br>解决关注点：重要操作不用使用get方式，要使用post方式；为每个能进行post动作的form增加token，并且在服务端检查token的合法性，合法则进行操作。<br>正确的防御方式：</p>
+<ul>
+<li>第一步，新建CSRF令牌添加进用户每次登陆以及存储在httpsession里，这种令牌至少对每个用户会话应是唯一的，或者是对每个请求是唯一的。</li>
+<li>第二步，令牌可以包含在URL中或作为一个URL参数记/隐藏字段。</li>
+<li>第三步，在服务器端检查提交令牌与用户会话对象令牌是否匹配。</li>
+<li>第四步，在注销和会话超时，删除用户对象会话和会话销毁。</li>
+</ul>
+<h3 id="未验证的重定向和转发"><a href="#未验证的重定向和转发" class="headerlink" title="未验证的重定向和转发"></a>未验证的重定向和转发</h3><p>原因：当系统接受重定向参数，如<code>http://www.a.com/login.aspx?returnUrl=default.aspx</code>，只要修改只要修改这个url为<code>http://www.a.com/login.aspx?returnUrl=http://wwv.a.com/login.aspx</code>，这样会被重定向到假冒站点的login界面，用户再次输入密码，此时密码就被假冒站点保存起来了。<br>解决关注点：对于returnUrl这种参数值进行判断，只要在白名单中的url才能redirect，尽量使用相对路径来redirect。</p>
+<h3 id="会话安全"><a href="#会话安全" class="headerlink" title="会话安全"></a>会话安全</h3><ul>
+<li>Session会话ID要足够长足够随机  </li>
+<li>认证用户后应开启一个全新的用户ID  </li>
+<li>限制会话闲置时间  </li>
+<li>限制会话生命周期  </li>
+<li>允许用户自行注销会话  </li>
+<li>会话结束后清除数据  </li>
+</ul>
+<h3 id="安全基础"><a href="#安全基础" class="headerlink" title="安全基础"></a>安全基础</h3><p>应当在完全不信任用户输入和客户端提交的数据的前提下开发应用程序。</p>
+<h3 id="输入验证"><a href="#输入验证" class="headerlink" title="输入验证"></a>输入验证</h3><ul>
+<li>集中式输入验证</li>
+<li>服务器端输入验证</li>
+<li>建议采用白名单放弃黑名单</li>
+<li>验证输入长度、格式、字符合法性等</li>
+<li>验证所有的输入</li>
+<li>防范元字符攻击</li>
+</ul>
+<h3 id="防范元字符攻击"><a href="#防范元字符攻击" class="headerlink" title="防范元字符攻击"></a>防范元字符攻击</h3><ul>
+<li>SQL注入</li>
+<li>跨站脚本</li>
+<li>路径操纵</li>
+<li>命令注入</li>
+<li>日志欺骗</li>
+</ul>
+<h3 id="数据库连接安全"><a href="#数据库连接安全" class="headerlink" title="数据库连接安全"></a>数据库连接安全</h3><ul>
+<li>使用参数化SQL语句</li>
+<li>数据库中的数据也是不可信的</li>
+<li>确保数据库资源能够被释放</li>
+</ul>
+<h3 id="减少编码逻辑漏洞"><a href="#减少编码逻辑漏洞" class="headerlink" title="减少编码逻辑漏洞"></a>减少编码逻辑漏洞</h3><p>执行操作时需要权限判断</p>
+<h3 id="文件安全"><a href="#文件安全" class="headerlink" title="文件安全"></a>文件安全</h3><h4 id="严格控制文件上传"><a href="#严格控制文件上传" class="headerlink" title="严格控制文件上传"></a>严格控制文件上传</h4><blockquote>
+<ul>
+<li>文件类型验证（白名单验证） </li>
+<li>存储路径安全（把握原则：可执行目录不可写，可写目录不可执行）  </li>
+<li>防范rar压缩炸弹  </li>
+<li>限制文件大小 </li>
+</ul>
+</blockquote>
+<h4 id="严格分配文件访问权限策略"><a href="#严格分配文件访问权限策略" class="headerlink" title="严格分配文件访问权限策略"></a>严格分配文件访问权限策略</h4><h4 id="安全的临时文件"><a href="#安全的临时文件" class="headerlink" title="安全的临时文件"></a>安全的临时文件</h4><h4 id="访问竞争条件"><a href="#访问竞争条件" class="headerlink" title="访问竞争条件"></a>访问竞争条件</h4><h3 id="开发调试"><a href="#开发调试" class="headerlink" title="开发调试"></a>开发调试</h3><h4 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h4><blockquote>
+<ul>
+<li>集中日志记录</li>
+<li>使用时间戳</li>
+<li>记录每个重要行为</li>
+<li>保护日志文件</li>
+</ul>
+</blockquote>
+<h4 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h4><blockquote>
+<ul>
+<li>上线产品删除调试代码</li>
+<li>产品中不包含后门代码</li>
+<li>清除备份和调试文件</li>
+</ul>
+</blockquote>
+<h4 id="错误日志"><a href="#错误日志" class="headerlink" title="错误日志"></a>错误日志</h4><h3 id="错误处理"><a href="#错误处理" class="headerlink" title="错误处理"></a>错误处理</h3><ul>
+<li>保证整个团队使用一个共同的异常处理方法</li>
+<li>禁用或限制详细错误处理信息（可以暴露错误状态码，而错误详细信息不应被暴露）</li>
+<li>多个错误同一时间内返回相似或同样的出错信息 </li>
+<li>各种应用层会返回错误或异常结果</li>
+<li>有必要创建一个默认的错误处理机</li>
+<li>可以用总是返回“200”错误代码来覆盖默认的错误输出</li>
+</ul>
+<h3 id="不安全的加密存储"><a href="#不安全的加密存储" class="headerlink" title="不安全的加密存储"></a>不安全的加密存储</h3><ul>
+<li>不要自己创建加密算法。  </li>
+<li>应使用已经被证明的公开加密算法，例如AES，RAS公钥加密，和SHA-256或更好的HASH算法。   </li>
+<li>不要使用弱加密算法，比如MD5/SHA1。  </li>
+<li>建议使用更安全的加密算法，比如SHA-256或更其它的选择。  </li>
+</ul>
+<h3 id="不安全的通讯"><a href="#不安全的通讯" class="headerlink" title="不安全的通讯"></a>不安全的通讯</h3><ul>
+<li>对所有传输认证或传输数据的连接启用SSL</li>
+<li>确保web服务器和数据库之间的通讯安全恰当的加密</li>
+</ul>
+<h3 id="限制敏感数据的生命周期"><a href="#限制敏感数据的生命周期" class="headerlink" title="限制敏感数据的生命周期"></a>限制敏感数据的生命周期</h3><h4 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h4><blockquote>
+<ul>
+<li>使用对象来存储敏感数据，但使用后没清除或回收  </li>
+<li>具有可以被操作系统按需交换到磁盘的内存页面  </li>
+<li>在缓冲区中有敏感数据  </li>
+<li>使用了一些反射机制来控制敏感数据  </li>
+<li>通过调试信息、日志文件、环境变量等方式暴露敏感数据  </li>
+</ul>
+</blockquote>
+<h3 id="不要在客户端存储未经加密的数据"><a href="#不要在客户端存储未经加密的数据" class="headerlink" title="不要在客户端存储未经加密的数据"></a>不要在客户端存储未经加密的数据</h3><h3 id="确保安全敏感方法被调用时参数经过验证"><a href="#确保安全敏感方法被调用时参数经过验证" class="headerlink" title="确保安全敏感方法被调用时参数经过验证"></a>确保安全敏感方法被调用时参数经过验证</h3><h3 id="不要使用不安全的弱加密算法"><a href="#不要使用不安全的弱加密算法" class="headerlink" title="不要使用不安全的弱加密算法"></a>不要使用不安全的弱加密算法</h3><h3 id="身份鉴别"><a href="#身份鉴别" class="headerlink" title="身份鉴别"></a>身份鉴别</h3><h4 id="用户ID管理"><a href="#用户ID管理" class="headerlink" title="用户ID管理"></a>用户ID管理</h4><blockquote>
+<p>用户名是唯一的</p>
+<ul>
+<li>注册判断重命等逻辑放在服务器端</li>
+<li>Insert之前判断用户名是否存在</li>
+</ul>
+</blockquote>
+<h4 id="密码管理"><a href="#密码管理" class="headerlink" title="密码管理"></a>密码管理</h4><blockquote>
+<p>密码长度不小于8个字符<br>密码至少包含大小写字母、数字及特殊符号。密码与账户名不同<br>存储过程中不能使用明文以及不安全的存储<br>在密码传输工程中不能使用明文，短信验证码设置有效期<br>输入密码时不显示密码<br>管理账户没弱口令，删除测试账户 </p>
+</blockquote>
+<h4 id="认证限制"><a href="#认证限制" class="headerlink" title="认证限制"></a>认证限制</h4><blockquote>
+<p>用户身份认证尝试超限锁定功能<br>如果用户名易被猜测，对同一ip多次认证失败锁定<br>认证期间不透露用户ID是否存在<br>关键系统双因子认证<br>认证需要采用有效挑战应答机制  </p>
+</blockquote>
+<h3 id="注意的漏洞"><a href="#注意的漏洞" class="headerlink" title="注意的漏洞"></a>注意的漏洞</h3><ol>
+<li>Struts2框架任意代码执行  </li>
+<li>Java反序列化化漏洞  </li>
+<li>容错处理不当致信息泄露  </li>
+<li><p>mybatis(ibatis)框架存在的SQL注入，正确的写法：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> username <span class="keyword">like</span> <span class="keyword">concat</span>(<span class="string">'%'</span>,#username#,<span class="string">'%'</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>mybatis框架$存在的SQL注入<br>尽量使用#描述参数，如果一定要使用$，则需要自己过滤用户输入。因为使用$参数MyBatis不会修改或转义字符串。</p>
+</li>
+<li>Hibernate存在的SQL注入<br>正确的写法：</li>
+</ol>
+<ul>
+<li><p>名称绑定</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String queryString = <span class="string">"from Item item where item.description like :searchString and item.date &gt; :minDate"</span>;</span><br><span class="line">List result = session.createQuery(queryString).setString(<span class="string">"searchString"</span>, searchString).setDate(<span class="string">"minDate"</span>, minDate).list();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>位置绑定</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String queryString = <span class="string">"from Item item where item.description like ? and item.date &gt; ?"</span>;</span><br><span class="line">List result = session.createQuery(queryString).setString(<span class="number">0</span>, searchString).setDate(<span class="number">1</span>, minDate).list();</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/08/14/常见的Web安全漏洞介绍及解决办法/" data-id="cjmlg93ns000zg82pebqei00x" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web安全/">Web安全</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/05/17/从接口调用安全考虑/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          从接口调用安全考虑
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/08/10/Linux下离线安装node和npm/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Linux下离线安装node和npm</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Nginx/">Nginx</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web安全/">Web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue/">vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/webpack/">webpack</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/博客/">博客</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/可视化/">可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/基础科学/">基础科学</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/感悟/">感悟</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据可视化/">数据可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/环境安装/">环境安装</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/系统设计/">系统设计</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/">Hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web安全/">Web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webcola/">webcola</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/书单/">书单</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端环境/">前端环境</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/接口设计/">接口设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据入库/">数据入库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/竞争力/">竞争力</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化部署-博客/">自动化部署 博客</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/D3-js/" style="font-size: 20px;">D3.js</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Hbase/" style="font-size: 15px;">Hbase</a> <a href="/tags/Web安全/" style="font-size: 10px;">Web安全</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/webcola/" style="font-size: 10px;">webcola</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/书单/" style="font-size: 10px;">书单</a> <a href="/tags/前端环境/" style="font-size: 10px;">前端环境</a> <a href="/tags/接口设计/" style="font-size: 10px;">接口设计</a> <a href="/tags/数据入库/" style="font-size: 10px;">数据入库</a> <a href="/tags/竞争力/" style="font-size: 10px;">竞争力</a> <a href="/tags/自动化部署-博客/" style="font-size: 10px;">自动化部署 博客</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/19/Hive2Hbase入库逻辑/">Hive2Hbase入库逻辑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/18/2018-2019技术书单/">2018-2019技术书单</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/18/怎样更有竞争力/">怎样更有竞争力</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/12/webcola介绍/">webcola介绍</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/10/Hbase基础知识点梳理/">Hbase基础知识点梳理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

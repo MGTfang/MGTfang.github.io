@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="default">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-Hive2Hbase入库逻辑" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/19/Hive2Hbase入库逻辑/" class="article-date">
+  <time datetime="2018-09-19T12:21:00.000Z" itemprop="datePublished">2018-09-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/大数据/">大数据</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/19/Hive2Hbase入库逻辑/">Hive2Hbase入库逻辑</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Parquet格式hdfs文件根据规则生成HFile"><a href="#Parquet格式hdfs文件根据规则生成HFile" class="headerlink" title="Parquet格式hdfs文件根据规则生成HFile"></a>Parquet格式hdfs文件根据规则生成HFile</h3><ol>
+<li>创建和设置habse参数</li>
+<li>清楚输出目录下HFile文件</li>
+<li>创建mapreduce job</li>
+<li>设置mapper：job.setJarByClass, job.setMapperClass, job.setMapOutputKeyClass, job.setMapOutputValueClass；</li>
+<li>设置Parquet格式的解析器；</li>
+<li>设置合并方法：job.setCombinerClass(Combiner.class)，Combiner继承自Reducer，reduce方法用于数据去重；</li>
+<li>设置写HFile的reduce：HFileOutputFormat2.configureIncrementalLoad, HFileOutputFormat2.setOutputPath; job.setReducerClass(KeyValueSortReducer.class)：设置reducer class, 如KeyValue、Put、Text，以正确地对输入值进行排序。configureIncrementalLoad中会根据前面设置的MapOutputKeyClass来设置ReducerClass，见下面的源代码。</li>
+<li>提交job，轮询等到其完成，退出程序执行。<br>第7步configureIncrementalLoad源代码：   <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">configureIncrementalLoad</span><span class="params">(Job job, HTableDescriptor tableDescriptor,</span></span></span><br><span class="line"><span class="function"><span class="params">                                     RegionLocator regionLocator, Class&lt;? extends OutputFormat&lt;?, ?&gt;&gt; cls)</span> <span class="keyword">throws</span> IOException,</span></span><br><span class="line"><span class="function">        UnsupportedEncodingException </span>&#123;</span><br><span class="line">    Configuration conf = job.getConfiguration();</span><br><span class="line">    job.setOutputKeyClass(ImmutableBytesWritable.class);</span><br><span class="line">    job.setOutputValueClass(KeyValue.class);</span><br><span class="line">    job.setOutputFormatClass(cls);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Based on the configured map output class, set the correct reducer to properly</span></span><br><span class="line">    <span class="comment">// sort the incoming values.</span></span><br><span class="line">    <span class="comment">// TODO it would be nice to pick one or the other of these formats.</span></span><br><span class="line">    <span class="keyword">if</span> (KeyValue.class.equals(job.getMapOutputValueClass())) &#123;</span><br><span class="line">        job.setReducerClass(KeyValueSortReducer.class);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Put.class.equals(job.getMapOutputValueClass())) &#123;</span><br><span class="line">        job.setReducerClass(PutSortReducer.class);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Text.class.equals(job.getMapOutputValueClass())) &#123;</span><br><span class="line">        job.setReducerClass(TextSortReducer.class);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        LOG.warn(<span class="string">"Unknown map output value type:"</span> + job.getMapOutputValueClass());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    conf.setStrings(<span class="string">"io.serializations"</span>, conf.get(<span class="string">"io.serializations"</span>),</span><br><span class="line">            MutationSerialization.class.getName(), ResultSerialization.class.getName(),</span><br><span class="line">            KeyValueSerialization.class.getName());</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Use table's region boundaries for TOP split points.</span></span><br><span class="line">    LOG.info(<span class="string">"Looking up current regions for table "</span> + tableDescriptor.getTableName());</span><br><span class="line">    List&lt;ImmutableBytesWritable&gt; startKeys = getRegionStartKeys(regionLocator);</span><br><span class="line">    LOG.info(<span class="string">"Configuring "</span> + startKeys.size() + <span class="string">" reduce partitions "</span> +</span><br><span class="line">            <span class="string">"to match current region count"</span>);</span><br><span class="line">    job.setNumReduceTasks(startKeys.size());</span><br><span class="line"></span><br><span class="line">    configurePartitioner(job, startKeys);</span><br><span class="line">    <span class="comment">// Set compression algorithms based on column families</span></span><br><span class="line">    configureCompression(conf, tableDescriptor);</span><br><span class="line">    configureBloomType(tableDescriptor, conf);</span><br><span class="line">    configureBlockSize(tableDescriptor, conf);</span><br><span class="line">    configureDataBlockEncoding(tableDescriptor, conf);</span><br><span class="line"></span><br><span class="line">    TableMapReduceUtil.addDependencyJars(job);</span><br><span class="line">    TableMapReduceUtil.initCredentials(job);</span><br><span class="line">    LOG.info(<span class="string">"Incremental table "</span> + regionLocator.getName() + <span class="string">" output configured."</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="加载HFile到HBase表"><a href="#加载HFile到HBase表" class="headerlink" title="加载HFile到HBase表"></a>加载HFile到HBase表</h3><ol>
+<li>加载配置文件hbase-site.xml</li>
+<li>读取hdfs配置文件hbase-hdfs-site.xml，然后配置hbase-site.xml的一些参数：<br>● 配置dfs.ha.namenodes.[nameservice ID]，让DataNode知道每个集群的所有NameNode<br>● 配置dfs.client.failover.proxy.provider.[nameservice    ID]，该参数定义HDFS客户端用来和活动的namenode节目联系的java类。配置的java类是用来给HDFS客户端判断哪个namenode节点是活动的，当前是哪个namenode处理客户端的请求。<br>● 配置dfs.namenode.rpc-address.[nameservice ID].[name node ID] ， 即配置每个namenode监听的RPC地址。<br>● 配置dfs.nameservices–自定义的HDFS服务名，在NameNode节点的集群中，对HDFS集群访问的入口是NameNode所在的服务器。但是在两个NameNode节点的HA集群中，无法配置单一服务器入口。所以需要指定一个逻辑上的服务名，这个服务名是自定义的。当外界访问HDFS集群时，入口就变为这个服务。用户不必关心当前具体是哪台服务器在提供服务（Active状态），只要访问这个服务就可以了。<br>● 配置mapreduce.job.hdfs-servers.token-renewal.exclude为名字服务id的数组，ResourceManager为应用程序更新委托令牌。只有当令牌的更新者是非空字符串时，此行为才被更新为令牌。MapReduce作业可以指示ResourceManager通过指定具有配置mapreduce.job.hdfs-servers.token-renewal.exclude = <host1>，<host2>，..，<hostn>的主机来跳过从某些主机获取的令牌的更新。   </hostn></host2></host1></li>
+<li>向HBASE表加载数据<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HTable table = <span class="keyword">new</span> HTable(conf, tableB);</span><br><span class="line">LoadIncrementalHFile loader = <span class="keyword">new</span> LoadIncrementalHFile(conf);</span><br><span class="line">loader.doBulkLoad(<span class="keyword">new</span> Path(outputPathOnHbase), table);  <span class="comment">// outputPathOnHbase是HBASE的hdfs上HFile的路径</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>API解释如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Class LoadIncrementalHFiles：Tool to load the output of HFileOutputFormat into an existing table.</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doBulkLoad</span><span class="params">(org.apache.hadoop.fs.Path hfofDir,</span></span></span><br><span class="line"><span class="function"><span class="params">              Admin admin,</span></span></span><br><span class="line"><span class="function"><span class="params">              Table table,</span></span></span><br><span class="line"><span class="function"><span class="params">              RegionLocator regionLocator)</span></span></span><br><span class="line"><span class="function">                <span class="keyword">throws</span> TableNotFoundException,</span></span><br><span class="line"><span class="function">                       IOException</span></span><br><span class="line"><span class="function">Perform a bulk load of the given directory into the given pre-existing table. This method is not threadsafe.</span></span><br><span class="line"><span class="function">Parameters:</span></span><br><span class="line"><span class="function">hfofDir - the directory that was provided as the output path of a job using HFileOutputFormat</span></span><br><span class="line"><span class="function">table - the table to load into</span></span><br><span class="line"><span class="function">Throws:</span></span><br><span class="line"><span class="function">TableNotFoundException - <span class="keyword">if</span> table does not yet exist</span></span><br><span class="line"><span class="function">IOException</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h4><p><a href="https://blog.csdn.net/book_mmicky/article/details/25714339" target="_blank" rel="noopener">https://blog.csdn.net/book_mmicky/article/details/25714339</a><br><a href="https://segmentfault.com/a/1190000007239743" target="_blank" rel="noopener">https://segmentfault.com/a/1190000007239743</a><br><a href="http://www.searchdoc.cn/hadoop/hadoop.apache.org/docs/r3.0.0-alpha1/hadoop-project-dist/hadoop-common/release/3.0.0-alpha1/RELEASENOTES.3.0.0-alpha1.com.coder114.cn.html" target="_blank" rel="noopener">http://www.searchdoc.cn/hadoop/hadoop.apache.org/docs/r3.0.0-alpha1/hadoop-project-dist/hadoop-common/release/3.0.0-alpha1/RELEASENOTES.3.0.0-alpha1.com.coder114.cn.html</a><br><a href="https://www.programcreek.com/java-api-examples/index.php?api=org.apache.hadoop.hbase.mapreduce.KeyValueSortReducer" target="_blank" rel="noopener">https://www.programcreek.com/java-api-examples/index.php?api=org.apache.hadoop.hbase.mapreduce.KeyValueSortReducer</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/19/Hive2Hbase入库逻辑/" data-id="cjmlg93nb000bg82p4jj97oa3" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hbase/">Hbase</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/数据入库/">数据入库</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2018-2019技术书单" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/18/2018-2019技术书单/" class="article-date">
+  <time datetime="2018-09-18T12:42:00.000Z" itemprop="datePublished">2018-09-18</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/基础科学/">基础科学</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/18/2018-2019技术书单/">2018-2019技术书单</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>2018到2019书单<br>       —— 计算机系统化学习，大神进化之路   </p>
+<h5 id="数学"><a href="#数学" class="headerlink" title="数学"></a>数学</h5><p>具体数学<br>图论及其应用<br>矩阵理论<br>线性代数与空间解析几何<br>最优化理论与方法<br>组合数学<br>深入浅出统计学  </p>
+<h5 id="机器学习"><a href="#机器学习" class="headerlink" title="机器学习"></a>机器学习</h5><p>统计学习方法<br>机器学习(西瓜书)<br>机器学习(经典)  </p>
+<h5 id="大数据"><a href="#大数据" class="headerlink" title="大数据"></a>大数据</h5><p>Hadoop权威指南   </p>
+<h4 id="编程语言"><a href="#编程语言" class="headerlink" title="编程语言"></a>编程语言</h4><p>css世界<br>Java核心技术(卷一)<br>深入理解Java虚拟机<br>webkit技术内幕<br>高性能JavaScript  </p>
+<h4 id="数据结构及算法"><a href="#数据结构及算法" class="headerlink" title="数据结构及算法"></a>数据结构及算法</h4><p>算法导论<br>算法：C语言实现<br>算法心得<br>数据结构与算法分析——C语言描述  </p>
+<h4 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h4><p>TCP/IP详解<br>计算机网络自顶向下方法  </p>
+<h4 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h4><p>深入理解计算机系统<br>Linux内核设计与实现(第三版)<br>Linux程序设计实践<br>Unix操作系统设计<br>老码识途  </p>
+<h4 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h4><p>数据库系统概论<br>MySQL DBA修炼之道<br>高性能MySQL  </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/18/2018-2019技术书单/" data-id="cjmlg93mw0001g82p1ukoaad3" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/书单/">书单</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-怎样更有竞争力" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/18/怎样更有竞争力/" class="article-date">
+  <time datetime="2018-09-18T12:34:00.000Z" itemprop="datePublished">2018-09-18</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/感悟/">感悟</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/18/怎样更有竞争力/">怎样更有竞争力</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ul>
+<li>做选择时选择难的，大家认为难的往往有竞争力  </li>
+<li>只有思考过总结出来记录下来的才是自己的  </li>
+<li>不在于愿望有多强烈，而在于每天达成一个个小目标  </li>
+<li>建立自己的个人品牌和影响力  </li>
+<li><p>凡事主动，主动思考，主动询问，主动了解  </p>
+</li>
+<li><p>搞技术最难的不是怎么用它，而是为什么用它，它是怎么实现的，实现用到了哪些技术，基于什么样的原理  </p>
+</li>
+<li><p>研究一门技术思考的是它的核心  </p>
+<ul>
+<li>大数据的核心是mr.hdfs</li>
+<li>后端的核心是框架源码和jvm</li>
+<li>前端的核心是框架源码，组件源码和编译原理，运行时环境</li>
+<li>机器学习核心是神经网络，矩阵理论，概率统计，优化</li>
+</ul>
+</li>
+<li><p>系统性学习，建立知识框架</p>
+</li>
+<li>写PPT的能力，做汇报的能力(写和讲)</li>
+<li>学习基础科学计划：<br>操作系统、计算机网络、编译原理、算法与数据结构</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/18/怎样更有竞争力/" data-id="cjmlg93nu0012g82ppfwlhdvt" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/竞争力/">竞争力</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-webcola介绍" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/12/webcola介绍/" class="article-date">
+  <time datetime="2018-09-12T12:18:00.000Z" itemprop="datePublished">2018-09-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/可视化/">可视化</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/12/webcola介绍/">webcola介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="https://ialab.it.monash.edu/webcola/" target="_blank" rel="noopener">cola.js</a>是一个开源的JavaScript库，使用基于约束的优化技术组织HTML5文档和图表。它可以和D3.js、SVG.js以及Cytoscape.js类似的很好配合。核心布局是基于libcola的C++库重写的。<br>它也适配于d3.js，允许你使用cola作为D3力布局的一个核心替代。不同于D3力布局，通过一个简单的退火策略使其布局收敛到局部最优，因此与D3力布局相比：   </p>
+<ul>
+<li>Cola实现更高质量的布局</li>
+<li>在交互式应用程序中更稳定（没有”抖动”）</li>
+<li>它允许用户指定约束，例如对齐和分组</li>
+<li>它能自动生成约束来<ul>
+<li>避免节点重叠</li>
+<li>为有向图提供流布局</li>
+</ul>
+</li>
+<li>对于非常大的图，它可能不太好扩展<br>然而，图上节点少于100个的情况下工作得很好，见<a href="https://ialab.it.monash.edu/webcola/examples/unix.html" target="_blank" rel="noopener">Unix家族树</a>   </li>
+</ul>
+<p>注意，虽然使用D3力布局，为了获得合理的节点分离，你可能要必须处理”charge”这样的参数。cola在最终布局中指定的链接距离方面做得更好。这是因为cola直接试着最小化理想链接距离和图中实际链接距离中的方差。换句话说，仅仅根据节点大小设置合理的链接距离。</p>
+<p>为了了解一些可选的参数，我们可以像这样开始布局：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">d3cola</span><br><span class="line">    .nodes(graph.nodes)</span><br><span class="line">    .links(graph.links)</span><br><span class="line">    .constraints(graph.constraints)</span><br><span class="line">    .symmetricDiffLinkLengths(<span class="number">5</span>)</span><br><span class="line">    .avoidOverlaps(<span class="literal">true</span>)</span><br><span class="line">    .start(<span class="number">10</span>,<span class="number">15</span>,<span class="number">20</span>);</span><br></pre></td></tr></table></figure></p>
+<p>我们像D3力布局一样指定节点和链接。constraints是一个新参数，它是一个包含约束的数组，像这样：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">"axis"</span>:<span class="string">"y"</span>, <span class="string">"left"</span>:<span class="number">0</span>, <span class="string">"right"</span>:<span class="number">1</span>, <span class="string">"gap"</span>:<span class="number">25</span>&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这就是说，<code>graph.nodes[0]</code>的中心必须与<code>graph.nodes[1]</code>的中心距离25个像素以上。更精确地讲，约束要求满足这样的不等式：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">graph.nodes[<span class="number">0</span>].y + gap &lt;= graph.nodes[<span class="number">1</span>].y</span><br></pre></td></tr></table></figure></p>
+<p>设置<code>avoidOverlaps(true)</code>，在布局进行时动态生成约束，以防止节点的边框彼此重叠。<br><code>symmetricDiffLinkLengths(5)</code> ，使用5作为基本长度，计算每个链路上的理想长度，为的是在高度节点周围创造额外的空间。或者，你也可以将自己的函数f传递给linkDistance，返回每个链接的特定长度。<br><code>start()</code>方法现在包含多达三个整数参数。在上面的例子中，start最初将应用10次没有约束的布局迭代，15次仅具有结构（用户指定的）约束的迭代，以及20次包含反重叠约束的具有所有约束的布局迭代。指定这样一个计划是有用的，使得图形在其被严格约束前展开。</p>
+<h4 id="在cytoscape-js中使用cola-js"><a href="#在cytoscape-js中使用cola-js" class="headerlink" title="在cytoscape.js中使用cola.js"></a>在cytoscape.js中使用cola.js</h4><p>Cytoscape.js通过扩展已经完全支持Cola.js.Cytoscape.js拥有一个完全的图理论模型，高度可定制的样式和布局。Cola.js在Cytoscape.js中运行只需要一行代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cy.layout(&#123; </span><br><span class="line">    name: <span class="string">'cola'</span> <span class="comment">/* and maybe some other options */</span> </span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<h5 id="翻译自"><a href="#翻译自" class="headerlink" title="翻译自"></a>翻译自</h5><p><a href="https://ialab.it.monash.edu/webcola" target="_blank" rel="noopener">https://ialab.it.monash.edu/webcola</a> </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/12/webcola介绍/" data-id="cjmlg93ni000ig82p2u91ejc8" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/webcola/">webcola</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Hbase基础知识点梳理" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/10/Hbase基础知识点梳理/" class="article-date">
+  <time datetime="2018-09-10T12:09:00.000Z" itemprop="datePublished">2018-09-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/大数据/">大数据</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/10/Hbase基础知识点梳理/">Hbase基础知识点梳理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h3><p>从HBase部署架构来说，HBase有两种服务器：Master服务器和RegionServer服务器。<br>一般一个HBase集群有一个Master服务器和几个RegionServer服务器。<br>Master服务器负责维护表结构信息，Master挂到后还能查询数据，只是不能新建表或修改表。<br>实际的数据存储在RegionServer服务器上，RegionServer保存的表数据是直接存储在Hadoop的HDFS上。客户端获取数据是由客户端直接连接RegionServer服务器。<br>RegionServer非常依赖ZooKeeper服务。ZooKeeper在HBase中扮演管家角色，管理了HBase所有RegionServer的信息，包括具体的数据段存放在哪个RegionServer上。<br>客户端每次与HBase连接，先与ZooKeeper通信，查询出需要与哪个RegionServer连接，然后再连接RegionServer。<br>整体架构图如下：<br><img src="http://207.148.69.56/pub/imgs/arch/full_arch.png" alt="整体架构图"></p>
+<h4 id="Region是什么"><a href="#Region是什么" class="headerlink" title="Region是什么"></a>Region是什么</h4><p>Region就是一段数据的集合。HBase中的表一般拥有一个到多个Region。Region有几个特性：</p>
+<ul>
+<li>Region不能跨服务器</li>
+<li>当数据量大的时候，HBase会拆分region</li>
+<li>HBase负载均衡的时候，可能会把Region从一个RegionServer移动到另一个上</li>
+<li>Region是基于HDFS的，所有数据存取操作都是调用了HDFS的客户端接口来实现的</li>
+</ul>
+<h4 id="RegionServer是什么"><a href="#RegionServer是什么" class="headerlink" title="RegionServer是什么"></a>RegionServer是什么</h4><p>RegionServer是存放Region的容器，直观来说就是服务器上的一个服务。一般来说，一个服务器只会安装一个RegionServer服务。<br>当客户端从ZooKeeper获取RegionServer的地址后，它会直接从RegionServer获取数据，插入、删除等数据操作也是经过它。</p>
+<h4 id="Master是什么"><a href="#Master是什么" class="headerlink" title="Master是什么"></a>Master是什么</h4><p>HBase中Master角色不像领导，更像是打杂的。Master负责各种协调工作，比如建表、删表、移动Region、合并等操作。它们的共性就是需要跨RegionServer，由哪个RegionServer<br>来执行都不合适，所以HBase将这些操作放到Master上。这种结构大大降低了集群对Master的依赖，即使Master宕机了，也不影响数据操作。</p>
+<h3 id="存储架构"><a href="#存储架构" class="headerlink" title="存储架构"></a>存储架构</h3><p>HBase最基本的存储单位是列。行跟行的列可以完全不一样，行与行的数据，甚至同一行的列可以存储在不同的机器上。若干个列被归类为一个列族。<br>存储架构图如下：<br><img src="http://207.148.69.56/pub/imgs/arch/storage_arch.png" alt="存储架构图"></p>
+<h4 id="行键是什么"><a href="#行键是什么" class="headerlink" title="行键是什么"></a>行键是什么</h4><p>rowkey是由用户指定的一串不重复字符串。rowkey是决定row存储顺序的唯一凭证。HBase是根据字典排序的。比如：row-1, row-11, row-2。</p>
+<h4 id="列族是什么"><a href="#列族是什么" class="headerlink" title="列族是什么"></a>列族是什么</h4><p>建表的时候不需要指定列，但需要确定列族，这就是说一个表有几个列族是一开始确定好的。此外，表的很多属性，比如过期时间、数据块缓存以及是否压缩等都是定义在列族上，而不是定义在表上或者列上。<br>同一个表里的不同列族可以有完全不同的属性配置，但是同一个列族内的所有列都会有相同属性。<br>列名称规范是列族：列名，如brother:age。<br>列族的意义是：HBase会把相同的列族尽量放在同一台机器上，所以说，如果想让某一个列被放在一起，就给他们定义相同的列族。<br>一个表设置多少个列族合适？官方的建议是：越少越好，因为Hbase虽然是分布式数据库，但是数据在同一台机器上仍然会加速数据的查询过程。所以请根据实际需要制定列族，列族太多会极大降低数据库性能。</p>
+<h4 id="单元格是什么"><a href="#单元格是什么" class="headerlink" title="单元格是什么"></a>单元格是什么</h4><p>一个列上可以存储多个版本的值，多个版本的值被存储在多个单元格里面，多个版本之间用版本号（Version）来区分。所以唯一确定一条结果的表达式应该是行键：列族：列：版本号(rowkey:column family:column:version)。不过版本号是可以省略的，如果不写版本号，HBase默认获取最后一个版本的数据并返回。每个列或者单元格的值都被赋予一个时间戳，这个时间戳默认是由系统指定的，也可以由用户显示指定。</p>
+<h4 id="Region跟行的关系"><a href="#Region跟行的关系" class="headerlink" title="Region跟行的关系"></a>Region跟行的关系</h4><p>一个Region就是多个行的集合。在Region中行的排序按照行键（rowkey）字典排序。<br>表结构图如下：<br><img src="http://207.148.69.56/pub/imgs/arch/table_struct.png" alt="表结构示意图"></p>
+<p>传统数据库insert语句可以把整行的数据一次性写在行语句里面，而在HBase里面如果一行有10列，那么存储一行的数据得写10行的语句。存储语句必须精确写出数据被存储到哪个单元格，根据表：列族：行：列来定义。行的概念被弱化到只有一个抽象的存在，rowkey是其唯一的体现。</p>
+<h3 id="讲讲ZooKeeper"><a href="#讲讲ZooKeeper" class="headerlink" title="讲讲ZooKeeper"></a>讲讲ZooKeeper</h3><p>ZooKeeper不知Hadoop的HA模式（HA的作用是保证一个namenode挂掉的时候，另外一个namenode能立即启动将其代替，这样就不会发生单点故障的问题）用到，HBase也会用到。ZooKeeper是Apache旗下的一个开源项目，它是一个开源的分布式应用程序协调服务，它可以为分布式应用提供一致性服务，提供的功能包括：配置服务、域名服务、分布式同步、组服务等。ZooKeeper负责维护HBase的所有节点，如果ZooKeeper宕掉了，集群的一个节点都连不上。<br>ZooKeeper最大的功能之一就是知道某个节点是否宕机了，那么ZooKeeper是如何知道某个节点宕机的呢？<br>答案是，每一个机器在ZooKeeper中都有一个会话（Session），如果某个机器宕机了，这个会话（Session）就会过期，与此同时，ZooKeeper就知道该节点已宕机。<br>多少个节点最好？节点越多容灾能力就越强，不过节点数最好是奇数个，这样有利于仲裁。<br>ZooKeeper的容灾机制：集群中只要有过半的机器是正常工作的，那么整个集群对外就是可用的。如果有5个节点，有2个集群宕掉，集群依然可以运行。这是我们称该集群容灾能力是2。目前节点数是6，只要有3个机器宕掉那么集群就宕掉了，此时的容灾能力仍是2。<br>ZooKeeper应该存储在一个独立的磁盘上，避免当磁盘出现IO问题的时候ZooKeeper被波及。</p>
+<h3 id="HBase常用命令"><a href="#HBase常用命令" class="headerlink" title="HBase常用命令"></a>HBase常用命令</h3><ul>
+<li><p>list<br>查看数据库中有哪些表</p>
+</li>
+<li><p>describe<br>查看表属性</p>
+</li>
+<li><p>create &amp; alter<br>create ‘test’, ‘cf’ # 建立一个叫test的表，这个表有一个列族叫cf<br>alter ‘test’, ‘cf2’ # 新增一个列族<br>在生产环境更改表之前，最好先停用（disable）这个表。因为对列族的所有操作都会同步到所有拥有这个表的RegionServer上。当有很多客户端都在连着的时候，直接新增一个列族对性能的影响较大。</p>
+</li>
+<li><p>put<br>put ‘test’, ‘row1’, ‘cf:name’, ‘jack’<br>意思是往test表插入一个单元格，这个单元格的rowkey为row1，也就是说它是属于row1这个行中的一个列。该单元格的列族是cf，单元格的列名是name，数据值是jack。   </p>
+<ul>
+<li>关于时间戳<br>每一个单元格可以存储多个版本的值。它用timestamp来存储该条记录的时间戳，这个时间戳就用来当版本号使用。timestamp虽然是时间的标定，其实可以输入任意的数字，比如1，2，3等。当用scan命令的时候HBase会显示拥有最大（最新）的timestamp的数据版本。<br>创建表时默认版本是1，也就是说在一个单元格插入多个版本的数据的时候，HBase只会保留最后一个版本。能够在scan操作的结果集看到多个版本的前提是建表时设定的VERSIONS参数要大于1，这样表才能保存设定VERSIONS数个历史记录。修改版本数的命令：<br>alter ‘test’, {NAME=&gt;’cf’,VERSION=&gt;5} # NAME为要修改的列族的名称，后面跟要修改的属性，我们修改VERSION为5<br>put ‘test’,’row2’,’cf:name’,’ted’<br>put ‘test’,’row2’,’cf:name’,’billy’,2222222222222 #自定义时间戳晚于当前时间<br>scan ‘test’ # 只能看到时间戳最大的那条结果<br>get ‘test’,’row2’,{COLUMN=&gt;’cf:name’, VERSIONS=&gt;3} #查询所有版本的数据   </li>
+</ul>
+</li>
+<li><p>scan<br>scan ‘表名’，这样输入的话，会从第一条数据开始把所有数据全部显示一遍。<br>在HBase中我们用起始行（STARTROW）和结束行（ENDROW）来限制记录的条数。<br>scan ‘test’,{STARTROW=&gt;’row3’} # 显示所有rowkey大于等于row3的记录<br>scan ‘test’,{ENDROW=&gt;’row4’} # 小于row4(不包括)的记录<br>两个参数一起用就是显示 &gt;= STARTROW 并且 &lt;ENDROW中的那段数据<br>scan ‘表名’,{COLUMNS=&gt;[‘列1’,’列2’,…]} # 只遍历指定列<br>scan ‘表名’,{STARTROW=&gt;’起始行键’,ENDROW=&gt;’结束行键’} # 指定行键范围<br>scan ‘表名’,{LIMIT=&gt;行数量} # 指定最大返回行数量<br>scan ‘表名’,{TIMERANGE=&gt;[最小时间戳,最大时间戳]} # 找出单元格的历史版本数据<br>scan ’表名’,{VERSION=&gt;’版本数’} # 指定版本数，显示单元格多个版本值<br>scan ‘表名’,{FILTER=&gt;’过滤器’} # scan ‘table1’ { FILTER=&gt; “PrefixFilter(‘row1’)” }   </p>
+</li>
+<li>get<br>scan可以查询表的多条数据，get只能查询一个单元格的记录。在数据量大的时候，get的查询熟读远远高于scan。<br>get ‘test’,’row7’,’cf:name’ # 查询某个单元格的记录<br>get ‘test’,’row7’,{COLUMN=&gt;’cf:name’,VERSION=&gt;5} # 把查询版本数设定为5<br>scan ‘test’,{VERSION=&gt;5} # scan跟上VERSIONS参数也可以查询出多个版本的数据   </li>
+<li>count<br>计算表的行数  </li>
+<li>delete<br>delete ‘表名’,’行键’,’列名’<br>delete ‘表名’,’行键’,’列名’,时间戳   </li>
+<li>split<br>拆分(split)指定的Region，除了可以等到Region大小达到阈值后触发自动拆分机制来拆分Region，还可以手动拆分指定的Region，如 split ‘region名’。   </li>
+<li>merge_region<br>合并（merge）两个Region和一个Region   </li>
+<li>compact<br>调用指定表的所有Region或者指定列族的所有Region的合并（compact）机制。通过compact机制可以合并该Region或者Region的列族下的所有HFile（StoreFile），以此来提高读取性能。<br>compact跟合并（merge）并不一样。merge操作是合并2个Region为1个，而compact操作更新的单元StoreFile，一个Region可以含有一个或多个StoreFile，compact操作的目的在于减少StoreFile的数量以增加读取性能。</li>
+<li><p>快照<br>快照就是表在某个时刻的结构和数据。可以使用快照来将表恢复到某个时刻的结构和数据，恢复过程很快，往往只有数秒。HBase是怎么做到的呢？其实快照并不直接复制数据，而是保持一份文件列表，通过修改表所链接的文件夹来改变表的数据，好处是：速度极快；不额外占用磁盘空间。<br>HBase要求在恢复快照之前必须要先停用（disable）需要恢复的表，才能恢复快照，避免不必要的麻烦。先停用，然后恢复快照，再启用（enable）。<br>通过snapshot命令可以创建指定表的快照。<br>disable ‘mgdmcredit:userblack_temp’<br>snapshot ‘mgdmcredit:userblack_temp’, ‘userblack_temp_snapshot’<br>disable ‘mgdmcredit:userblack’<br>drop ‘mgdmcredit:userblack’<br>clone_snapshot ‘userblack_temp_snapshot’ ‘mgdmcredit:userblack’<br>enable ‘mgdmcredit:userblack_temp’<br>truncate ‘mgdmcredit:userblack_temp’<br>delete_snapshot ‘userblack_temp_snapshot’<br>clone_snapshot使用快照的数据创建一张新表，创建的过程很快，因为使用的方式不是复制数据，并且修改新表的数据不会影响旧表的数据。   </p>
+<h3 id="客户端API"><a href="#客户端API" class="headerlink" title="客户端API"></a>客户端API</h3><p>在HBase中有一个理念：所有数据皆为bytes。在HBase中数据最终都会被序列化为bytes[]保存。</p>
+<ul>
+<li>put方法<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>(Connection connection = ConnectionFactory.createConnection(config)) &#123;</span><br><span class="line">    Table table = connection.getTable(TableName.valueOf(<span class="string">"myTable"</span>));</span><br><span class="line">    Put put = <span class="keyword">new</span> Put(Bytes.toBytes(<span class="string">"row1"</span>));</span><br><span class="line">    put.addColumn(Bytes.toBytes(<span class="string">"mycf"</span>), Bytes.toBytes(<span class="string">"name"</span>), Bytes.toBytes(<span class="string">"ted"</span>));</span><br><span class="line">    table.put(put);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>新增和修改类型，修改就是往同一个rowkey再执行一次put操作，将之前的数据覆盖掉。<br>JDK的try-with-resources，上面例子中看到try(…){….}，{….}中的代码执行完毕会自动释放资源，不需要手动写finally语句块了。</p>
+</li>
+<li><p>get方法<br>get不像scan，并不能用多种条件去查找，只能用行键去查找。不过HBase一行有可能很大，我们可以通过设置参数让get只获取其中一部分的数据，以提高查询性能。   </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Get get = <span class="keyword">new</span> Get(Bytes.toBytes(<span class="string">"row1"</span>));</span><br><span class="line">get.setMaxVersions(<span class="number">10</span>);</span><br><span class="line">Result result = table.get(get);</span><br><span class="line">List&lt;Cell&gt; cells = result.getColumnCells(Bytes.toBytes(<span class="string">"mycf"</span>), Bytes.toBytes(<span class="string">"name"</span>));</span><br><span class="line"><span class="keyword">for</span>(Cell c: cells) &#123;</span><br><span class="line">    <span class="comment">// 用CellUtil.cloneValue来获取数据而不是getValue</span></span><br><span class="line">    bytes[] cValue = CellUtil.cloneValue(c);</span><br><span class="line">    System.out.println(Bytes.toString(cValue));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>用CellUtil.cloneValue来获取数据而不用getValue的原因：根据目前getValue的实现代码，每次调用它都会获取整个Cell的数组备份，比较消耗性能。所以当需要获取Cell中的值时，请使用CellUtil.cloneValue方法。   </p>
+<ul>
+<li>Scan扫描<br>查询多条数据我们会想到用scan。默认的scan是从表头一直遍历到表尾，非常耗时好性能，实际工作中，我们至少要定义一下遍历的起始rowkey，如果知道遍历的结束rowkey就好了。<br>举个栗子：<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Scan scan = <span class="keyword">new</span> Scan(Bytes.toBytes(<span class="string">"row1"</span>));</span><br><span class="line">ResultScanner rs = table.getScanner(scan);</span><br><span class="line">...</span><br><span class="line">rs.close(); <span class="comment">// 使用完了关闭</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>这里为什么是getScanner()而不是scan()？因为Table通过传入scan之后返回的结果扫描器（ResultScanner）并不是实际的查询结果。获取结果扫描器（ResultScanner）的时候并没有实际去查询数据。真正要获取数据的时候要打开扫描器，然后遍历它，这个时候才真正地查询了数据。<br>这个ResultScanner就像关系型数据库中的ResultSet一样是需要持续占用资源的，所以用完后务必记得关闭它。</p>
+<ul>
+<li>缓存<br>HBase在扫描的时候已经默认开启了缓存。具体来讲，每一次的next()操作都会产生一次完整的RPC请求，而这次RPC请求可以获取多少数据是通过hbase-site.xml中的hbase.client.scanner.caching参数配置的。比如配置为1，遍历了10个结果就会发送10次请求。<br>可以在表的层面修改缓存条数，也可以在扫描层面去修改。表的层面修改时通过hbase-site.xml中的配置:   <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">name</span>&gt;</span>hbase.client.scanner.caching<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">value</span>&gt;</span>1000<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>hbase.client.scanner.caching的默认配置是100.<br>在扫描层面修改缓存可以使用Scan.setCaching(int caching)方法设置一次next获取的数据条数，这个配置的优先级比配置文件内的hbase.client.scanner.caching高。   </p>
+<h3 id="HBase二层查询架构"><a href="#HBase二层查询架构" class="headerlink" title="HBase二层查询架构"></a>HBase二层查询架构</h3><p>从0.96版本之后三层查询架构被改成了二层查询架构。直接把.META.表所在的RegionServer信息存储到zk中的/hbase/meta-region-server去了。<br><img src="http://207.148.69.56/pub/imgs/arch/query_arch.png" alt="二级查询架构图"><br>上图可以总结成以下流程：   </p>
+<ol>
+<li>客户端先通过ZooKeeper的/hbase/meta-region-server节点查询到哪台RegionServer上有hbase:meta表。  </li>
+<li>客户端连接含有hbase:meta表的RegionServer。hbase:meta表存储了所有Region的行键范围信息，通过这个表可以查询出你要存放的rowkey属于哪个Region的范围里面，以及这个Region又属于哪个RegionServer。</li>
+<li>获取这些信息后，客户端就可以直连其中一台用于你要存取的rowkey的RegionServer，并直接对其操作。</li>
+<li>客户端会把meta信息缓存起来，下次操作就不需要进行以上加载habse:meta的步骤了。</li>
+</ol>
+<h3 id="过滤器"><a href="#过滤器" class="headerlink" title="过滤器"></a>过滤器</h3><p>过滤器就是在Get或Scan的时候过滤结果用的，可以把他看成SQL中的where语句。HBase中过滤器被用户创建出来以后会被序列化我可以网络传输的格式，然后被分发到各个RegionServer。在RegionServer中Filter被还原出来。这样在Scan的遍历过程中，不满足过滤条件的结果将不会被返回客户端。</p>
+<h4 id="前缀过滤器"><a href="#前缀过滤器" class="headerlink" title="前缀过滤器"></a>前缀过滤器</h4><p>这种过滤器可以根据行键的前缀匹配同样是这个前缀的行。运用它能提高查询性能，因为前缀过滤器在遇到扫描的行键的前缀大于所指定的前缀时，立即停止扫描。<br>就算用了前缀过滤器也依然要结合上STARTROW使用，否则scan还是会从第一条记录开始扫描，浪费了大量的性能。<br>当我们用Scan扫描数据的时候，如果使用STOPROW来指定终止行，结果集中并不会包含终止行。如果想在结果中包含终止行可以有两种方式：<br>（1）在终止行的rowkey上增加一个字节的数据，然后把增加一个字节的rowkey作为STOPROW<br>（2）使用包含结尾过滤器（InclusiveStopFilter）</p>
+<h3 id="Region的拆分"><a href="#Region的拆分" class="headerlink" title="Region的拆分"></a>Region的拆分</h3><p>通过查询hbase:meta我们可以形象地看到，一个Region就是一个表的一段rowkey的数据集合。<br>当Region太大的时候HBase会拆分它。<br>为什么要拆分Region？因为当某个Region太大的时候读取效率太低了。<br>我们可以想想为什么从MySQL、Oracle转移到NoSQL来？最根本的原因就是这些关系型数据库把数据放到一个地方，而当数据量增大到上亿的时候同一个磁盘已经无法应付这些数据的读取了，因为遍历一遍数据的时间实在太长了。用NoSQL的理由就是其能把大数据分拆到不同的机器上，然后像查询一个完整的数据一样查询他们。当Region太大的时候，一样会遇到跟传统数据库一样的问题，所以要拆分Region。   </p>
+<h4 id="IncreasingToUpperBounRegionSplitPolicy策略（默认）"><a href="#IncreasingToUpperBounRegionSplitPolicy策略（默认）" class="headerlink" title="IncreasingToUpperBounRegionSplitPolicy策略（默认）"></a>IncreasingToUpperBounRegionSplitPolicy策略（默认）</h4><p>计算公式：<br>Math.min(tableRegionsCount^3 * initialSize, defaultRegionMaxFileSzie)   </p>
+<ul>
+<li>tableRegionsCount：表在所有RegionServer上拥有的Region数量总和</li>
+<li>initialSize：如果定义了hbase.increasing.policy.initial.size，则使用这个数值，否则，就使用memstore的刷写大小的2倍，即hbase.hregion.memstore.flush.size *2</li>
+<li>defaultRegionMaxFileSzie：ConstantSizeRegionSplitPolicy所用到的hbase.hregion.max(一般是10G)</li>
+</ul>
+<p>一开始可以先定义拆分点，但是当书记开始工作起来后会出现热点不均的情况，所以推荐的方法是：</p>
+<ol>
+<li>用预拆分导入初始数据</li>
+<li>然后用自动拆分来让HBase自动管理Region<br>Region的拆分对性能的影响还是很大的，默认的策略已经适用于大多数情况。可以尝试哪种策略最好。</li>
+</ol>
+<h3 id="Region的合并"><a href="#Region的合并" class="headerlink" title="Region的合并"></a>Region的合并</h3><p>Region的合并（merge）并不是为了性能考虑，更多地出于维护的目的。<br>啥时候才会用到合并呢？比如删了大量的数据，每个Region都变小了，这个时候分成这么多个Region就有点浪费，可以把Region合并起来。<br>通过Merge类来合并叫冷合并，就是要把HMaster和所有的HRegionServer全部停掉，再执行才可以；<br>通过online_merge命令叫做热合并   </p>
+<h3 id="HFile的合并"><a href="#HFile的合并" class="headerlink" title="HFile的合并"></a>HFile的合并</h3><p>除了Region会合并和拆分，在Region中的单个Store中也会发生合并（compaction）。<br>HFile为什么要合并？但凡存储在磁盘上的东西都涉及到一个操作：寻址。传统硬盘是磁头的移动寻址，是一个很慢的动作。当HFile一多，每次读取数据的时候寻址动作就多了，效率就降低了。所以我们要适当减少碎片文件，进而需要合并操作。HFile的合并操作就是在一个store里面找到需要合并的HFile，把他们合并起来，再把之前的碎文件移除。   </p>
+<h4 id="0-96版本之后的合并算法"><a href="#0-96版本之后的合并算法" class="headerlink" title="0.96版本之后的合并算法"></a>0.96版本之后的合并算法</h4><h5 id="待合并文件挑选条件"><a href="#待合并文件挑选条件" class="headerlink" title="待合并文件挑选条件"></a>待合并文件挑选条件</h5><p>该文件 &lt; （所有文件大小总和 - 该文件大小）* 比例因子<br>如果该文件大小小于最小合并大小(minCompactSize)，直接进入待合并列表。最小合并大小配置项：hbase.hstore.compaction.min.size，如果没有设定该项，则使用hbase.hregion.memstore.flush.size.</p>
+<h5 id="以组合作为计算单元"><a href="#以组合作为计算单元" class="headerlink" title="以组合作为计算单元"></a>以组合作为计算单元</h5><p>新的算法不再按文件为单元进行比较了，而是挑出多个文件组合。<br>挑选组合的条件：<br>被挑选的文件必须能通过以上提到的筛选条件，并且组合内含有的文件数必须大于hbase.hstore.compaction.min，小于hbase.hstore.compaction.max.<br>挑选完组合后，比较哪个文件组合包含的文件更多，则合并哪个组合。如果出现平局，就挑选哪个文件尺寸总和更少的组合。</p>
+<p>调整HFile合并策略，让HFile的数量尽量减小，以减少每次Scan的跨HFile的次数，但同时又要保证该合并策略适用于场景，并且不用太频繁。   </p>
+<h3 id="读取性能优化"><a href="#读取性能优化" class="headerlink" title="读取性能优化"></a>读取性能优化</h3><p>性能有两方面的提高空间：</p>
+<ul>
+<li>调整对于API的用法   </li>
+<li>调整系统配置   </li>
+</ul>
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><p>《Mysql不睡觉书》</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/10/Hbase基础知识点梳理/" data-id="cjmlg93n90007g82piz3m969d" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hbase/">Hbase</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-D3-js数据可视化实践（精简）" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/07/01/D3-js数据可视化实践（精简）/" class="article-date">
+  <time datetime="2018-07-01T11:03:00.000Z" itemprop="datePublished">2018-07-01</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/数据可视化/">数据可视化</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/07/01/D3-js数据可视化实践（精简）/">D3.js数据可视化实践（精简）</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="D3数据可视化实践"><a href="#D3数据可视化实践" class="headerlink" title="D3数据可视化实践"></a>D3数据可视化实践</h2><blockquote>
+<p>方鹏 2018/07/05</p>
+</blockquote>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在我们的APP上线后，经过数据分析，实时获取反映使用情况的活跃用户数；活跃数可分为总的日活或月活，分APP的日活或月活，分APP分省的日活或月活等等。想把这些数据表达清楚，可能会涉及实时的动态的变化数据；数据的按维度分类展示；如何按数字大小或者属性进行区分，着重展示我们感兴趣的数据。以上涉及到的就是我们常说的数据可视化。数据可视化的目的就是对数据进行可视化处理，以使得明确有效地传递信息。<br>利用图表来对数据进行可视化是我们熟知的方式。产品经理对可视化需求进行分析，选择合适的图表来表达和传递信息。而我们作为前端开发人员，也需要理解需求及设计，选用能满足需求的图表组件或可视化方案来实现产品设计。<br>选择技术方案的时候，我们或许会发现，因为图表内容复杂，没有现成的图表组件能够利用；或者现有的图表组件不能满足我们的部分需求；或者因为大数据量的场景，造成图表渲染较慢。解决这些需求中的痛点，我们就得思考用何种技术方案，怎样解决遇到的问题。思考为什么选择这个方案，它能帮助我们解决什么问题，或者说它有什么优势。</p>
+<h3 id="怎么选择"><a href="#怎么选择" class="headerlink" title="怎么选择"></a>怎么选择</h3><p>现有的可视化库很多，像Echarts，Highcharts，D3这些我们多少都在项目中经常使用或者听说过大名。Echarts等可视化库封装层次很高，能够简单地制作图表，但是给予开发者控制和设计的空间较少。D3在这一点上取得了平衡。D3提供了极度灵活的Web标准化能力，例如CSS3, HTML5, SVG。<br>试想用原生的HTML、SVG、Canvas来实现数据绘图是困难和繁琐的。D3封装了这些能力，使开发者专注布局和逻辑。那么方案怎么选择呢？我们应该熟悉各可视化库的优势，在满足需求的同时也要考虑开发成本。</p>
+<h3 id="关于D3-js"><a href="#关于D3-js" class="headerlink" title="关于D3.js"></a>关于D3.js</h3><h4 id="什么是D3-js"><a href="#什么是D3-js" class="headerlink" title="什么是D3.js"></a>什么是D3.js</h4><p>D3 全称是Data-Driven Document，直译为<strong style="color:red;">数据驱动文档</strong>。</p>
+<blockquote>
+<p>数据由用户或开发者提供<br>文档指的是基于web的文档，即Web浏览器可以渲染的任何元素，例如HTML、SVG、Canvas<br>由D3来驱动数据和文档。从某种意义上说，它将文档和数据联系起来。</p>
+</blockquote>
+<p><strong style="color:red;">D3是一个JavaScript函数库，是用来做数据可视化的</strong>。</p>
+<p>用D3.js的创始人<a href="https://bl.ocks.org/mbostock" target="_blank" rel="noopener">Mike Bostock</a></p>
+<p>其开源地址：<br><a href="https://github.com/d3/d3" target="_blank" rel="noopener">https://github.com/d3/d3</a></p>
+<h4 id="历史及版本比较"><a href="#历史及版本比较" class="headerlink" title="历史及版本比较"></a>历史及版本比较</h4><ol>
+<li>2011年2月，Mike Bostock发布了v1.0.0版本。</li>
+<li>2012年12月，v3.0.0版本发布，网上3.x的资料比较多。</li>
+<li>2016年6月，v4.0.0版本发布，开始支持Canvas，采用模块化设计模式。</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">v3.x</th>
+<th style="text-align:center">v4.x</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">嵌套结构</td>
+<td style="text-align:center">模块化</td>
+</tr>
+<tr>
+<td style="text-align:center">稳定，资料多</td>
+<td style="text-align:center">有优化，资料相对较少</td>
+</tr>
+<tr>
+<td style="text-align:center">只支持SVG渲染</td>
+<td style="text-align:center">支持Canvas渲染</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>注意：<strong style="color:red;">两个版本的代码不兼容</strong></p>
+</blockquote>
+<h4 id="D3的优势"><a href="#D3的优势" class="headerlink" title="D3的优势"></a>D3的优势</h4><ul>
+<li>相对比较底层<br>数据和元素捆绑。DOM里含有数据，数据更新时重绘。同时支持SVG和Canvas。</li>
+<li>更像数学库<br>强大的图形计算能力，D3的“布局”封装了提供力直方图、饼图、树图、力导向图等。D3的“比例尺”提供线性、指数、对数、序数等多种关于对应关系的计算。还提供“地图”功能。</li>
+<li>即封装操作，也给予自由<br>计算和绘图相互独立。计算是算出节点的位置、线段端点、弧线角度等；绘图是将计算所得的节点、线段绘制到网页上。</li>
+</ul>
+<h4 id="D3部分模块"><a href="#D3部分模块" class="headerlink" title="D3部分模块"></a>D3部分模块</h4><table>
+<thead>
+<tr>
+<th>模块</th>
+<th>描述</th>
+<th>依赖</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>d3-axis</td>
+<td>坐标轴</td>
+<td>d3-scale, d3-selection, d3-transition</td>
+</tr>
+<tr>
+<td>d3-color</td>
+<td>颜色集操作和呈现</td>
+<td>None.</td>
+</tr>
+<tr>
+<td>d3-format</td>
+<td>数字格式化</td>
+<td>None.</td>
+</tr>
+<tr>
+<td>d3-interpolate</td>
+<td>插值函数</td>
+<td>d3-color</td>
+</tr>
+<tr>
+<td>d3-path</td>
+<td>路径生成</td>
+<td>None.</td>
+</tr>
+<tr>
+<td>d3-polygon</td>
+<td>二维多边形几何操作</td>
+<td>None.</td>
+</tr>
+<tr>
+<td>d3-request</td>
+<td>XMLHttpRequest封装</td>
+<td>d3-dsv, d3-dispatch</td>
+</tr>
+<tr>
+<td>d3-scale</td>
+<td>XMLHttpRequest封装</td>
+<td>d3-dsv, d3-dispatch</td>
+</tr>
+<tr>
+<td>d3-request</td>
+<td>从抽象到具体数据的映射</td>
+<td>d3-array, d3-collection, d3-color, d3-format, d3-interpolate, d3-time, d3-time-format</td>
+</tr>
+<tr>
+<td>d3-selection</td>
+<td>通过选择和加入数据进行DOM转换</td>
+<td>d3-dsv, d3-dispatch</td>
+</tr>
+<tr>
+<td>d3-transition</td>
+<td>D3.js选择集的动画过渡</td>
+<td>d3-ease, d3-timer, d3-interpolate, d3-selection</td>
+</tr>
+</tbody>
+</table>
+<h3 id="D3基础"><a href="#D3基础" class="headerlink" title="D3基础"></a>D3基础</h3><h4 id="SVG基础"><a href="#SVG基础" class="headerlink" title="SVG基础"></a>SVG基础</h4><p>SVG（可缩放矢量图形），除了IE8之前的版本外，绝大部分浏览器支持SVG，可以直接嵌入HTML显示。<br>位图与矢量图的区别：<br>位图缩放后失真，矢量图缩放不失真；位图色彩表现力较丰富，矢量图图形色彩较简单；矢量图占用空间较小，位图较大；矢量图容易转化为位图，反之不容易。</p>
+<h5 id="SVG图形元素"><a href="#SVG图形元素" class="headerlink" title="SVG图形元素"></a>SVG图形元素</h5><p>SVG预定义七种形状元素：<br>矩形<code>&lt;rect&gt;</code>、圆形<code>&lt;circle&gt;</code>、椭圆形<code>&lt;ellipse&gt;</code>、线段<code>&lt;line&gt;</code>、折线<code>&lt;polyline&gt;</code>、多边形<code>&lt;polygon&gt;</code>、路径<code>&lt;path&gt;</code><br>路径指令：   </p>
+<ul>
+<li>M=moveto</li>
+<li>L=lineto</li>
+<li>H=horizontal lineto</li>
+<li>V=vertical lineto</li>
+<li>C=curveto 画三次贝塞尔曲线经<strong>两个</strong>指定控制点到达终点</li>
+<li>S=smooth curveto 与前一条三次贝塞尔曲线相连，第一个控制点与前一条曲线的第二个控制点对称</li>
+<li>Q=quadratic curveto 画二次贝塞尔曲线经<strong>一个</strong>指定控制点到达终点</li>
+<li>T=smooth quadratic Bezier curvto 与前一条二次贝塞尔曲线相连，第一个控制点与前一条曲线的第二个控制点对称，只需输入终点，即可绘制一条二次贝塞尔曲线<br><a href="http://blockbuilder.org/MGTfang/7bf8068b2ff08cf98c83a5a7e73a9106" target="_blank" rel="noopener">SVG 示例</a></li>
+</ul>
+<h5 id="文字"><a href="#文字" class="headerlink" title="文字"></a>文字</h5><p>在SVG中可以使用<code>&lt;text&gt;</code>标签绘制文字<br>dx: 相对当前位置在x方向上平移的距离，dy同理。<br><a href="https://segmentfault.com/a/1190000009293590" target="_blank" rel="noopener">text-anchor属性</a><br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">text</span> <span class="attr">class</span>=<span class="string">"label-2"</span> <span class="attr">text-anchor</span>=<span class="string">"end"</span> <span class="attr">dy</span>=<span class="string">".35em"</span> <span class="attr">rank</span>=<span class="string">"B"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">tspan</span> <span class="attr">x</span>=<span class="string">"0"</span> <span class="attr">dy</span>=<span class="string">"0.35em"</span>&gt;</span>(不知情定制B004)内容战<span class="tag">&lt;/<span class="name">tspan</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">tspan</span> <span class="attr">x</span>=<span class="string">"0"</span> <span class="attr">dy</span>=<span class="string">"1.0499999999999998em"</span>&gt;</span>略合作伙伴分类不合规<span class="tag">&lt;/<span class="name">tspan</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">text</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="D3数据选择和属性设定"><a href="#D3数据选择和属性设定" class="headerlink" title="D3数据选择和属性设定"></a>D3数据选择和属性设定</h3><p>我们要对DOM中的元素执行一个行为，例如移动位置，改变颜色,更新数据中的值，首先要选中它。<br>d3.select()是选中单个元素；d3.selectAll()是选中多个元素。<br>选择集是一个或多个页面元素的组合，能够与数据集相关联。<br>利用D3提供的方法设置元素属性和样式值：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">d3.selectAll(<span class="string">"circle.a"</span>).style(<span class="string">"fill"</span>, <span class="string">"red"</span>).attr(<span class="string">"cx"</span>, <span class="number">100</span>)</span><br><span class="line">d3.select(<span class="string">"circle"</span>).attr(<span class="string">"class"</span>, <span class="string">"active"</span>);</span><br><span class="line">d3.select(<span class="string">"circle"</span>).classed(<span class="string">"active"</span>, <span class="literal">true</span>); <span class="comment">// 添加或者移除命名的样式</span></span><br></pre></td></tr></table></figure></p>
+<p>有部分属性不能用attr()设定和获取，最典型的就是文本框的value属性，这样情况可以用property()来设定，例如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">d3.select(<span class="string">"#someCheckbox"</span>).property(<span class="string">"checked"</span>, <span class="literal">true</span>);</span><br></pre></td></tr></table></figure>
+<p>方法链，也叫链式调用。和JQuery写法类似。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">d3.selectAll(<span class="string">"div"</span>).data(someData).enter().append(<span class="string">"div"</span>).html(<span class="string">"Wow"</span>).append(<span class="string">"span"</span>).html(<span class="string">"Even More Wow"</span>).style(<span class="string">"font-weight"</span>, <span class="string">"900"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>可以给.style(), .attr(), .property(), .html()设置匿名函数调用或者其他提供数据绑定的选择器的函数。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> someColors = [<span class="string">"blue"</span>, <span class="string">"red"</span>, <span class="string">"chartreuse"</span>, <span class="string">"orange"</span>];</span><br><span class="line">someColors = someColors.filter(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123;<span class="keyword">return</span> d.length &lt; <span class="number">5</span>&#125;);</span><br><span class="line">d3.select(<span class="string">"body"</span>).selectAll(<span class="string">"div"</span>)</span><br><span class="line">  .data(someColors)</span><br><span class="line">  .enter()</span><br><span class="line">  .append(<span class="string">"div"</span>)</span><br><span class="line">  .style(<span class="string">"background"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123;<span class="keyword">return</span> d&#125;)</span><br><span class="line">  .attr(<span class="string">"cx"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">d,i</span>) </span>&#123;<span class="keyword">return</span> i&#125;)</span><br><span class="line">  .html(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123;<span class="keyword">return</span> d&#125;)</span><br></pre></td></tr></table></figure></p>
+<p><a href="http://blockbuilder.org/MGTfang/ac3f1dee9143e3874398df498483ed31" target="_blank" rel="noopener"></a></p>
+<h3 id="D3数据处理"><a href="#D3数据处理" class="headerlink" title="D3数据处理"></a>D3数据处理</h3><ul>
+<li>数据映射<br>数字数据仅仅同图形化元素在屏幕上的尺寸和位置相关。Scales（比例尺）有一个定义域domain和一个值域range。我们使用d3.scale()函数来归一化数据。例如我们通过线性比例尺，将 500,000到13,000,000的城市人口相同的线性变化映射到0到500px宽的画布上。<br><img src="https://mmbiz.qpic.cn/mmbiz_png/GWicdfXT7twRA5heUgAGibFCfBW6IB2XsToicK4bbZXicsHTkMajMTP75ibRcXZlFSdKxXQczGXJ64CcSG51074fl1A/0?wx_fmt=png" alt="线性比例尺示意"><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> newRamp = d3.scaleLinear().domain([<span class="number">500000</span>,<span class="number">13000000</span>]).range([<span class="number">0</span>, <span class="number">500</span>]);</span><br><span class="line">newRamp(<span class="number">1000000</span>); <span class="comment">// 返回20，可以将一千万人口的国家放在20px处</span></span><br><span class="line">newRamp(<span class="number">9000000</span>); <span class="comment">// 返回340</span></span><br><span class="line">newRamp.invert(<span class="number">313</span>); <span class="comment">// 求逆，返回8325000</span></span><br><span class="line"><span class="keyword">var</span> newRamp = d3.scaleLinear().domain([<span class="number">500000</span>,<span class="number">13000000</span>]).range([<span class="string">"blue"</span>, <span class="string">"red"</span>]);</span><br><span class="line">newRamp(<span class="number">1000000</span>); <span class="comment">// 返回"#0a00f5"，可以将一百万人口的城市用深紫色表示</span></span><br><span class="line">newRamp(<span class="number">9000000</span>); <span class="comment">// 返回"#ad0052"</span></span><br><span class="line">newRamp.invert(<span class="string">"#ad0052"</span>); <span class="comment">// 因为invert函数只接受数字，因此返回NaN</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>我们也能使用d3.scaleLog(), d3.scalePow(), d3.scaleOrdinal()等其他对数据集来说更加适合的比例尺来映射数据。</p>
+<ul>
+<li>数据分类<br>将定量数据分类，是将值按范围分或者组装到一起。一种分类方法是将数组均分几份。<br><img src="https://mmbiz.qpic.cn/mmbiz_png/GWicdfXT7twRA5heUgAGibFCfBW6IB2XsTvC0bxjDkN7K9SW4BRglwcTu3DsK1yA6h5P7Pa9j0DGVuSaXTc8gn9Q/0?wx_fmt=png" alt="定量数据分类"><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> sampleArray = [<span class="number">423</span>,<span class="number">124</span>,<span class="number">66</span>,<span class="number">424</span>,<span class="number">58</span>,<span class="number">10</span>,<span class="number">900</span>,<span class="number">44</span>,<span class="number">1</span>];</span><br><span class="line"><span class="keyword">var</span> qScale = d3.scaleQuantile().domain(sampleArray).range([<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>]);</span><br><span class="line">qScale(<span class="number">423</span>); <span class="comment">// 返回2</span></span><br><span class="line">qScale(<span class="number">20</span>); <span class="comment">// 返回0</span></span><br><span class="line">qScale(<span class="number">10000</span>); <span class="comment">// 返回2</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>嵌套允许数组中的元素被组织为分层树型结构；类似SQL语句里面的GROUP BY方法。<br>下面的例子，将示例数据首先按year分组再按variety分组，如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> yields = [&#123;<span class="attr">yield</span>: <span class="number">27.00</span>, <span class="attr">variety</span>: <span class="string">"Manchuria"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"University Farm"</span>&#125;,</span><br><span class="line">              &#123;<span class="attr">yield</span>: <span class="number">48.87</span>, <span class="attr">variety</span>: <span class="string">"Manchuria"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"Waseca"</span>&#125;,</span><br><span class="line">              &#123;<span class="attr">yield</span>: <span class="number">27.43</span>, <span class="attr">variety</span>: <span class="string">"Manchuria"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"Morris"</span>&#125;, </span><br><span class="line">               ...]</span><br><span class="line"><span class="keyword">var</span> nest = d3.nest()</span><br><span class="line">    .key(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123; <span class="keyword">return</span> d.year; &#125;)</span><br><span class="line">    .key(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123; <span class="keyword">return</span> d.variety; &#125;)</span><br><span class="line">    .entries(yields);</span><br></pre></td></tr></table></figure></p>
+<p>返回的嵌套数组中,以键值对的形式对数据进行分组:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[&#123;<span class="attr">key</span>: <span class="number">1931</span>, <span class="attr">values</span>: [</span><br><span class="line">    &#123;<span class="attr">key</span>: <span class="string">"Manchuria"</span>, <span class="attr">values</span>: [</span><br><span class="line">        &#123;<span class="attr">yield</span>: <span class="number">27.00</span>, <span class="attr">variety</span>: <span class="string">"Manchuria"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"University Farm"</span>&#125;,</span><br><span class="line">        &#123;<span class="attr">yield</span>: <span class="number">48.87</span>, <span class="attr">variety</span>: <span class="string">"Manchuria"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"Waseca"</span>&#125;,</span><br><span class="line">        &#123;<span class="attr">yield</span>: <span class="number">27.43</span>, <span class="attr">variety</span>: <span class="string">"Manchuria"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"Morris"</span>&#125;, ...]&#125;,</span><br><span class="line">    &#123;<span class="attr">key</span>: <span class="string">"Glabron"</span>, <span class="attr">values</span>: [</span><br><span class="line">        &#123;<span class="attr">yield</span>: <span class="number">43.07</span>, <span class="attr">variety</span>: <span class="string">"Glabron"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"University Farm"</span>&#125;,</span><br><span class="line">        &#123;<span class="attr">yield</span>: <span class="number">55.20</span>, <span class="attr">variety</span>: <span class="string">"Glabron"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"Waseca"</span>&#125;, ...]&#125;, ...]&#125;,</span><br><span class="line"> &#123;<span class="attr">key</span>: <span class="number">1932</span>, <span class="attr">values</span>: ...&#125;]</span><br></pre></td></tr></table></figure></p>
+<p>在数据格式化以后，需要测量它，以确保创建的图形尺寸合适，位置是基于数据集的参数。那你将会一直用到d3.extent，d3.min，d3.max，d3.mean。</p>
+<ul>
+<li>数据测量<br>在加载你的数据以后，首要的事情之一是应该对数据进行测量和排序。很重要的是知道特殊属性值的分布，以及最大最小值和属性名称。D3提供一个数组的函数集合能帮助理解数据。<br>加入想从cities.csv获取城市人口的最小，最大，平均值：<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">d3.csv(<span class="string">"cities.csv"</span>, data =&gt; &#123;</span><br><span class="line">  d3.min(data, el =&gt; +el.population); </span><br><span class="line">  d3.max(data, el =&gt; +el.population);</span><br><span class="line">  d3.mean(data, el =&gt; +el.population);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>d3.extent方便地将d3.min()和d3.max()在一个数组中返回：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">d3.extent(data, el =&gt; +el.population); <span class="comment">// 返回[500000, 1300000]</span></span><br></pre></td></tr></table></figure></p>
+<p>现在，我们已经加载、格式化、测量了我们的数据，那我们就可以创建数据可视化了。</p>
+<p><a href="http://blockbuilder.org/MGTfang/3d2d4fccbbc8023bd00f94451abf50ac" target="_blank" rel="noopener">简单数据可视化示例</a></p>
+<h3 id="D3数据绑定过程"><a href="#D3数据绑定过程" class="headerlink" title="D3数据绑定过程"></a>D3数据绑定过程</h3><p>一个选择集是由DOM中一个或多个元素构成。能使用选择器创建和删除元素，更改样式和内容。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">d3.csv(<span class="string">"cities.csv"</span>, (error,data) =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span> (error) &#123;</span><br><span class="line">      <span class="built_in">console</span>.error(error)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      dataViz(data)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">dataViz</span>(<span class="params">incomingData</span>) </span>&#123;</span><br><span class="line">  d3.select(<span class="string">"body"</span>).selectAll(<span class="string">"div.cities"</span>)</span><br><span class="line">      .data(incomingData) <span class="comment">// 绑定数据到选择集</span></span><br><span class="line">      .enter() <span class="comment">// 定义当选择集中的数据多于DOM元素时如何响应</span></span><br><span class="line">      .append(<span class="string">"div"</span>) <span class="comment">// 在当前选择集中创建一个元素</span></span><br><span class="line">      .attr(<span class="string">"class"</span>, <span class="string">"cities"</span>) <span class="comment">// 设置新创建元素class</span></span><br><span class="line">      .html(<span class="function"><span class="params">d</span> =&gt;</span> d.label); <span class="comment">// 设置创建div的内容</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>经常传入id没有匹配到任何元素，那么称其为空选择集。<br>当数据值的数量大于选择器中元素的数量，.enter()函数触发，允许你为每一个没有相应DOM元素的值定义一个执行行为。<br>这里需要将选中的DOM元素同一个数组联系起来。数据集里的每一个城市同选择集中的一个DOM元素相联系，关联数据是存在元素的data属性中。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.getElementsByClassName(<span class="string">"cities"</span>)[<span class="number">0</span>].__data__ <span class="comment">// 返回一个指向对象的指针</span></span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>如果数组长度大于元素数量，则部分还不存在的元素“即将进入可视化（enter）”</li>
+<li>如果数组长度小于元素数量，则多余的元素“即将退出可视化（exit）”</li>
+<li>如果数组长度等于元素数量，则绑定数据的元素“即将被更新（update）”</li>
+</ul>
+<p>大多数情况，.enter()函数触发，使用.append()来添加元素；.exit()函数触发，使用.remove()来移除元素。<br><img src="https://mmbiz.qpic.cn/mmbiz_png/GWicdfXT7twRA5heUgAGibFCfBW6IB2XsTyUz4Pa5o4PUA4ia9iaU3VX4nRnbPx1SuEbndtj97bWiaov6yvIU1ImwTA/0?wx_fmt=png" alt="进入退出更新示意图"></p>
+<h3 id="交互"><a href="#交互" class="headerlink" title="交互"></a>交互</h3><h4 id="颜色插值"><a href="#颜色插值" class="headerlink" title="颜色插值"></a>颜色插值</h4><p>D3支持颜色插值<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> ybRamp = d3.scaleLinear()</span><br><span class="line">  .interpolate(d3.interpolateHsl)</span><br><span class="line">  .domain([<span class="number">0</span>, maxValue]).range([<span class="string">"yellow"</span>, <span class="string">"blue"</span>]);</span><br></pre></td></tr></table></figure></p>
+<p>离散颜色比例尺：<code>d3.schemeCategory10, d3.schemeCategory20, d3.schemeCategory20b, and d3.schemeCategory20c</code><br>序数比例尺，映射离散值为特殊的颜色。一个有用的特征是它的unknown方法，当传入一个不存在的值的时候，返回设定值。<br><a href="https://bl.ocks.org/pstuffa/3393ff2711a53975040077b7453781a9" target="_blank" rel="noopener">Color Scales</a><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> tenColorScale = d3.scaleOrdinal()</span><br><span class="line">  .domain([<span class="string">"UEFA"</span>, <span class="string">"CONMEBOL"</span>])</span><br><span class="line">  .range(d3.schemeCategory10)</span><br><span class="line">  .unknown(<span class="string">"#c4b9ac"</span>)</span><br></pre></td></tr></table></figure></p>
+<h4 id="事件监听"><a href="#事件监听" class="headerlink" title="事件监听"></a>事件监听</h4><p>D3选择器可以通过on来为事件添加监听器：<code>selection.on(type[, listener[, capture]])</code><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">selection.on(<span class="string">"click"</span>,  <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(d3.mouse(<span class="keyword">this</span>)); <span class="comment">// 输出相对坐标</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>在当前选择的每个元素，为指定的类型type，添加或删除事件监听器listener 。type是一个字符串事件类型的名称，如“click”、“mouseover”、“keydown”、“touchstart”。基本上支持任何DOM事件，如鼠标、键盘、触屏事件。为了在侦听器内访问当前事件，使用全局函数d3.event。</p>
+<p>如果所选择的元素相同类型的一个事件监听已经注册了，新的侦听加入之前的现有侦听被除去。为注册相同事件类型的多个监听器，该类型可以跟一个可选的命名空间，如“click.first”和“click.second”。 要删除一个监听器，传递null给listener如：selection.on(click”, null)。</p>
+<h4 id="行为"><a href="#行为" class="headerlink" title="行为"></a>行为</h4><p>下面给出拖拽和缩放的例子：<br><a href="http://blockbuilder.org/MGTfang/8608aa25a5f44feefa2f1ee5c1c399dc" target="_blank" rel="noopener">拖拽简单示例</a><br><a href="http://blockbuilder.org/MGTfang/8203f1fe95d2afd455729c4cf8384549" target="_blank" rel="noopener">缩放简单示例</a></p>
+<h4 id="布局"><a href="#布局" class="headerlink" title="布局"></a>布局</h4><p>D3 3.x提供了12种布局：饼状图（Pie）、力导向图（Force）、弦图（Chord）、树图（Tree）、集群图（Cluster）、捆图（Bundle）、打包图（Pack）、直方图（Histogram）、分区图（Partition）、堆栈图（Stack）、矩阵树图（Treemap）、层级图（Hierarchy）。<br>力导向图（Force-Directed Graph），是一种常用的绘图算法。d3-force, 力布局这个模块基于Verlet integration(韦尔莱积分法)实现了物理粒子之间的作用力的仿真。模拟的作用力有电荷之间的吸引排斥力，重力，链接吸引力。</p>
+<blockquote>
+<p>力导向图的绘制</p>
+<ol>
+<li>生成数据</li>
+<li>设置力导向图</li>
+<li>添加绘制方法</li>
+<li>添加交互</li>
+</ol>
+</blockquote>
+<p><a href="http://blockbuilder.org/MGTfang/4080ee9dc10804fd7a362565e54c78da" target="_blank" rel="noopener">力导向图示例</a></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>Ben Fry提出的数据可视化七个步骤：获取、解析、过滤、挖掘、表现、改善、交互。D3数据可视化也会经历这几个过程。首先D3读取源数据，进行解析得到需要处理的对象数组，然后将得到的数据进行过滤返回我们感兴趣的数据，然后对过滤得到的数据进行格式化，分类或分组，方便利用数据来驱动文档。<br>通常我们根据数据数值大小或时间远近等熟悉转换为图形上元素的大小或者位置。如果需要生成网络图谱等可视化图表，我们可以利用D3提供的布局来绘制。以力导向图为例，首先构建节点和连线的对象数据，然后将其设定给力导向图，力导向图为给节点连线生成初始的位置信息，然后根据节点和连线对象数据来自定义（绘制）节点和内容。同时我们利用tick机制绑定tick回调函数，在回调函数中定义机制对节点和连线的坐标进行更新，并更新图表。<br>D3.js是一种很强大的可视化利器，在GitHub数据可视化分类中关注度最高的。在AI+物联网时代，数据可视化或者说人机交互将会越来越重要。掌握常见的数据可视化技术，理解可视化中的图形图像算法对于想在可视化方向深耕的小伙伴来说是很有必要的。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ul>
+<li><a href="https://github.com/d3/d3/wiki/API--%E4%B8%AD%E6%96%87%E6%89%8B%E5%86%8C" target="_blank" rel="noopener">D3 API 中文文档</a></li>
+<li><a href="https://www.manning.com/books/d3-js-in-action" target="_blank" rel="noopener">D3 js in action</a></li>
+<li><a href="http://www.broadview.com.cn/book/4786" target="_blank" rel="noopener">精通D3.js（第二版）</a></li>
+<li><a href="https://www.amazon.com/D3-js-4-x-Data-Visualization-Third/dp/178712035X" target="_blank" rel="noopener">D3.js 4.x Data Visualization(Third Edition)</a></li>
+<li><a href="http://www.broadview.com.cn/book/638" target="_blank" rel="noopener">图说D3数据可视化利器从入门到进阶</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/07/01/D3-js数据可视化实践（精简）/" data-id="cjmlg93my0002g82p6exhvjdn" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/D3-js/">D3.js</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-D3-js数据可视化实践（讲义）" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/29/D3-js数据可视化实践（讲义）/" class="article-date">
+  <time datetime="2018-06-29T11:01:00.000Z" itemprop="datePublished">2018-06-29</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/数据可视化/">数据可视化</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/29/D3-js数据可视化实践（讲义）/">D3.js数据可视化实践（讲义）</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="D3数据可视化实践"><a href="#D3数据可视化实践" class="headerlink" title="D3数据可视化实践"></a>D3数据可视化实践</h1><blockquote>
+<p>方鹏 2018/06/29</p>
+</blockquote>
+<ul>
+<li><p>目标<br>了解D3常用API和重要知识点，能阅读和编写简单的D3.js可视化程序。</p>
+</li>
+<li><p>内容</p>
+<ol>
+<li>D3简介</li>
+<li>基础知识点（SVG + D3）</li>
+<li>数据处理（涉及加载数据、处理数据）</li>
+<li>数据绑定</li>
+<li>交互</li>
+<li>布局</li>
+</ol>
+</li>
+</ul>
+<h3 id="什么是D3"><a href="#什么是D3" class="headerlink" title="什么是D3"></a>什么是D3</h3><p>D3 全称是Data-Driven Document，直译为<strong style="color:red;">数据驱动文档</strong>。</p>
+<blockquote>
+<p>数据由用户或开发者提供<br>文档指的是基于web的文档，即Web浏览器可以渲染的任何元素，例如HTML、SVG<br>它们由D3来驱动。从某种意义上说，它将文档和数据联系起来。</p>
+</blockquote>
+<p>只要记住：<strong style="color:red;">D3是一个JavaScript函数库，是用来做数据可视化的</strong>。</p>
+<p>其开源地址：<br><a href="https://github.com/d3/d3" target="_blank" rel="noopener">https://github.com/d3/d3</a></p>
+<p>用D3.js的创始人<a href="https://bl.ocks.org/mbostock" target="_blank" rel="noopener">Mike Bostock</a>的话说：D3提供了极度灵活，Web标准化的能力，例如CSS3, HTML5, SVG。<br>试想用原生的HTML、SVG、Canvas来实现数据变成图形是困难和繁琐的。D3封装了这些能力，使开发者专注布局和逻辑。</p>
+<h3 id="D3简史"><a href="#D3简史" class="headerlink" title="D3简史"></a>D3简史</h3><ol>
+<li>2011年2月，Mike Bostock发布了v1.0.0版本。</li>
+<li>2012年12月，v3.0.0版本发布，网上3.x的资料比较多。</li>
+<li>2016年6月，v4.0.0版本发布，开始支持Canvas，采用模块化设计模式。</li>
+</ol>
+<h3 id="D3的优势"><a href="#D3的优势" class="headerlink" title="D3的优势"></a>D3的优势</h3><p>Echarts等封装层次很高，能够简单地制作图表，但是给予开发者控制和设计的空间较少。<br>D3在这一点上取得了平衡。</p>
+<ul>
+<li>相对比较底层<br>数据和元素捆绑。DOM里含有数据，数据更新时重绘。同时支持SVG和Canvas。</li>
+<li>更像数学库<br>强大的图形计算能力，D3的“布局”封装了提供力直方图、饼图、树图、力导向图等。D3的“比例尺”提供线性、指数、对数、序数等多种关于对应关系的计算。还提供“地图”功能。</li>
+<li>即封装操作，也给予自由<br>计算和绘图相互独立。计算是算出节点的位置、线段端点、弧线角度等；绘图是将计算所得的节点、线段绘制到网页上。</li>
+</ul>
+<p>应用截图如下：<br><img src="http://baapps.com/theme/images/cargo-analytics-apps-thumb.jpg" alt="Alt text" title="cargo analytics"><br><img src="http://baapps.com/theme/images/sct-app-thumb.jpg" alt="Alt text" title="sct app"><br><img src="http://baapps.com/theme/images/kpi-tracker-thumb.jpg" alt="Alt text" title="kpi tracker"><br><img src="http://baapps.com/theme/images/eval-app-thumb.jpg" alt="Alt text" title="eval app"></p>
+<h3 id="适用范围"><a href="#适用范围" class="headerlink" title="适用范围"></a>适用范围</h3><p>数据可视化七个步骤：获取、解析、过滤、挖掘、表现、改善、交互<br><strong style="color:red;">表现、改善、交互</strong>属于D3的适用范围</p>
+<h3 id="它不能干什么"><a href="#它不能干什么" class="headerlink" title="它不能干什么"></a>它不能干什么</h3><p>  D3不能生成预定义的或者封装好的可视化效果，也就是不提供预先配置的图表类型。<br>  D3不支持老的浏览器。<br>  D3代码在客户端执行，因此不能隐藏源数据。如果担心数据泄露，最好不要可视化，可视化的目的是交流数据。</p>
+<h3 id="SVG"><a href="#SVG" class="headerlink" title="SVG"></a>SVG</h3><p>SVG（可缩放矢量图形），除了IE8之前的版本外，绝大部分浏览器支持SVG，可以直接嵌入HTML显示。<br>位图与矢量图的区别：<br>位图缩放后失真，矢量图缩放不失真；位图色彩表现力较丰富，矢量图图形色彩较简单；矢量图占用空间较小，位图较大；矢量图容易转化为位图，反之不容易。</p>
+<h4 id="SVG图形元素"><a href="#SVG图形元素" class="headerlink" title="SVG图形元素"></a>SVG图形元素</h4><p>SVG预定义七种形状元素：<br>矩形<code>&lt;rect&gt;</code>、圆形<code>&lt;circle&gt;</code>、椭圆形<code>&lt;ellipse&gt;</code>、线段<code>&lt;line&gt;</code>、折线<code>&lt;polyline&gt;</code>、多边形<code>&lt;polygon&gt;</code>、路径<code>&lt;path&gt;</code><br>路径指令：   </p>
+<ul>
+<li>M=moveto</li>
+<li>L=lineto</li>
+<li>H=horizontal lineto</li>
+<li>V=vertical lineto</li>
+<li>C=curveto 画三次贝塞尔曲线经<strong>两个</strong>指定控制点到达终点</li>
+<li>S=smooth curveto 与前一条三次贝塞尔曲线相连，第一个控制点与前一条曲线的第二个控制点对称</li>
+<li>Q=quadratic curveto 画二次贝塞尔曲线经<strong>一个</strong>指定控制点到达终点</li>
+<li>T=smooth quadratic Bezier curvto 与前一条二次贝塞尔曲线相连，第一个控制点与前一条曲线的第二个控制点对称，只需输入终点，即可绘制一条二次贝塞尔曲线<br><a href="http://blockbuilder.org/MGTfang/7bf8068b2ff08cf98c83a5a7e73a9106" target="_blank" rel="noopener">示例</a></li>
+</ul>
+<h4 id="文字"><a href="#文字" class="headerlink" title="文字"></a>文字</h4><p>在SVG中可以使用<code>&lt;text&gt;</code>标签绘制文字<br>dx: 相对当前位置在x方向上平移的距离，dy同理。<br><a href="https://segmentfault.com/a/1190000009293590" target="_blank" rel="noopener">text-anchor属性</a><br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">text</span> <span class="attr">class</span>=<span class="string">"label-2"</span> <span class="attr">text-anchor</span>=<span class="string">"end"</span> <span class="attr">dy</span>=<span class="string">".35em"</span> <span class="attr">rank</span>=<span class="string">"B"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">tspan</span> <span class="attr">x</span>=<span class="string">"0"</span> <span class="attr">dy</span>=<span class="string">"0.35em"</span>&gt;</span>(不知情定制B004)内容战<span class="tag">&lt;/<span class="name">tspan</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">tspan</span> <span class="attr">x</span>=<span class="string">"0"</span> <span class="attr">dy</span>=<span class="string">"1.0499999999999998em"</span>&gt;</span>略合作伙伴分类不合规<span class="tag">&lt;/<span class="name">tspan</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">text</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="D3数据选择和属性设定"><a href="#D3数据选择和属性设定" class="headerlink" title="D3数据选择和属性设定"></a>D3数据选择和属性设定</h3><p>我们要对DOM中的元素执行一个行为，例如移动位置，改变颜色,更新数据中的值，首先要选中它。<br>d3.select()是选中单个元素；d3.selectAll()是选中多个元素。<br>选择集是一个或多个页面元素的组合，能够与数据集相关联。<br>利用D3提供的方法设置元素属性和样式值：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">d3.selectAll(<span class="string">"circle.a"</span>).style(<span class="string">"fill"</span>, <span class="string">"red"</span>).attr(<span class="string">"cx"</span>, <span class="number">100</span>)</span><br><span class="line">d3.select(<span class="string">"circle"</span>).attr(<span class="string">"class"</span>, <span class="string">"active"</span>);</span><br><span class="line">d3.select(<span class="string">"circle"</span>).classed(<span class="string">"active"</span>, <span class="literal">true</span>); <span class="comment">// 添加或者移除命名的样式</span></span><br></pre></td></tr></table></figure></p>
+<p>有部分属性不能用attr()设定和获取，最典型的就是文本框的value属性，这样情况可以用property()来设定，例如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">d3.select(<span class="string">"#someCheckbox"</span>).property(<span class="string">"checked"</span>, <span class="literal">true</span>);</span><br></pre></td></tr></table></figure>
+<p>方法链，也叫链式调用。和JQuery写法类似。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">d3.selectAll(<span class="string">"div"</span>).data(someData).enter().append(<span class="string">"div"</span>).html(<span class="string">"Wow"</span>).append(<span class="string">"span"</span>).html(<span class="string">"Even More Wow"</span>).style(<span class="string">"font-weight"</span>, <span class="string">"900"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>可以给.style(), .attr(), .property(), .html()设置匿名函数调用或者其他提供数据绑定的选择器的函数。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> someColors = [<span class="string">"blue"</span>, <span class="string">"red"</span>, <span class="string">"chartreuse"</span>, <span class="string">"orange"</span>];</span><br><span class="line">someColors = someColors.filter(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123;<span class="keyword">return</span> d.length &lt; <span class="number">5</span>&#125;);</span><br><span class="line">d3.select(<span class="string">"body"</span>).selectAll(<span class="string">"div"</span>)</span><br><span class="line">  .data(someColors)</span><br><span class="line">  .enter()</span><br><span class="line">  .append(<span class="string">"div"</span>)</span><br><span class="line">  .style(<span class="string">"background"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123;<span class="keyword">return</span> d&#125;)</span><br><span class="line">  .attr(<span class="string">"cx"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">d,i</span>) </span>&#123;<span class="keyword">return</span> i&#125;)</span><br><span class="line">  .html(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123;<span class="keyword">return</span> d&#125;)</span><br></pre></td></tr></table></figure></p>
+<p><a href="http://blockbuilder.org/MGTfang/ac3f1dee9143e3874398df498483ed31" target="_blank" rel="noopener">Hello World 示例</a></p>
+<h3 id="使用数据"><a href="#使用数据" class="headerlink" title="使用数据"></a>使用数据</h3><p>D3数据处理流程：<br><img src="http://pic.caigoubao.cc/604149/blog/visualization/%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png" alt="数据处理流程"></p>
+<h4 id="加载数据"><a href="#加载数据" class="headerlink" title="加载数据"></a>加载数据</h4><p>D3提供几个方法来导入和处理数据。一样的是，d3.csv()和d3.json()生成一个JSON对象数组，而d3.xml()会创建一个XML文档。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">d3.csv(<span class="string">"cities.csv"</span>, (error, data) =&gt; &#123; <span class="built_in">console</span>.log(error, data) &#125;);</span><br><span class="line">d3.json(<span class="string">"tweets.json"</span>, data =&gt; <span class="built_in">console</span>.log(data));</span><br></pre></td></tr></table></figure></p>
+<p>error变量是可选项</p>
+<h4 id="数据格式化"><a href="#数据格式化" class="headerlink" title="数据格式化"></a>数据格式化</h4><ul>
+<li>数据映射<br>数字数据仅仅同图形化元素在屏幕上的尺寸和位置相关。Scales（比例尺）有一个定义域domain和一个值域range。我们使用d3.scale()函数来归一化数据。例如我们通过线性比例尺，将 500,000到13,000,000的城市人口相同的线性变化映射到0到500px宽的画布上。<br><img src="http://pic.caigoubao.cc/604149/blog/visualization/%E7%BA%BF%E6%80%A7%E6%AF%94%E4%BE%8B%E5%B0%BA%E7%A4%BA%E6%84%8F.png" alt="线性比例尺示意"><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> newRamp = d3.scaleLinear().domain([<span class="number">500000</span>,<span class="number">13000000</span>]).range([<span class="number">0</span>, <span class="number">500</span>]);</span><br><span class="line">newRamp(<span class="number">1000000</span>); <span class="comment">// 返回20，可以将一千万人口的国家放在20px处</span></span><br><span class="line">newRamp(<span class="number">9000000</span>); <span class="comment">// 返回340</span></span><br><span class="line">newRamp.invert(<span class="number">313</span>); <span class="comment">// 求逆，返回8325000</span></span><br><span class="line"><span class="keyword">var</span> newRamp = d3.scaleLinear().domain([<span class="number">500000</span>,<span class="number">13000000</span>]).range([<span class="string">"blue"</span>, <span class="string">"red"</span>]);</span><br><span class="line">newRamp(<span class="number">1000000</span>); <span class="comment">// 返回"#0a00f5"，可以将一百万人口的城市用深紫色表示</span></span><br><span class="line">newRamp(<span class="number">9000000</span>); <span class="comment">// 返回"#ad0052"</span></span><br><span class="line">newRamp.invert(<span class="string">"#ad0052"</span>); <span class="comment">// 因为invert函数只接受数字，因此返回NaN</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>我们也能使用d3.scaleLog(), d3.scalePow(), d3.scaleOrdinal()等其他对数据集来说更加适合的比例尺来映射数据。</p>
+<ul>
+<li>数据分类<br>将定量数据分类，是将值按范围分或者组装到一起。一种分类方法是将数组均分几份。<br><img src="http://pic.caigoubao.cc/604149/blog/visualization/%E5%AE%9A%E9%87%8F%E6%95%B0%E6%8D%AE%E5%88%86%E7%B1%BB.png" alt="定量数据分类"><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> sampleArray = [<span class="number">423</span>,<span class="number">124</span>,<span class="number">66</span>,<span class="number">424</span>,<span class="number">58</span>,<span class="number">10</span>,<span class="number">900</span>,<span class="number">44</span>,<span class="number">1</span>];</span><br><span class="line"><span class="keyword">var</span> qScale = d3.scaleQuantile().domain(sampleArray).range([<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>]);</span><br><span class="line">qScale(<span class="number">423</span>); <span class="comment">// 返回2</span></span><br><span class="line">qScale(<span class="number">20</span>); <span class="comment">// 返回0</span></span><br><span class="line">qScale(<span class="number">10000</span>); <span class="comment">// 返回2</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>嵌套允许数组中的元素被组织为分层树型结构；类似SQL语句里面的GROUP BY方法。<br>下面的例子，将示例数据首先按year分组再按variety分组，如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> yields = [&#123;<span class="attr">yield</span>: <span class="number">27.00</span>, <span class="attr">variety</span>: <span class="string">"Manchuria"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"University Farm"</span>&#125;,</span><br><span class="line">              &#123;<span class="attr">yield</span>: <span class="number">48.87</span>, <span class="attr">variety</span>: <span class="string">"Manchuria"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"Waseca"</span>&#125;,</span><br><span class="line">              &#123;<span class="attr">yield</span>: <span class="number">27.43</span>, <span class="attr">variety</span>: <span class="string">"Manchuria"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"Morris"</span>&#125;, </span><br><span class="line">               ...]</span><br><span class="line"><span class="keyword">var</span> nest = d3.nest()</span><br><span class="line">    .key(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123; <span class="keyword">return</span> d.year; &#125;)</span><br><span class="line">    .key(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123; <span class="keyword">return</span> d.variety; &#125;)</span><br><span class="line">    .entries(yields);</span><br></pre></td></tr></table></figure></p>
+<p>返回的嵌套数组中,以键值对的形式对数据进行分组:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[&#123;<span class="attr">key</span>: <span class="number">1931</span>, <span class="attr">values</span>: [</span><br><span class="line">    &#123;<span class="attr">key</span>: <span class="string">"Manchuria"</span>, <span class="attr">values</span>: [</span><br><span class="line">        &#123;<span class="attr">yield</span>: <span class="number">27.00</span>, <span class="attr">variety</span>: <span class="string">"Manchuria"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"University Farm"</span>&#125;,</span><br><span class="line">        &#123;<span class="attr">yield</span>: <span class="number">48.87</span>, <span class="attr">variety</span>: <span class="string">"Manchuria"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"Waseca"</span>&#125;,</span><br><span class="line">        &#123;<span class="attr">yield</span>: <span class="number">27.43</span>, <span class="attr">variety</span>: <span class="string">"Manchuria"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"Morris"</span>&#125;, ...]&#125;,</span><br><span class="line">    &#123;<span class="attr">key</span>: <span class="string">"Glabron"</span>, <span class="attr">values</span>: [</span><br><span class="line">        &#123;<span class="attr">yield</span>: <span class="number">43.07</span>, <span class="attr">variety</span>: <span class="string">"Glabron"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"University Farm"</span>&#125;,</span><br><span class="line">        &#123;<span class="attr">yield</span>: <span class="number">55.20</span>, <span class="attr">variety</span>: <span class="string">"Glabron"</span>, <span class="attr">year</span>: <span class="number">1931</span>, <span class="attr">site</span>: <span class="string">"Waseca"</span>&#125;, ...]&#125;, ...]&#125;,</span><br><span class="line"> &#123;<span class="attr">key</span>: <span class="number">1932</span>, <span class="attr">values</span>: ...&#125;]</span><br></pre></td></tr></table></figure></p>
+<p>在数据格式化以后，需要测量它，以确保创建的图形尺寸合适，位置是基于数据集的参数。那你将会一直用到d3.extent，d3.min，d3.max，d3.mean。</p>
+<h4 id="测量数据"><a href="#测量数据" class="headerlink" title="测量数据"></a>测量数据</h4><p>在加载你的数据以后，首要的事情之一是应该对数据进行测量和排序。很重要的是知道特殊属性值的分布，以及最大最小值和属性名称。D3提供一个数组的函数集合能帮助理解数据。<br>加入想从cities.csv获取城市人口的最小，最大，平均值：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">d3.csv(<span class="string">"cities.csv"</span>, data =&gt; &#123;</span><br><span class="line">  d3.min(data, el =&gt; +el.population); </span><br><span class="line">  d3.max(data, el =&gt; +el.population);</span><br><span class="line">  d3.mean(data, el =&gt; +el.population);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>d3.extent方便地将d3.min()和d3.max()在一个数组中返回：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">d3.extent(data, el =&gt; +el.population); <span class="comment">// 返回[500000, 1300000]</span></span><br></pre></td></tr></table></figure></p>
+<p>现在，我们已经加载、格式化、测量了我们的数据，那我们就可以创建数据可视化了。</p>
+<p><a href="http://blockbuilder.org/MGTfang/3d2d4fccbbc8023bd00f94451abf50ac" target="_blank" rel="noopener">简单数据可视化示例</a></p>
+<h3 id="数据可视化"><a href="#数据可视化" class="headerlink" title="数据可视化"></a>数据可视化</h3><p>接下来将更深入解释选择器是如何与数据绑定一起创建元素的，以及创建后如何改变这些元素。</p>
+<h4 id="data工作过程"><a href="#data工作过程" class="headerlink" title="data工作过程"></a>data工作过程</h4><p>一个选择集是由DOM中一个或多个元素构成。能使用选择器创建和删除元素，更改样式和内容。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">d3.csv(<span class="string">"cities.csv"</span>, (error,data) =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span> (error) &#123;</span><br><span class="line">      <span class="built_in">console</span>.error(error)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      dataViz(data)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">dataViz</span>(<span class="params">incomingData</span>) </span>&#123;</span><br><span class="line">  d3.select(<span class="string">"body"</span>).selectAll(<span class="string">"div.cities"</span>)</span><br><span class="line">      .data(incomingData) <span class="comment">// 绑定数据到选择集</span></span><br><span class="line">      .enter() <span class="comment">// 定义当选择集中的数据多于DOM元素时如何响应</span></span><br><span class="line">      .append(<span class="string">"div"</span>) <span class="comment">// 在当前选择集中创建一个元素</span></span><br><span class="line">      .attr(<span class="string">"class"</span>, <span class="string">"cities"</span>) <span class="comment">// 设置新创建元素class</span></span><br><span class="line">      .html(<span class="function"><span class="params">d</span> =&gt;</span> d.label); <span class="comment">// 设置创建div的内容</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>经常传入id没有匹配到任何元素，那么称其为空选择集。<br>当数据值的数量大于选择器中元素的数量，.enter()函数触发，允许你为每一个没有相应DOM元素的值定义一个执行行为。<br>这里需要将选中的DOM元素同一个数组联系起来。数据集里的每一个城市同选择集中的一个DOM元素相联系，关联数据是存在元素的data属性中。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.getElementsByClassName(<span class="string">"cities"</span>)[<span class="number">0</span>].__data__ <span class="comment">// 返回一个指向对象的指针</span></span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>如果数组长度大于元素数量，则部分还不存在的元素“即将进入可视化（enter）”</li>
+<li>如果数组长度小于元素数量，则多余的元素“即将退出可视化（exit）”</li>
+<li>如果数组长度等于元素数量，则绑定数据的元素“即将被更新（update）”</li>
+</ul>
+<p>大多数情况，.enter()函数触发，使用.append()来添加元素；.exit()函数触发，使用.remove()来移除元素。<br><img src="http://pic.caigoubao.cc/604149/blog/visualization/%E8%BF%9B%E5%85%A5%E9%80%80%E5%87%BA%E6%9B%B4%E6%96%B0%E7%A4%BA%E6%84%8F%E5%9B%BE.png" alt="进入退出更新示意图"></p>
+<h3 id="文档驱动设计及交互"><a href="#文档驱动设计及交互" class="headerlink" title="文档驱动设计及交互"></a>文档驱动设计及交互</h3><p>D3v4 有几个方法帮助DOM上下移动：selection.raise 和 selection.lower. 使用这些方法来移动选择的元素到DOM兄弟节点的末尾或者移动到开头位置。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">d3.select(<span class="string">"g.overallG"</span>).raise()</span><br><span class="line">d3.select(<span class="string">"g.overallG"</span>).lower()</span><br></pre></td></tr></table></figure></p>
+<p>禁用元素的鼠标事件：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">teamG.select(<span class="string">"text"</span>).style(<span class="string">"pointer-events"</span>,<span class="string">"none"</span>);</span><br></pre></td></tr></table></figure></p>
+<h4 id="使用颜色"><a href="#使用颜色" class="headerlink" title="使用颜色"></a>使用颜色</h4><p>d3.rbg()的使用如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">teamColor = d3.rgb(<span class="string">"red"</span>);</span><br><span class="line">teamColor = d3.rgb(<span class="string">"#ff0000"</span>);</span><br><span class="line">teamColor = d3.rgb(<span class="string">"rgb(255,0,0)"</span>);</span><br><span class="line">teamColor = d3.rgb(<span class="number">255</span>,<span class="number">0</span>,<span class="number">0</span>);</span><br></pre></td></tr></table></figure></p>
+<p>这些颜色对象有两个有用的方法：.darker() 和 .brighter()，返回比初始值更亮或更暗的值。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">d3.selectAll(<span class="string">"g.overallG"</span>).select(<span class="string">"circle"</span>)</span><br><span class="line">  .style(<span class="string">"fill"</span>, p =&gt; p.region === d.region ?</span><br><span class="line">  teamColor.darker(<span class="number">.75</span>) : teamColor.brighter(<span class="number">.5</span>)) <span class="comment">// rgb.brighter([k]),每个颜色通道值将乘以0.7 ^ -k</span></span><br></pre></td></tr></table></figure></p>
+<p><code>d3.hsl, d3.lab, d3.cubehelix, d3.hcl</code>可以呈现不同的颜色空间<br>D3支持颜色插值<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> ybRamp = d3.scaleLinear()</span><br><span class="line">  .interpolate(d3.interpolateHsl)</span><br><span class="line">  .domain([<span class="number">0</span>, maxValue]).range([<span class="string">"yellow"</span>, <span class="string">"blue"</span>]);</span><br></pre></td></tr></table></figure></p>
+<p>离散颜色比例尺：<code>d3.schemeCategory10, d3.schemeCategory20, d3.schemeCategory20b, and d3.schemeCategory20c</code><br>序数比例尺，映射离散值为特殊的颜色。一个有用的特征是它的unknown方法，当传入一个不存在的值的时候，返回设定值。<br><a href="https://bl.ocks.org/pstuffa/3393ff2711a53975040077b7453781a9" target="_blank" rel="noopener">Color Scales</a><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> tenColorScale = d3.scaleOrdinal()</span><br><span class="line">  .domain([<span class="string">"UEFA"</span>, <span class="string">"CONMEBOL"</span>])</span><br><span class="line">  .range(d3.schemeCategory10)</span><br><span class="line">  .unknown(<span class="string">"#c4b9ac"</span>)</span><br></pre></td></tr></table></figure></p>
+<h4 id="监听器"><a href="#监听器" class="headerlink" title="监听器"></a>监听器</h4><p>D3选择器可以通过on来为事件添加监听器：<code>selection.on(type[, listener[, capture]])</code><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">selection.on(<span class="string">"click"</span>,  <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(d3.mouse(<span class="keyword">this</span>)); <span class="comment">// 输出相对坐标</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>在当前选择的每个元素，为指定的类型type，添加或删除事件监听器listener 。type是一个字符串事件类型的名称，如“click”、“mouseover”、“keydown”、“touchstart”。基本上支持任何DOM事件，如鼠标、键盘、触屏事件。为了在侦听器内访问当前事件，使用全局函数d3.event。</p>
+<p>如果所选择的元素相同类型的一个事件监听已经注册了，新的侦听加入之前的现有侦听被除去。为注册相同事件类型的多个监听器，该类型可以跟一个可选的命名空间，如“click.first”和“click.second”。 要删除一个监听器，传递null给listener如：selection.on(click”, null)。</p>
+<h4 id="行为"><a href="#行为" class="headerlink" title="行为"></a>行为</h4><p>下面给出拖拽和缩放的例子：<br><a href="http://blockbuilder.org/MGTfang/8608aa25a5f44feefa2f1ee5c1c399dc" target="_blank" rel="noopener">拖拽简单示例</a><br><a href="http://blockbuilder.org/MGTfang/8203f1fe95d2afd455729c4cf8384549" target="_blank" rel="noopener">缩放简单示例</a></p>
+<h3 id="布局"><a href="#布局" class="headerlink" title="布局"></a>布局</h3><p>D3 3.x提供了12种布局：饼状图（Pie）、力导向图（Force）、弦图（Chord）、树图（Tree）、集群图（Cluster）、捆图（Bundle）、打包图（Pack）、直方图（Histogram）、分区图（Partition）、堆栈图（Stack）、矩阵树图（Treemap）、层级图（Hierarchy）</p>
+<h4 id="力导向图"><a href="#力导向图" class="headerlink" title="力导向图"></a>力导向图</h4><p>力导向图（Force-Directed Graph），是绘图的一种算法。d3-force, 力布局这个模块基于Verlet integration(韦尔莱积分法)实现了物理粒子之间的作用力的仿真。模拟的作用力有电荷之间的吸引排斥力，重力，链接吸引力。</p>
+<p><a href="http://blockbuilder.org/MGTfang/4080ee9dc10804fd7a362565e54c78da" target="_blank" rel="noopener">力导向图示例</a></p>
+<h3 id="项目案例分析"><a href="#项目案例分析" class="headerlink" title="项目案例分析"></a>项目案例分析</h3><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ul>
+<li><a href="https://github.com/d3/d3/wiki/API--%E4%B8%AD%E6%96%87%E6%89%8B%E5%86%8C" target="_blank" rel="noopener">D3 API 中文文档</a></li>
+<li><a href="https://www.manning.com/books/d3-js-in-action" target="_blank" rel="noopener">D3 js in action</a></li>
+<li><a href="http://www.broadview.com.cn/book/4786" target="_blank" rel="noopener">精通D3.js（第二版）</a></li>
+<li><a href="https://www.amazon.com/D3-js-4-x-Data-Visualization-Third/dp/178712035X" target="_blank" rel="noopener">D3.js 4.x Data Visualization(Third Edition)</a></li>
+<li><a href="http://www.broadview.com.cn/book/638" target="_blank" rel="noopener">图说D3数据可视化利器从入门到进阶</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/29/D3-js数据可视化实践（讲义）/" data-id="cjmlg93n30005g82pscnlih2r" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/D3-js/">D3.js</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-《D3-js-in-Action-Data-visualization-with-JavaScript-2nd-》部分章节摘要" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/27/《D3-js-in-Action-Data-visualization-with-JavaScript-2nd-》部分章节摘要/" class="article-date">
+  <time datetime="2018-06-27T10:58:00.000Z" itemprop="datePublished">2018-06-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/数据可视化/">数据可视化</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/27/《D3-js-in-Action-Data-visualization-with-JavaScript-2nd-》部分章节摘要/">《D3.js in Action Data visualization with JavaScript(2nd)》部分章节摘要</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="什么是D3"><a href="#什么是D3" class="headerlink" title="什么是D3"></a>什么是D3</h2><p>为满足Web可访问的，复杂的数据可视化需求而生。<br>假如你公司使用了BI工具，但是他们不能满足团队需求用来显示数据的类型模式。<br>那么你就需要量身定制地构建一个客户化的看板来精确展示具体领域客户的行为。<br>这个数据看板需要快速、可交互、能在组织内分享。那么可以使用D3来做这个事情。<br>D3.js的创始人Mike Bostock，用他的话说：提供极度灵活，Web标准化的能力，例如CSS3,HTML5,SVG. 最新迭代版本D3.v4</p>
+<h2 id="D3怎样工作"><a href="#D3怎样工作" class="headerlink" title="D3怎样工作"></a>D3怎样工作</h2><p>怎样使用D3来处理和呈现数据，也是增加交互性，优化数据可视化。<br>理解D3选择器、数据绑定、D3怎样与DOM中的SVG和HTML交互。</p>
+<h3 id="数据可视化不仅仅是图表"><a href="#数据可视化不仅仅是图表" class="headerlink" title="数据可视化不仅仅是图表"></a>数据可视化不仅仅是图表</h3><p>你或许认为数据可视化仅限于饼图、线图、以及其他各类图表。远远不止如此。D3.js核心能力之一是为传统图表创建矢量图形，创建地理空间和网络可视化，以及丰富的动画和交互性。数据可视化这种广泛的方法中，地图或者网络图谱或表格是数据的一种表现形式，也是D3.js库提供的核心能力。<br>学习D3是因为它提供能力实现几乎每个主要的数据可视化技术，也提供能力创建你自己的数据可视化技术。</p>
+<h3 id="D3数据选择和绑定"><a href="#D3数据选择和绑定" class="headerlink" title="D3数据选择和绑定"></a>D3数据选择和绑定</h3><p>selection是数据和元素的组合。我们对group中的元素执行一个行为，例如移动或者改变颜色。同样也可以更新数据中的值。尽管我们以页面元素和数据分离的方式工作，D3真正强大来自于使用选择器来合并数据和web页面元素。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">d3.selectAll(<span class="string">"circle.a"</span>).style(<span class="string">"fill"</span>, <span class="string">"red"</span>).attr(<span class="string">"cx"</span>, <span class="number">100</span>)</span><br></pre></td></tr></table></figure></p>
+<p>使用d3.select()选择单个元素；使用d3.selectAll()选中多个元素<br>选择器是一个或多个页面元素的组合能够与数据集相关联，例如下面的代码是绑定数组[1,5,11,3]元素到样式名为market的div：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">d3.selectAll(<span class="string">"div.market"</span>).data([<span class="number">1</span>,<span class="number">5</span>,<span class="number">11</span>,<span class="number">3</span>])</span><br></pre></td></tr></table></figure></p>
+<p>D3遍历选择器中的元素，使用绑定数据执行相同的行为，导致不同的图形化效果。行为相同，效果不同。<br>决定一个元素的行为和呈现分别是：样式、属性attributes、特性properties。样式决定不透明度、颜色、尺寸、边框等。属性包含ID、类名、交互行为。特性涉及状态，例如单选框的选中。D3有三个函数来定义这些值：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">d3.select(<span class="string">"#someDiv"</span>).style(<span class="string">"border"</span>, <span class="string">"5px darkgray dashed"</span>);</span><br><span class="line">d3.select(<span class="string">"#someDiv"</span>).attr(<span class="string">"id"</span>, <span class="string">"newID"</span>);</span><br><span class="line">d3.select(<span class="string">"#someCheckbox"</span>).property(<span class="string">"checked"</span>, <span class="literal">true</span>);</span><br></pre></td></tr></table></figure></p>
+<p>DOM决定了元素在屏幕上的绘制顺序，孩子元素在父元素的里面及之后绘制。尽管传统HTML中可以使用z-index来控制，但是在SVG2规范实现之前，设置z-index对SVG元素来说不管用。</p>
+<h3 id="SVG"><a href="#SVG" class="headerlink" title="SVG"></a>SVG</h3><p>HTML5一个主要的特性就是集成支持SVG。SVG允许图像简单的数字呈现如缩放，这并应用到动画和交互中。D3提供一个抽象层绘制SVG。SVG绘制复杂形状的指令如路径，从画布的一个点开始向另一个点画线。如果想绘制曲线，将绘制曲线的坐标设置为path的d属性。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!doctype html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"d3.v4.min.js"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"infovizDiv"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">svg</span> <span class="attr">style</span>=<span class="string">"width:500px;height:500px;border:1px lightgray solid;"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">path</span> <span class="attr">d</span>=<span class="string">"M 10,60 40,30 50,50 60,30 70,80"</span></span></span><br><span class="line"><span class="tag"><span class="attr">style</span>=<span class="string">"fill:black;stroke:gray;stroke-width:4px;"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">polygon</span> <span class="attr">style</span>=<span class="string">"fill:gray;"</span></span></span><br><span class="line"><span class="tag"><span class="attr">points</span>=<span class="string">"80,400 120,400 160,440 120,480 60,460"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">g</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">line</span> <span class="attr">x1</span>=<span class="string">"200"</span> <span class="attr">y1</span>=<span class="string">"100"</span> <span class="attr">x2</span>=<span class="string">"450"</span> <span class="attr">y2</span>=<span class="string">"225"</span></span></span><br><span class="line"><span class="tag"><span class="attr">style</span>=<span class="string">"stroke:black;stroke-width:2px;"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">circle</span> <span class="attr">cy</span>=<span class="string">"100"</span> <span class="attr">cx</span>=<span class="string">"200"</span> <span class="attr">r</span>=<span class="string">"30"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">rect</span> <span class="attr">x</span>=<span class="string">"410"</span> <span class="attr">y</span>=<span class="string">"200"</span> <span class="attr">width</span>=<span class="string">"100"</span> <span class="attr">height</span>=<span class="string">"50"</span></span></span><br><span class="line"><span class="tag"><span class="attr">style</span>=<span class="string">"fill:pink;stroke:black;stroke-width:1px;"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">g</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">svg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>svg提供一系列的通用形状集合：<code>&lt;CIRCLE&gt;</code>, <code>&lt;RECT&gt;</code>, <code>&lt;LINE&gt;</code>, <code>&lt;POLYGON&gt;</code>，每个形状都有元素决定它的尺寸和位置。<code>&lt;RECT&gt;</code>有x和y属性决定形状左上角的位置。<code>&lt;CIRCLE&gt;</code>的x和y属性决定圆心的位置，r属性决定圆半径。<code>&lt;LINE&gt;</code>x1和y1作为起点坐标，x2和y2决定中的坐标位置。<br>任何形状的颜色、外轮廓、不透明度能被改变来适应形状的样式，fill决定形状区域的颜色，stroke,stroke-width,stroke-dasharray决定其外轮廓。<br>能像下面这样改变矩形的样式：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">fill</span><span class="selector-pseudo">:purple</span>;<span class="selector-tag">stroke-width</span><span class="selector-pseudo">:5px</span>;<span class="selector-tag">stroke</span><span class="selector-pseudo">:cornflowerblue</span>;</span><br></pre></td></tr></table></figure></p>
+<p><code>&lt;TEXT&gt;</code>,SVG提供写文本的能力。如果想要实现基本的格式化，可以在<code>&lt;TEXT&gt;</code>中嵌套<code>&lt;TSPAN&gt;</code>。<br><code>&lt;G&gt;</code>或者组元素，区别于之前的SVG元素，它没有图形化呈现的能力，不存在一个边界空间。可以使用它来表示一个逻辑分组。当创建一个图形对象，有几个形状的图形和文本组成，就可以将它们放在<code>&lt;G&gt;</code>标签内。在画板内移动<code>&lt;G&gt;</code>元素，可以通过transform属性，它接受一个结构化的描述就是translate()，传一对坐标x和y，表示其向右和向下移动的像素数。transform属性还接受scale()，用来改变图形渲染的比例。<br><img src="http://pic.caigoubao.cc/604149/blog/visualization/Path%E5%B1%9E%E6%80%A7%E8%AE%BE%E7%BD%AE%E5%B7%AE%E5%BC%82.png" alt="路径的属性设置"></p>
+<h3 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h3><p>.css文件能被引入到HTML页当中，或者直接嵌入HTML当中，或者同js控制。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">d3.select(#someElement).style(opacity, .5);</span><br><span class="line">d3.select(<span class="string">"circle"</span>).attr(<span class="string">"class"</span>, <span class="string">"tentative"</span>);</span><br><span class="line">d3.select(<span class="string">"circle"</span>).classed(<span class="string">"active"</span>, <span class="literal">true</span>);</span><br></pre></td></tr></table></figure></p>
+<p>通过<code>.classed()</code>，不必重写存在的样式，而是从样式列表中添加或者移除命名的样式。</p>
+<h3 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h3><p>方法链，也叫链式调用。这和我们平时聊天有点像。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">d3.selectAll(<span class="string">"div"</span>).data(someData).enter().append(<span class="string">"div"</span>).html(<span class="string">"Wow"</span>).append(<span class="string">"span"</span>).html(<span class="string">"Even More Wow"</span>).style(<span class="string">"font-weight"</span>, <span class="string">"900"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>可以给.style(), .attr(), .property(), .html()设置匿名函数调用或者其他提供数据绑定的选择器的函数。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> someColors = [<span class="string">"blue"</span>, <span class="string">"red"</span>, <span class="string">"chartreuse"</span>, <span class="string">"orange"</span>];</span><br><span class="line">someColors = someColors.filter(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123;<span class="keyword">return</span> d.length &lt; <span class="number">5</span>&#125;);</span><br><span class="line">d3.select(<span class="string">"body"</span>).selectAll(<span class="string">"div"</span>)</span><br><span class="line">.data(someColors)</span><br><span class="line">.enter()</span><br><span class="line">.append(<span class="string">"div"</span>)</span><br><span class="line">.style(<span class="string">"background"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123;<span class="keyword">return</span> d&#125;)</span><br><span class="line">.attr(<span class="string">"cx"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">d,i</span>) </span>&#123;<span class="keyword">return</span> i&#125;)</span><br><span class="line">.html(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123;<span class="keyword">return</span> d&#125;)</span><br></pre></td></tr></table></figure></p>
+<h2 id="数据标准"><a href="#数据标准" class="headerlink" title="数据标准"></a>数据标准</h2><p>因为不同目的数据被格式化为不同的形式，但是它倾向存在于我们认识的类型：表格数据，嵌套数据，网络数据，地理数据，裸数据，对象。</p>
+<h2 id="第一个D3-APP"><a href="#第一个D3-APP" class="headerlink" title="第一个D3 APP"></a>第一个D3 APP</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://d3js.org/d3.v4.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"vizcontainer"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">svg</span> <span class="attr">style</span>=<span class="string">"width:500px;height:500px;border:1px lightgray solid;"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">d3.select(<span class="string">"svg"</span>)</span></span><br><span class="line"><span class="javascript">.append(<span class="string">"circle"</span>)</span></span><br><span class="line"><span class="javascript">.attr(<span class="string">"r"</span>, <span class="number">20</span>)</span></span><br><span class="line"><span class="javascript">.attr(<span class="string">"cx"</span>,<span class="number">20</span>)</span></span><br><span class="line"><span class="javascript">.attr(<span class="string">"cy"</span>,<span class="number">20</span>)</span></span><br><span class="line"><span class="javascript">.style(<span class="string">"fill"</span>,<span class="string">"red"</span>);</span></span><br><span class="line"><span class="javascript">d3.select(<span class="string">"svg"</span>)</span></span><br><span class="line"><span class="javascript">.append(<span class="string">"text"</span>)</span></span><br><span class="line"><span class="javascript">.attr(<span class="string">"id"</span>, <span class="string">"a"</span>)</span></span><br><span class="line"><span class="javascript">.attr(<span class="string">"x"</span>,<span class="number">20</span>)</span></span><br><span class="line"><span class="javascript">.attr(<span class="string">"y"</span>,<span class="number">20</span>)</span></span><br><span class="line"><span class="javascript">.style(<span class="string">"opacity"</span>, <span class="number">0</span>)</span></span><br><span class="line"><span class="javascript">.text(<span class="string">"HELLO WORLD"</span>);</span></span><br><span class="line"><span class="javascript">d3.select(<span class="string">"svg"</span>)</span></span><br><span class="line"><span class="javascript">.append(<span class="string">"circle"</span>)</span></span><br><span class="line"><span class="javascript">.attr(<span class="string">"r"</span>, <span class="number">100</span>)</span></span><br><span class="line"><span class="javascript">.attr(<span class="string">"cx"</span>,<span class="number">400</span>)</span></span><br><span class="line"><span class="javascript">.attr(<span class="string">"cy"</span>,<span class="number">400</span>)</span></span><br><span class="line"><span class="javascript">.style(<span class="string">"fill"</span>,<span class="string">"lightblue"</span>);</span></span><br><span class="line"><span class="javascript">d3.select(<span class="string">"svg"</span>)</span></span><br><span class="line"><span class="javascript">.append(<span class="string">"text"</span>)</span></span><br><span class="line"><span class="javascript">.attr(<span class="string">"id"</span>, <span class="string">"b"</span>)</span></span><br><span class="line"><span class="javascript">.attr(<span class="string">"x"</span>,<span class="number">400</span>)</span></span><br><span class="line"><span class="javascript">.attr(<span class="string">"y"</span>,<span class="number">400</span>)</span></span><br><span class="line"><span class="javascript">.style(<span class="string">"opacity"</span>, <span class="number">0</span>)</span></span><br><span class="line"><span class="javascript">.text(<span class="string">"Uh, hi."</span>);</span></span><br><span class="line"><span class="javascript">d3.select(<span class="string">"#a"</span>).transition().delay(<span class="number">1000</span>).style(<span class="string">"opacity"</span>, <span class="number">1</span>);</span></span><br><span class="line"><span class="javascript">d3.select(<span class="string">"#b"</span>).transition().delay(<span class="number">3000</span>).style(<span class="string">"opacity"</span>, <span class="number">.75</span>);</span></span><br><span class="line"><span class="javascript">d3.selectAll(<span class="string">"circle"</span>).transition().duration(<span class="number">2000</span>).attr(<span class="string">"cy"</span>, <span class="number">200</span>);</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="使用数据"><a href="#使用数据" class="headerlink" title="使用数据"></a>使用数据</h2><p><img src="http://pic.caigoubao.cc/604149/blog/visualization/%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png" alt="数据处理流程"></p>
+<h3 id="加载数据"><a href="#加载数据" class="headerlink" title="加载数据"></a>加载数据</h3><p>不管什么样的数据源，都可能被格式化成XML，CSV，或者JSON这样的格式。D3提供几个方法来导入和处理数据。一样的是，d3.csv()和d3.json()生成一个JSON对象数组，而d3.xml()会创建一个XML文档。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">d3.csv(<span class="string">"cities.csv"</span>, (error,data) =&gt; &#123; <span class="built_in">console</span>.log(error, data) &#125;);</span><br><span class="line">d3.json(<span class="string">"tweets.json"</span>, data =&gt; <span class="built_in">console</span>.log(data));</span><br></pre></td></tr></table></figure></p>
+<p>error变量是可选项</p>
+<h3 id="数据格式化"><a href="#数据格式化" class="headerlink" title="数据格式化"></a>数据格式化</h3><p>在我们加载数据集以后，我们需要定义方法以致于数据的属性同颜色、尺寸和位置的设定相关。比如想展示导入的CSV文件格式的城市数据，假如使用圆来表示，根据人口数量来设置圆的大小，根据几何坐标设置位置。在做数据可视化的时候，我们需要理解数据形式，通常可以分为数量的，类别的，几何的，临时的，拓扑的或者未加工的。</p>
+<h3 id="进一步更改数据"><a href="#进一步更改数据" class="headerlink" title="进一步更改数据"></a>进一步更改数据</h3><p>数字数据仅仅同图形化元素在屏幕上的尺寸和位置相关。使用d3.scale()函数来归一化数据。Scales（比例尺）有一个定义域domain和一个值域range。例如，从cities.csv里面取出人口数字的最小值和最大值，通过线性比例尺我们能将它们的不同很容易地展示到500px的画布上。下图所示，将 500,000到13,000,000相同的线性变化映射到0到500.<br><img src="http://pic.caigoubao.cc/604149/blog/visualization/%E7%BA%BF%E6%80%A7%E6%AF%94%E4%BE%8B%E5%B0%BA%E7%A4%BA%E6%84%8F.png" alt="线性比例尺示意"><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> newRamp = d3.scaleLinear().domain([<span class="number">500000</span>,<span class="number">13000000</span>]).range([<span class="number">0</span>, <span class="number">500</span>]);</span><br><span class="line">newRamp(<span class="number">1000000</span>); <span class="comment">// 返回20，可以将一千万人口的国家放在20px处</span></span><br><span class="line">newRamp(<span class="number">9000000</span>); <span class="comment">// 返回340</span></span><br><span class="line">newRamp.invert(<span class="number">313</span>); <span class="comment">// 求逆，返回8325000</span></span><br><span class="line"><span class="keyword">var</span> newRamp = d3.scaleLinear().domain([<span class="number">500000</span>,<span class="number">13000000</span>]).range([<span class="string">"blue"</span>, <span class="string">"red"</span>]);</span><br><span class="line">newRamp(<span class="number">1000000</span>); <span class="comment">// 返回"#0a00f5"，可以将一百万人口的城市用深紫色表示</span></span><br><span class="line">newRamp(<span class="number">9000000</span>); <span class="comment">// 返回"#ad0052"</span></span><br><span class="line">newRamp.invert(<span class="string">"#ad0052"</span>); <span class="comment">// 因为invert函数只接受数字，因此返回NaN</span></span><br></pre></td></tr></table></figure></p>
+<p>我们也能使用d3.scaleLog(), d3.scalePow(),d3.scaleOrdinal(), 以及其他不太通用但对数据集来说更加适合的比例尺来映射数据。<br>将定量数据分类，将值按范围分或者组装到一起，是挺有用的。一种分类方法是将数组均分几份。<br><img src="http://pic.caigoubao.cc/604149/blog/visualization/%E5%AE%9A%E9%87%8F%E6%95%B0%E6%8D%AE%E5%88%86%E7%B1%BB.png" alt="定量数据分类"><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> sampleArray = [<span class="number">423</span>,<span class="number">124</span>,<span class="number">66</span>,<span class="number">424</span>,<span class="number">58</span>,<span class="number">10</span>,<span class="number">900</span>,<span class="number">44</span>,<span class="number">1</span>];</span><br><span class="line"><span class="keyword">var</span> qScale = d3.scaleQuantile().domain(sampleArray).range([<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>]);</span><br><span class="line">qScale(<span class="number">423</span>); <span class="comment">// 返回2</span></span><br><span class="line">qScale(<span class="number">20</span>); <span class="comment">// 返回0</span></span><br><span class="line">qScale(<span class="number">10000</span>); <span class="comment">// 返回2</span></span><br></pre></td></tr></table></figure></p>
+<p>嵌套背后的观点是数据的共享属性能被用来排序成离散的类别和子类。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">d3.json(<span class="string">"tweets.json"</span>, data =&gt; &#123;</span><br><span class="line"><span class="keyword">var</span> tweetData = data.tweets;</span><br><span class="line"><span class="keyword">var</span> nestedTweets = d3.nest()</span><br><span class="line">.key(<span class="function"><span class="params">d</span> =&gt;</span> d.user)</span><br><span class="line">.entries(tweetData);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>d3.nest()合并推特账户到新的对象下的数组，这些新对象由唯一的用户属性值标记。<br>在数据格式化以后，需要测量它，以确保创建的图形尺寸合适，位置是基于数据集的参数。那你将会一直用到d3.extent，d3.min，d3.max，d3.mean.</p>
+<h3 id="测量数据"><a href="#测量数据" class="headerlink" title="测量数据"></a>测量数据</h3><p>在加载你的数据以后，首页的事情之一是你应该将它测量和排序。很重要的是知道特殊属性值的分布，以及最大最小值和属性名称。D3提供一个数组的函数集合能帮助你理解数据。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> testArray = [<span class="number">88</span>,<span class="number">10000</span>,<span class="number">1</span>,<span class="number">75</span>,<span class="number">12</span>,<span class="number">35</span>];</span><br><span class="line">d3.min(testArray, el =&gt; el); <span class="comment">// return 1</span></span><br><span class="line">d3.max(testArray, el =&gt; el); <span class="comment">// 返回10000</span></span><br><span class="line">d3.mean(testArray, el =&gt; el); <span class="comment">// 返回平均值1701.83</span></span><br></pre></td></tr></table></figure></p>
+<p>加入想从cities.csv获取人口的最小，最大，平均值：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">d3.csv(<span class="string">"cities.csv"</span>, data =&gt; &#123;</span><br><span class="line">    d3.min(data, el =&gt; +el.population);</span><br><span class="line">    d3.max(data, el =&gt; +el.population);</span><br><span class="line">    d3.mean(data, el =&gt; +el.population);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>d3.extent方便地将d3.min()和d3.max()在一个数组中返回：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">d3.extent(data, el =&gt; +el.population); // 返回[500000, 1300000]</span><br></pre></td></tr></table></figure></p>
+<p>现在，我们已经加载、格式化、测量了我们的数据，那我们就可以创建数据可视化了。</p>
+<h2 id="数据可视化"><a href="#数据可视化" class="headerlink" title="数据可视化"></a>数据可视化</h2><p>接下来将更深入解释选择器是如何与数据绑定一起创建元素的，以及创建后如何改变这些元素。<br>第一个例子使用cities.csv中的数据。</p>
+<h3 id="选择器及绑定"><a href="#选择器及绑定" class="headerlink" title="选择器及绑定"></a>选择器及绑定</h3><p>使用D3选择器来改变web页的结构和呈现。一个选择器是由DOM中一个或多个元素构成。你能使用选择器创建和删除元素，更改样式和内容。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">d3.csv(<span class="string">"cities.csv"</span>, (error,data) =&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> (error) &#123;</span><br><span class="line">        <span class="built_in">console</span>.error(error)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        dataViz(data)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">dataViz</span>(<span class="params">incomingData</span>) </span>&#123;</span><br><span class="line">    d3.select(<span class="string">"body"</span>).selectAll(<span class="string">"div.cities"</span>)</span><br><span class="line">        .data(incomingData) <span class="comment">// 绑定数据到选择器</span></span><br><span class="line">        .enter() <span class="comment">// 定义当选择中的数据多于DOM元素时如何响应</span></span><br><span class="line">        .append(<span class="string">"div"</span>) <span class="comment">// 在当前选择器中创建一个元素</span></span><br><span class="line">        .attr(<span class="string">"class"</span>, <span class="string">"cities"</span>) <span class="comment">// 设置新创建元素class</span></span><br><span class="line">        .html(<span class="function"><span class="params">d</span> =&gt;</span> d.label); <span class="comment">// 设置创建div的内容</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>d3.selectAll()传入对应于DOM一部分的CSS id选择器。经常传入id没有匹配到任何元素，那么称其为空选择器，使用.enter()函数在页面上创建新元素。需要指明一个选择器如何创建或更改一个具体DOM元素的孩子元素。注意子选项不会自动生成父节点。父亲必须已经存在，或者需要使用.append()创建一个。<br>这里需要将选中的DOM元素同一个数组联系起来。数据集里的每一个城市通选中器中的一个DOM元素想联系，关联数据是存在元素的data属性中。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.getElementsByClassName(<span class="string">"cities"</span>)[<span class="number">0</span>].__data__ <span class="comment">// 返回一个指向对象的指针</span></span><br></pre></td></tr></table></figure></p>
+<p>当数据值的数量大于选择器中元素的数量，.enter()函数触发，允许你为每一个没有相应DOM元素的值定义一个执行行为。<br>当存在的数据值比较少，.enter()函数会触发<br>当两者数量一样，则都不会触发<br>当你知道将不会有更少的数据元素，则不必为.exit()定义处理行为。<br>.append()函数允许你添加更多元素，定义添加哪个元素。通过.insert()你能控制新元素添加的地方。<br>.attr()函数是用来改变样式和属性<br>.html()函数可以设置DOM元素的内容</p>
+<h3 id="使用内联函数访问数据"><a href="#使用内联函数访问数据" class="headerlink" title="使用内联函数访问数据"></a>使用内联函数访问数据</h3><p>在选择器中使用一个内联匿名函数，自动提供两个变量的访问，这对数据呈现很关键。一个是数据值本身，一个是该数据在数组中的位置。<br>直方图是分类表达数据数值最简单最有效的方法。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">d3.select(<span class="string">"svg"</span>)</span><br><span class="line">    .selectAll(<span class="string">"rect"</span>)</span><br><span class="line">    .data([<span class="number">15</span>, <span class="number">50</span>, <span class="number">22</span>, <span class="number">8</span>, <span class="number">100</span>, <span class="number">10</span>])</span><br><span class="line">    .enter()</span><br><span class="line">    .append(<span class="string">"rect"</span>)</span><br><span class="line">    .attr(<span class="string">"height"</span>, d =&gt; d)</span><br><span class="line">    .style(<span class="string">"fill"</span>, <span class="string">"#FE9922"</span>)</span><br><span class="line">    .style(<span class="string">"stroke"</span>, <span class="string">"#9A8B7A"</span>)</span><br><span class="line">    .style(<span class="string">"stroke-width"</span>, <span class="string">"1px"</span>)</span><br><span class="line">    .attr(<span class="string">"x"</span>, (d,i) =&gt; i * <span class="number">10</span>)</span><br><span class="line">    .attr(<span class="string">"y"</span>, d =&gt; <span class="number">100</span> - d);</span><br></pre></td></tr></table></figure></p>
+<p>多线性比例尺是在domain和range带有多个点的线性比例尺。比如我们对1到100范围内的值特别感兴趣，对100到1000内的值有时候感兴趣。偶尔会得到相当大的异常值。我们能这样表示：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> yScale =</span><br><span class="line">    d3.scaleLinear().domain([<span class="number">0</span>,<span class="number">100</span>,<span class="number">1000</span>,<span class="number">24500</span>]).range([<span class="number">0</span>,<span class="number">50</span>,<span class="number">75</span>,<span class="number">100</span>]);</span><br></pre></td></tr></table></figure></p>
+<p>例如，有一些调查返回的数据，我们认为大于500就表示成功。我们仅仅想显示0到500内的数据，同时用比例尺强调0到100的变化。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> yScale = d3.scaleLinear().domain([<span class="number">0</span>,<span class="number">100</span>,<span class="number">500</span>]).range([<span class="number">0</span>,<span class="number">50</span>,<span class="number">100</span>]);</span><br><span class="line">yScale(<span class="number">1000</span>); <span class="comment">// 返回162.5</span></span><br></pre></td></tr></table></figure></p>
+<p>通常D3比例尺会推断最小值到最大值之外的值。如果想设置小于最小值的取最小值，大于最大值的取最大值。<br>可以使用.clamp()函数：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> yScale = d3.scaleLinear()</span><br><span class="line">    .domain([<span class="number">0</span>,<span class="number">100</span>,<span class="number">500</span>])</span><br><span class="line">    .range([<span class="number">0</span>,<span class="number">50</span>,<span class="number">100</span>])</span><br><span class="line">    .clamp(<span class="literal">true</span>);</span><br><span class="line">yScale(<span class="number">1000</span>); <span class="comment">// 返回100</span></span><br></pre></td></tr></table></figure></p>
+<p>scale函数使决定位置、尺寸、数据可视化元素颜色的关键。</p>
+<h2 id="数据呈现"><a href="#数据呈现" class="headerlink" title="数据呈现"></a>数据呈现</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">d3.csv(<span class="string">"cities.csv"</span>,(error, data) =&gt; &#123; dataViz(data) &#125;);</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">dataViz</span>(<span class="params">incomingData</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> maxPopulation = d3.max(incomingData, d =&gt; <span class="built_in">parseInt</span>(d.population)) <span class="comment">// 人口数最大值</span></span><br><span class="line">    <span class="keyword">var</span> yScale = d3.scaleLinear().domain([<span class="number">0</span>, maxPopulation]).range([<span class="number">0</span>,<span class="number">460</span>]);</span><br><span class="line">    d3.select(<span class="string">"svg"</span>).attr(<span class="string">"style"</span>, <span class="string">"height: 480px; width: 600px;"</span>);</span><br><span class="line">    d3.select(<span class="string">"svg"</span>)</span><br><span class="line">        .selectAll(<span class="string">"rect"</span>)</span><br><span class="line">        .data(incomingData)</span><br><span class="line">        .enter()</span><br><span class="line">        .append(<span class="string">"rect"</span>)</span><br><span class="line">        .attr(<span class="string">"width"</span>, <span class="number">50</span>)</span><br><span class="line">        .attr(<span class="string">"height"</span>, d =&gt; yScale(<span class="built_in">parseInt</span>(d.population)))</span><br><span class="line">        .attr(<span class="string">"x"</span>, (d,i) =&gt; i * <span class="number">60</span>)</span><br><span class="line">        .attr(<span class="string">"y"</span>, d =&gt; <span class="number">480</span> - yScale(<span class="built_in">parseInt</span>(d.population)))</span><br><span class="line">        .style(<span class="string">"fill"</span>, <span class="string">"#FE9922"</span>)</span><br><span class="line">        .style(<span class="string">"stroke"</span>, <span class="string">"#9A8B7A"</span>)</span><br><span class="line">        .style(<span class="string">"stroke-width"</span>, <span class="string">"1px"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">d3.json(<span class="string">"tweets.json"</span>,(error, data) =&gt; &#123; dataViz(data.tweets) &#125;); </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">dataViz</span>(<span class="params">incomingData</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> nestedTweets = d3.nest()</span><br><span class="line">        .key(<span class="function"><span class="params">d</span> =&gt;</span> d.user)</span><br><span class="line">        .entries(incomingData);</span><br><span class="line">    nestedTweets.forEach(<span class="function"><span class="params">d</span> =&gt;</span> &#123;</span><br><span class="line">        d.numTweets = d.values.length; <span class="comment">// 创建一个新属性</span></span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">var</span> maxTweets = d3.max(nestedTweets, d =&gt; d.numTweets);</span><br><span class="line">    <span class="keyword">var</span> yScale = d3.scaleLinear().domain([<span class="number">0</span>,maxTweets]).range([<span class="number">0</span>,<span class="number">500</span>]);</span><br><span class="line">    d3.select(<span class="string">"svg"</span>)</span><br><span class="line">        .selectAll(<span class="string">"rect"</span>)</span><br><span class="line">        .data(nestedTweets)</span><br><span class="line">        .enter()</span><br><span class="line">        .append(<span class="string">"rect"</span>)</span><br><span class="line">        .attr(<span class="string">"width"</span>, <span class="number">50</span>)</span><br><span class="line">        .attr(<span class="string">"height"</span>, d =&gt; yScale(d.numTweets))</span><br><span class="line">        .attr(<span class="string">"x"</span>, (d,i) =&gt; i * <span class="number">60</span>)</span><br><span class="line">        .attr(<span class="string">"y"</span>, d =&gt; <span class="number">500</span> - yScale(d.numTweets))</span><br><span class="line">        .style(<span class="string">"fill"</span>, <span class="string">"#FE9922"</span>)</span><br><span class="line">        .style(<span class="string">"stroke"</span>, <span class="string">"#9A8B7A"</span>)</span><br><span class="line">        .style(<span class="string">"stroke-width"</span>, <span class="string">"1px"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="http://pic.caigoubao.cc/604149/blog/visualization/%E6%8E%A8%E7%89%B9%E7%94%A8%E6%88%B7%E7%9B%B4%E6%96%B9%E5%9B%BE.png" alt="推特用户直方图"></p>
+<h3 id="设置通道channel"><a href="#设置通道channel" class="headerlink" title="设置通道channel"></a>设置通道channel</h3><p>多变量是另一种表示具有多个数据特征的数据点的方式。channel是一个图形如何直观表达数据的技术术语，它取决于你正在使用的数据，不同的通道适用于来表达不同的数据可视化。<br>下面通过时间和影响因子两个维度来呈现数据：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">dataViz</span>(<span class="params">incomingData</span>) </span>&#123;</span><br><span class="line">    incomingData.forEach(<span class="function"><span class="params">d</span> =&gt;</span> &#123;</span><br><span class="line">        d.impact = d.favorites.length + d.retweets.length;</span><br><span class="line">        d.tweetTime = <span class="keyword">new</span> <span class="built_in">Date</span>(d.timestamp);</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">var</span> maxImpact = d3.max(incomingData, d =&gt; d.impact);</span><br><span class="line">    <span class="keyword">var</span> startEnd = d3.extent(incomingData, d =&gt; d.tweetTime);</span><br><span class="line">    <span class="keyword">var</span> timeRamp = d3.scaleTime().domain(startEnd).range([<span class="number">20</span>, <span class="number">480</span>]);</span><br><span class="line">    <span class="keyword">var</span> yScale = d3.scaleLinear().domain([<span class="number">0</span>, maxImpact]).range([<span class="number">0</span>, <span class="number">460</span>]);</span><br><span class="line">    <span class="keyword">var</span> radiusScale = d3.scaleLinear()</span><br><span class="line">        .domain([<span class="number">0</span>, maxImpact]).range([<span class="number">1</span>, <span class="number">20</span>]);</span><br><span class="line">    <span class="keyword">var</span> colorScale = d3.scaleLinear()</span><br><span class="line">        .domain([<span class="number">0</span>, maxImpact]).range([<span class="string">"white"</span>, <span class="string">"#75739F"</span>]);</span><br><span class="line">    d3.select(<span class="string">"svg"</span>)</span><br><span class="line">        .selectAll(<span class="string">"circle"</span>)</span><br><span class="line">        .data(incomingData)</span><br><span class="line">        .enter()</span><br><span class="line">        .append(<span class="string">"circle"</span>)</span><br><span class="line">        .attr(<span class="string">"r"</span>, d =&gt; radiusScale(d.impact))</span><br><span class="line">        .attr(<span class="string">"cx"</span>, d =&gt; timeRamp(d.tweetTime))</span><br><span class="line">        .attr(<span class="string">"cy"</span>, d =&gt; <span class="number">480</span> - yScale(d.impact))</span><br><span class="line">        .style(<span class="string">"fill"</span>, d =&gt; colorScale(d.impact))</span><br><span class="line">        .style(<span class="string">"stroke"</span>, <span class="string">"black"</span>)</span><br><span class="line">        .style(<span class="string">"stroke-width"</span>, <span class="string">"1px"</span>);</span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure></p>
+<h3 id="Enter-update-mergem-exit"><a href="#Enter-update-mergem-exit" class="headerlink" title="Enter, update, mergem, exit"></a>Enter, update, mergem, exit</h3><p>.enter()已经用到很多次了。现在让我们近距离看看它， 以及与它配对的.exit()。它们只有在绑定数据个数和选择器中DOM元素个数不匹配时才会触发。使用selection.enter() 定义怎样基于绑定数据创建新元素，使用selection.exit()定义元素相关的数据被删除时，如何移除选择器中的元素。更新绑定数据时，会基于数据重新创建图形元素。<br>大多数情况，使用.enter()事件，就会使用.append()来添加元素。<br><img src="http://pic.caigoubao.cc/604149/blog/visualization/%E8%BF%9B%E5%85%A5%E9%80%80%E5%87%BA%E6%9B%B4%E6%96%B0%E7%A4%BA%E6%84%8F%E5%9B%BE.png" alt="进入退出更新示意图"><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">d3.selectAll(<span class="string">"g"</span>).data([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>]).exit().remove();</span><br></pre></td></tr></table></figure></p>
+<p>这个代码会删除四个<g>元素。选择器前四个元素绑定了新数据，其余的属于.exit()函数。大多数情况下，不会遇到这样的绑定数组完全不同情况，一般通过用户交互或者其他行为触发数据过滤界面呈现变化后会看到初始化数据的重新绑定。<br>d3.merge()允许合并两个选择器，以致于可以同时操作它们。<br>通常.data()绑定基于数据值在数组中的位置。如果不想依赖位置，而是依赖你绑定的键值，使用有意义的键值，例如数据对象本身的值。所有对象都被当做[object object]对待，所有可以使用JSON.stringify函数。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">dataViz</span>(<span class="params">incomingData</span>) </span>&#123;</span><br><span class="line">    incomingData.forEach(<span class="function"><span class="params">d</span> =&gt;</span> &#123;</span><br><span class="line">        d.impact = d.favorites.length + d.retweets.length;</span><br><span class="line">        d.tweetTime = <span class="keyword">new</span> <span class="built_in">Date</span>(d.timestamp);</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">var</span> maxImpact = d3.max(incomingData, d =&gt; d.impact)</span><br><span class="line">    <span class="keyword">var</span> startEnd = d3.extent(incomingData, d =&gt; d.tweetTime)</span><br><span class="line">    <span class="keyword">var</span> timeRamp = d3.scaleTime().domain(startEnd).range([ <span class="number">50</span>, <span class="number">450</span> ]);</span><br><span class="line">    <span class="keyword">var</span> yScale = d3.scaleLinear().domain([ <span class="number">0</span>, maxImpact ]).range([ <span class="number">0</span>, <span class="number">460</span> ]);</span><br><span class="line">    <span class="keyword">var</span> radiusScale = d3.scaleLinear()</span><br><span class="line">        .domain([ <span class="number">0</span>, maxImpact ])</span><br><span class="line">        .range([ <span class="number">1</span>, <span class="number">20</span> ]);</span><br><span class="line">    d3.select(<span class="string">"svg"</span>).selectAll(<span class="string">"circle"</span>)</span><br><span class="line">        .data(incomingData, <span class="built_in">JSON</span>.stringify)</span><br><span class="line">        .enter().append(<span class="string">"circle"</span>)</span><br><span class="line">        .attr(<span class="string">"r"</span>, d =&gt; radiusScale(d.impact))</span><br><span class="line">        .attr(<span class="string">"cx"</span>, d =&gt; timeRamp(d.tweetTime))</span><br><span class="line">        .attr(<span class="string">"cy"</span>, d =&gt; <span class="number">480</span> - yScale(d.impact))</span><br><span class="line">        .style(<span class="string">"fill"</span>, <span class="string">"#75739F "</span>)</span><br><span class="line">        .style(<span class="string">"stroke"</span>, <span class="string">"black"</span>)</span><br><span class="line">        .style(<span class="string">"stroke-width"</span>, <span class="string">"1px"</span>);</span><br><span class="line">    <span class="keyword">var</span> filteredData = incomingData.filter(<span class="function"><span class="params">d</span> =&gt;</span> d.impact &gt; <span class="number">0</span>)</span><br><span class="line">    d3.selectAll(<span class="string">"circle"</span>)</span><br><span class="line">        .data(filteredData, d =&gt; <span class="built_in">JSON</span>.stringify(d))</span><br><span class="line">        .exit()</span><br><span class="line">        .remove();</span><br><span class="line">&#125;</span><br><span class="line">以上代码，会将影响因子不大于<span class="number">0</span>的元素移除。</span><br><span class="line">如果使用转化为字符串的对象，改变数据的话将不起作用，因为它不再与原始绑定的字符串相关。如果计划做重要的改变和更新，数据对象需要一个唯一ID作为绑定键值。</span><br></pre></td></tr></table></figure></g></p>
+<h2 id="文档驱动设计及交互"><a href="#文档驱动设计及交互" class="headerlink" title="文档驱动设计及交互"></a>文档驱动设计及交互</h2><p>D3v4 有几个方法帮助DOM上下移动：selection.raise 和 selection.lower. 使用这些方法来移动选择的元素到DOM兄弟节点的末尾或者移动到开头位置。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">d3.select(<span class="string">"g.overallG"</span>).raise()</span><br><span class="line">d3.select(<span class="string">"g.overallG"</span>).lower()</span><br></pre></td></tr></table></figure></p>
+<p>禁用元素的鼠标事件：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">teamG.select(<span class="string">"text"</span>).style(<span class="string">"pointer-events"</span>,<span class="string">"none"</span>);</span><br></pre></td></tr></table></figure></p>
+<h3 id="使用颜色"><a href="#使用颜色" class="headerlink" title="使用颜色"></a>使用颜色</h3><p>d3.rbg()的使用如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">teamColor = d3.rgb(<span class="string">"red"</span>);</span><br><span class="line">teamColor = d3.rgb(<span class="string">"#ff0000"</span>);</span><br><span class="line">teamColor = d3.rgb(<span class="string">"rgb(255,0,0)"</span>);</span><br><span class="line">teamColor = d3.rgb(<span class="number">255</span>,<span class="number">0</span>,<span class="number">0</span>);</span><br></pre></td></tr></table></figure></p>
+<p>这些颜色对象有两个有用的方法：.darker() 和 .brighter()，返回比初始值更亮或更暗的值。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">d3.selectAll(<span class="string">"g.overallG"</span>).select(<span class="string">"circle"</span>)</span><br><span class="line">  .style(<span class="string">"fill"</span>, p =&gt; p.region === d.region ?</span><br><span class="line">  teamColor.darker(<span class="number">.75</span>) : teamColor.brighter(<span class="number">.5</span>))</span><br></pre></td></tr></table></figure></p>
+<p>d3.hsl, d3.lab, d3.cubehelix, d3.hcl可以呈现不同的颜色空间<br>D3支持颜色插值<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> ybRamp = d3.scaleLinear()</span><br><span class="line">  .interpolate(d3.interpolateHsl)</span><br><span class="line">  .domain([<span class="number">0</span>,maxValue]).range([<span class="string">"yellow"</span>, <span class="string">"blue"</span>]);</span><br></pre></td></tr></table></figure></p>
+<p>离散颜色比例尺：d3.schemeCategory10, d3.schemeCategory20, d3.schemeCategory20b, and d3.schemeCategory20c<br>序数比例尺，映射离散值为特殊的颜色。一个有用的特征是它的unknown方法，当传入一个不存在的值的时候，返回灰色值。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> tenColorScale = d3.scaleOrdinal()</span><br><span class="line">  .domain([<span class="string">"UEFA"</span>, <span class="string">"CONMEBOL"</span>])</span><br><span class="line">  .range(d3.schemeCategory10)</span><br><span class="line">  .unknown(<span class="string">"#c4b9ac"</span>)</span><br></pre></td></tr></table></figure></p>
+<h2 id="预生成内容"><a href="#预生成内容" class="headerlink" title="预生成内容"></a>预生成内容</h2><h3 id="图片"><a href="#图片" class="headerlink" title="图片"></a>图片</h3><p>使用insert()替代append()，是告诉D3在文本元素前面嵌入图片，使得标签文字在新添加的图片后被绘制。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">d3.selectAll(<span class="string">"g.overallG"</span>).insert(<span class="string">"image"</span>, <span class="string">"text"</span>)</span><br><span class="line">  .attr(<span class="string">"xlink:href"</span>, d =&gt; <span class="string">`images/<span class="subst">$&#123;d.team&#125;</span>.png`</span>)</span><br><span class="line">  .attr(<span class="string">"width"</span>, <span class="string">"45px"</span>).attr(<span class="string">"height"</span>, <span class="string">"20px"</span>)</span><br><span class="line">  .attr(<span class="string">"x"</span>, <span class="number">-22</span>).attr(<span class="string">"y"</span>, <span class="number">-10</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="SVG-1"><a href="#SVG-1" class="headerlink" title="SVG"></a>SVG</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">d3.html(<span class="string">"resources/icon_1907.svg"</span>, loadSVG);</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">loadSVG</span>(<span class="params">svgData</span>) </span>&#123;</span><br><span class="line">  d3.selectAll(<span class="string">"g"</span>).each(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> gParent = <span class="keyword">this</span>;</span><br><span class="line">    d3.select(svgData).selectAll(<span class="string">"path"</span>).each(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      gParent.appendChild(<span class="keyword">this</span>.cloneNode(<span class="literal">true</span>))</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br><span class="line">d3.selectAll(<span class="string">"path"</span>).style(<span class="string">"fill"</span>, <span class="string">"#93C464"</span>)</span><br><span class="line">  .style(<span class="string">"stroke"</span>, <span class="string">"black"</span>).style(<span class="string">"stroke-width"</span>, <span class="string">"1px"</span>);</span><br></pre></td></tr></table></figure>
+<p>效果图<br><img src="http://pic.caigoubao.cc/604149/blog/visualization/footballs.png" alt="Football icons"></p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ul>
+<li><a href="https://www.manning.com/books/d3-js-in-action" target="_blank" rel="noopener">D3 js in action</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/27/《D3-js-in-Action-Data-visualization-with-JavaScript-2nd-》部分章节摘要/" data-id="cjmlg93nn000og82pzhvjzlpz" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/D3-js/">D3.js</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-HTTPS证书及Nginx配置相关" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/08/HTTPS证书及Nginx配置相关/" class="article-date">
+  <time datetime="2018-06-08T10:11:00.000Z" itemprop="datePublished">2018-06-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Nginx/">Nginx</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/08/HTTPS证书及Nginx配置相关/">HTTPS证书及Nginx配置相关</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文档包括：<br>Nginx支持HTTPS，自签名证书生成，配置Nginx支持HTTPS，客户端证书导入。<br>作者：方鹏</p>
+<h2 id="Nginx安装SSL模块"><a href="#Nginx安装SSL模块" class="headerlink" title="Nginx安装SSL模块"></a>Nginx安装SSL模块</h2><ol>
+<li><p>安装依赖包</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y install gcc gcc-c++ make libtool zlib zlib-devel openssl openssl-devel pcre pcre-devel</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>执行编译<br>解压安装包，进入目录，执行命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./configure --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module --with-file-aio --with-http_realip_module</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="自签名证书生成"><a href="#自签名证书生成" class="headerlink" title="自签名证书生成"></a>自签名证书生成</h2><blockquote>
+<pre><code>[root@vultr ~]# openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout bcp.key -out bcp.crt
+Generating a 2048 bit RSA private key
+...................................................&gt;     ................................+++
+....................+++
+writing new private key to &apos;bcp.key&apos;
+------
+You are about to be asked to enter information that will be incorporated into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank For some fields there will be a default value, If you enter &apos;.&apos;, the field will be left blank.
+Country Name (2 letter code) [XX]:CN
+State or Province Name (full name) []:SICHUAN
+Locality Name (eg, city) [Default City]:CHENGDU
+Organization Name (eg, company) [Default Company Ltd]:MIGU
+Organizational Unit Name (eg, section) []:TSG 
+Common Name (eg, your name or your server&apos;s hostname) []:10.146.50.22 #注意：这里填服务端的IP地址
+Email Address []:fangpeng@address.cn
+</code></pre></blockquote>
+<h2 id="配置Nginx支持HTTPS"><a href="#配置Nginx支持HTTPS" class="headerlink" title="配置Nginx支持HTTPS"></a>配置Nginx支持HTTPS</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> HTTPS server</span></span><br><span class="line">    server &#123;</span><br><span class="line">        listen       443 ssl;</span><br><span class="line">        server_name  localhost;</span><br><span class="line">        ssl on;</span><br><span class="line">        ssl_certificate      /usr/local/nginx/key/bcp.crt; #证书文件存放路径</span><br><span class="line">        ssl_certificate_key  /usr/local/nginx/key/bcp.key;</span><br><span class="line">        ssl_session_cache    shared:SSL:1m;</span><br><span class="line">        ssl_session_timeout  5m;</span><br><span class="line">        ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;</span><br><span class="line">        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;</span><br><span class="line">        ssl_prefer_server_ciphers  on;</span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">            proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">            proxy_set_header Host $http_host;</span><br><span class="line">            proxy_set_header X-NginX-Proxy true;</span><br><span class="line">            proxy_pass http://127.0.0.1:8080/; #后端服务地址</span><br><span class="line">            proxy_redirect off;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="客户端证书导入"><a href="#客户端证书导入" class="headerlink" title="客户端证书导入"></a>客户端证书导入</h2><p>如果在调用服务的客户端没有导入自签名证书，那么可能在接口调用时会出现如下错误：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sun.security.validator.ValidatorException: PKIX path building </span><br><span class="line">failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target</span><br></pre></td></tr></table></figure></p>
+<p>导入证书：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -import -alias $&#123;alias&#125; -keystore $&#123;JAVA_HOME&#125;/jre/lib/security/cacerts -file $&#123;path-to-certificate-file&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd $&#123;JAVA_HOME&#125;/jre/lib/security/</span><br><span class="line">sudo keytool -import -alias 5022-cert -keystore cacerts -file ~/server.crt</span><br></pre></td></tr></table></figure>
+<p>server.crt：服务端自签名的证书文件<br>keystore密码：默认changit<br>如果导入过证书，alias相同，会出现错误提示：<br><code>Certificate not imported, alias &lt;xxx&gt; already exists.</code><br>从keystone删除证书：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo keytool -delete -keystore cacerts -alias &apos;bcp-cert&apos;</span><br></pre></td></tr></table></figure></p>
+<p>导入后调用依然出现异常：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javax.net.ssl.SSLException: Certificate for XXX doesn&apos;t match common name of the certificate subject: XXX</span><br></pre></td></tr></table></figure></p>
+<p>原因：需要连接服务器的域名或IP和证书中的common name不一致。<br>重新生成证书，Common Name 填服务器IP。</p>
+<blockquote>
+<p>证书文件也可以通过命令请求远端站点获取</p>
+</blockquote>
+<ol>
+<li><p>获取远程网站（服务器）的根证书和中间证书</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl s_client -showcerts -connect 10.146.50.22:443</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>保存证书文件<br>保存证书hash（上图中包含–BEGIN CERTIFICATE–到–END CERTIFICATE–部分）<br>为文件，例如server.crt</p>
+</li>
+<li>证书导入keystore<br>使用keytool import 命令导入根证书和中间证书到JAVA信任的根证书中（通常叫cacerts)<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo keytool -importcert -keystore $&#123;JAVA_HOME&#125;/jre/lib/security/cacerts -storepass changeit -file ~/server.crt -alias &quot;5022-cert&quot;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>证书添加到keystore<br><a href="https://docs.oracle.com/cd/E19830-01/819-4712/ablqw/index.html" target="_blank" rel="noopener">参考文章</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/08/HTTPS证书及Nginx配置相关/" data-id="cjmlg93n70006g82p2hqhh8m6" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/HTTPS/">HTTPS</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-从接口调用安全考虑" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/17/从接口调用安全考虑/" class="article-date">
+  <time datetime="2018-05-17T10:09:00.000Z" itemprop="datePublished">2018-05-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/系统设计/">系统设计</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/17/从接口调用安全考虑/">从接口调用安全考虑</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在数据通信时，需要考虑接口访问的合法性和安全性：</p>
+<ul>
+<li>用户身份的合法性校验</li>
+<li>接口调用的合法性校验</li>
+<li>敏感数据加密</li>
+</ul>
+<h3 id="用户身份的合法性校验"><a href="#用户身份的合法性校验" class="headerlink" title="用户身份的合法性校验"></a>用户身份的合法性校验</h3><p>用户身份校验一般通过用户名和密码。这里要考虑明文如何加密为密文。具体应用中RSA加密比较常见。RSA的密钥n长度一般是1024位，长度越长就越难被破解，目前被破解最长的RSA密钥是768位。</p>
+<ol>
+<li>n能分解为两个质数的乘积，即n = p <em> q,这样我们就可以计算出欧拉函数φ(n) = (p-1)</em>(q-1)</li>
+<li>随机选择一个整数e，条件是1&lt; e &lt; φ(n)且与φ(n)互为质数</li>
+<li>计算<a href="http://zh.wikipedia.org/wiki/%E6%A8%A1%E5%8F%8D%E5%85%83%E7%B4%A0" target="_blank" rel="noopener">模反元素</a>d，使得ed被φ(n)除的余数为1。如果n能被因数分解，那么d可以被算出，意味着私钥被破解。<br>加密的公钥是(n,e)，解密的私钥是(n,d)<br>用户合法性认证以后，在整个会话过程中，必须携带服务端返回的令牌token，以保证会话的合法性。</li>
+</ol>
+<h3 id="接口调用的合法性校验"><a href="#接口调用的合法性校验" class="headerlink" title="接口调用的合法性校验"></a>接口调用的合法性校验</h3><p>为了防止接口调用中，参数被篡改或者防止重放攻击，需要在参数中加上签名。<br>在参数中可以加上imei(设备唯一Id)、timestamp，以确保签名sign的唯一性。sign=md5(path?query&amp;imei&amp;tamp&amp;SIGN_KEY)<br>服务端接收到请求后，首先根据参数和SIGN_KEY验证签名结果是否一致，然后验证时间戳是否是在一定时间范围内，比如5分钟之内，如果超过则视为无效请求，如果在时间范围内，需要检查签名是否存在Redis中以防止重放攻击，如果不存在则存入Redis中5分钟。因为签名的唯一性，如果Redis中已存在相同的签名，那么很可能是重放攻击。</p>
+<h3 id="敏感数据加密"><a href="#敏感数据加密" class="headerlink" title="敏感数据加密"></a>敏感数据加密</h3><p>HTTP协议通信是不安全的，敏感数据传输采用基于SSL的HTTPS会更安全。<br>另外敏感数据最好加密（加盐）传输，防止被篡改。</p>
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><p><a href="https://segmentfault.com/q/1010000008918918" target="_blank" rel="noopener">如何确保服务端的接口调用安全</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/17/从接口调用安全考虑/" data-id="cjmlg93nl000mg82p1wvisqr6" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/接口设计/">接口设计</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Nginx/">Nginx</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web安全/">Web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue/">vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/webpack/">webpack</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/博客/">博客</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/可视化/">可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/基础科学/">基础科学</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/感悟/">感悟</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据可视化/">数据可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/环境安装/">环境安装</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/系统设计/">系统设计</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/">Hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web安全/">Web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webcola/">webcola</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/书单/">书单</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端环境/">前端环境</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/接口设计/">接口设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据入库/">数据入库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/竞争力/">竞争力</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化部署-博客/">自动化部署 博客</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/D3-js/" style="font-size: 20px;">D3.js</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Hbase/" style="font-size: 15px;">Hbase</a> <a href="/tags/Web安全/" style="font-size: 10px;">Web安全</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/webcola/" style="font-size: 10px;">webcola</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/书单/" style="font-size: 10px;">书单</a> <a href="/tags/前端环境/" style="font-size: 10px;">前端环境</a> <a href="/tags/接口设计/" style="font-size: 10px;">接口设计</a> <a href="/tags/数据入库/" style="font-size: 10px;">数据入库</a> <a href="/tags/竞争力/" style="font-size: 10px;">竞争力</a> <a href="/tags/自动化部署-博客/" style="font-size: 10px;">自动化部署 博客</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/19/Hive2Hbase入库逻辑/">Hive2Hbase入库逻辑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/18/2018-2019技术书单/">2018-2019技术书单</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/18/怎样更有竞争力/">怎样更有竞争力</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/12/webcola介绍/">webcola介绍</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/10/Hbase基础知识点梳理/">Hbase基础知识点梳理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

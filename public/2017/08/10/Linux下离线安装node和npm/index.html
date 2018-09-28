@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Linux下离线安装node和npm | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="本文记录在Linux环境下怎样离线安装node和npm环境。 上传安装包到服务器 从Download Node.js and npm下载Linux Binaries可运行uname -a查看系统的位数，如x86_64为64为系统。先上传安装包到FTP，用root账号登录服务器后从FTP下载安装包  执行安装命令 解压安装包到想要安装node的目录 1234sudo mkdir /usr/lib/n">
+<meta name="keywords" content="前端环境">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux下离线安装node和npm">
+<meta property="og:url" content="http://yoursite.com/2017/08/10/Linux下离线安装node和npm/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="本文记录在Linux环境下怎样离线安装node和npm环境。 上传安装包到服务器 从Download Node.js and npm下载Linux Binaries可运行uname -a查看系统的位数，如x86_64为64为系统。先上传安装包到FTP，用root账号登录服务器后从FTP下载安装包  执行安装命令 解压安装包到想要安装node的目录 1234sudo mkdir /usr/lib/n">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-09-28T03:29:11.721Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux下离线安装node和npm">
+<meta name="twitter:description" content="本文记录在Linux环境下怎样离线安装node和npm环境。 上传安装包到服务器 从Download Node.js and npm下载Linux Binaries可运行uname -a查看系统的位数，如x86_64为64为系统。先上传安装包到FTP，用root账号登录服务器后从FTP下载安装包  执行安装命令 解压安装包到想要安装node的目录 1234sudo mkdir /usr/lib/n">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Linux下离线安装node和npm" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/08/10/Linux下离线安装node和npm/" class="article-date">
+  <time datetime="2017-08-10T09:56:00.000Z" itemprop="datePublished">2017-08-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/环境安装/">环境安装</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Linux下离线安装node和npm
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文记录在Linux环境下怎样离线安装node和npm环境。</p>
+<h2 id="上传安装包到服务器"><a href="#上传安装包到服务器" class="headerlink" title="上传安装包到服务器"></a>上传安装包到服务器</h2><blockquote>
+<p>从<a href="https://nodejs.org/en/download/" target="_blank" rel="noopener">Download Node.js and npm</a>下载Linux Binaries<br>可运行<code>uname -a</code>查看系统的位数，如x86_64为64为系统。<br>先上传安装包到FTP，用root账号登录服务器后从FTP下载安装包</p>
+</blockquote>
+<h2 id="执行安装命令"><a href="#执行安装命令" class="headerlink" title="执行安装命令"></a>执行安装命令</h2><ol>
+<li><p>解压安装包到想要安装node的目录</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo mkdir /usr/lib/nodejs</span><br><span class="line">sudo tar -xJvf node-v8.2.1-linux-x64.tar.xz -C /usr/lib/nodejs</span><br><span class="line"><span class="built_in">cd</span> /usr/lib/nodejs</span><br><span class="line">sudo mv node-v8.2.1-linux-x64/ node-v8.2.1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>设置环境变量<br>设置环境变量<code>vi ~/.profile</code>，在最后添加下面的shell命令</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Nodejs</span></span><br><span class="line"><span class="built_in">export</span> NODEJS_HOME=/usr/lib/nodejs/node-v8.2.1</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$NODEJS_HOME</span>/bin:<span class="variable">$PATH</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>执行<code>source ~/.profile</code>使环境变量生效</p>
+<ol start="3">
+<li>创建软链接<br>配置了环境变量，有可能出现npm命令找不到的情况。我的办法是添加软链接：<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo ln -s /usr/lib/nodejs/node-v8.2.1/bin/node /usr/bin/node</span><br><span class="line">sudo ln -s /usr/lib/nodejs/node-v8.2.1/bin/node /usr/lib/node</span><br><span class="line">sudo ln -s /usr/lib/nodejs/node-v8.2.1/bin/npm /usr/bin/npm</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<blockquote>
+<p>注意在Windows下运行过npm install安装了node组件的，到Linux下面删除node_components目录重新运行npm install。</p>
+</blockquote>
+<ol start="4">
+<li>测试安装<br>执行下面的命令测试安装是否成功<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">node -v</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>这里输出：</p>
+<blockquote>
+<p>v8.2.1</p>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm version</span><br></pre></td></tr></table></figure>
+<p>这里输出：</p>
+<blockquote>
+<pre><code>{ 
+ &apos;vue-riskaudit&apos;: &apos;1.0.5&apos;,
+  npm: &apos;5.3.0&apos;,
+  ares: &apos;1.10.1-DEV&apos;,
+  cldr: &apos;31.0.1&apos;,
+  http_parser: &apos;2.7.0&apos;,
+  icu: &apos;59.1&apos;,
+  modules: &apos;57&apos;,
+  node: &apos;8.2.1&apos;,
+  openssl: &apos;1.0.2l&apos;,
+  tz: &apos;2017b&apos;,
+  unicode: &apos;9.0&apos;,
+  uv: &apos;1.13.1&apos;,
+  v8: &apos;5.8.283.41&apos;,
+  zlib: &apos;1.2.11&apos; 
+}
+</code></pre></blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/08/10/Linux下离线安装node和npm/" data-id="cjmlg93nd000cg82pd9ng35rw" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端环境/">前端环境</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/08/14/常见的Web安全漏洞介绍及解决办法/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          常见的Web安全漏洞介绍及解决办法
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/07/31/基于VUE-VUEX-ELEMENT-UI的项目结构/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">基于VUE+VUEX+ELEMENT-UI的项目结构</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Nginx/">Nginx</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web安全/">Web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue/">vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/webpack/">webpack</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/博客/">博客</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/可视化/">可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/基础科学/">基础科学</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/感悟/">感悟</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据可视化/">数据可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/环境安装/">环境安装</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/系统设计/">系统设计</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/">Hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web安全/">Web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webcola/">webcola</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/书单/">书单</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端环境/">前端环境</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/接口设计/">接口设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据入库/">数据入库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/竞争力/">竞争力</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化部署-博客/">自动化部署 博客</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/D3-js/" style="font-size: 20px;">D3.js</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Hbase/" style="font-size: 15px;">Hbase</a> <a href="/tags/Web安全/" style="font-size: 10px;">Web安全</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/webcola/" style="font-size: 10px;">webcola</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/书单/" style="font-size: 10px;">书单</a> <a href="/tags/前端环境/" style="font-size: 10px;">前端环境</a> <a href="/tags/接口设计/" style="font-size: 10px;">接口设计</a> <a href="/tags/数据入库/" style="font-size: 10px;">数据入库</a> <a href="/tags/竞争力/" style="font-size: 10px;">竞争力</a> <a href="/tags/自动化部署-博客/" style="font-size: 10px;">自动化部署 博客</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/19/Hive2Hbase入库逻辑/">Hive2Hbase入库逻辑</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/18/2018-2019技术书单/">2018-2019技术书单</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/18/怎样更有竞争力/">怎样更有竞争力</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/12/webcola介绍/">webcola介绍</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/10/Hbase基础知识点梳理/">Hbase基础知识点梳理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
