@@ -62,6 +62,95 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-HTTPS证书及Nginx配置相关" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/08/HTTPS证书及Nginx配置相关/" class="article-date">
+  <time datetime="2018-06-08T10:11:00.000Z" itemprop="datePublished">2018-06-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Nginx/">Nginx</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/08/HTTPS证书及Nginx配置相关/">HTTPS证书及Nginx配置相关</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文档包括：<br>Nginx支持HTTPS，自签名证书生成，配置Nginx支持HTTPS，客户端证书导入。<br>作者：方鹏</p>
+<h2 id="Nginx安装SSL模块"><a href="#Nginx安装SSL模块" class="headerlink" title="Nginx安装SSL模块"></a>Nginx安装SSL模块</h2><ol>
+<li><p>安装依赖包</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y install gcc gcc-c++ make libtool zlib zlib-devel openssl openssl-devel pcre pcre-devel</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>执行编译<br>解压安装包，进入目录，执行命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./configure --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module --with-file-aio --with-http_realip_module</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="自签名证书生成"><a href="#自签名证书生成" class="headerlink" title="自签名证书生成"></a>自签名证书生成</h2><blockquote>
+<pre><code>[root@vultr ~]# openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout bcp.key -out bcp.crt
+Generating a 2048 bit RSA private key
+...................................................&gt;     ................................+++
+....................+++
+writing new private key to &apos;bcp.key&apos;
+------
+You are about to be asked to enter information that will be incorporated into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank For some fields there will be a default value, If you enter &apos;.&apos;, the field will be left blank.
+Country Name (2 letter code) [XX]:CN
+State or Province Name (full name) []:SICHUAN
+Locality Name (eg, city) [Default City]:CHENGDU
+Organization Name (eg, company) [Default Company Ltd]:MIGU
+Organizational Unit Name (eg, section) []:TSG 
+Common Name (eg, your name or your server&apos;s hostname) []:10.146.50.22 #注意：这里填服务端的IP地址
+Email Address []:fangpeng@address.cn
+</code></pre></blockquote>
+<h2 id="配置Nginx支持HTTPS"><a href="#配置Nginx支持HTTPS" class="headerlink" title="配置Nginx支持HTTPS"></a>配置Nginx支持HTTPS</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> HTTPS server</span></span><br><span class="line">    server &#123;</span><br><span class="line">        listen       443 ssl;</span><br><span class="line">        server_name  localhost;</span><br><span class="line">        ssl on;</span><br><span class="line">        ssl_certificate      /usr/local/nginx/key/bcp.crt; #证书文件存放路径</span><br><span class="line">        ssl_certificate_key  /usr/local/nginx/key/bcp.key;</span><br><span class="line">        ssl_session_cache    shared:SSL:1m;</span><br><span class="line">        ssl_session_timeout  5m;</span><br><span class="line">        ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;</span><br><span class="line">        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;</span><br><span class="line">        ssl_prefer_server_ciphers  on;</span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">            proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">            proxy_set_header Host $http_host;</span><br><span class="line">            proxy_set_header X-NginX-Proxy true;</span><br><span class="line">            proxy_pass http://127.0.0.1:8080/; #后端服务地址</span><br><span class="line">            proxy_redirect off;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="客户端证书导入"><a href="#客户端证书导入" class="headerlink" title="客户端证书导入"></a>客户端证书导入</h2><p>如果在调用服务的客户端没有导入自签名证书，那么可能在接口调用时会出现如下错误：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sun.security.validator.ValidatorException: PKIX path building </span><br><span class="line">failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target</span><br></pre></td></tr></table></figure></p>
+<p>导入证书：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -import -alias $&#123;alias&#125; -keystore $&#123;JAVA_HOME&#125;/jre/lib/security/cacerts -file $&#123;path-to-certificate-file&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd $&#123;JAVA_HOME&#125;/jre/lib/security/</span><br><span class="line">sudo keytool -import -alias 5022-cert -keystore cacerts -file ~/server.crt</span><br></pre></td></tr></table></figure>
+<p>server.crt：服务端自签名的证书文件<br>keystore密码：默认changit<br>如果导入过证书，alias相同，会出现错误提示：<br><code>Certificate not imported, alias &lt;xxx&gt; already exists.</code><br>从keystone删除证书：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo keytool -delete -keystore cacerts -alias &apos;bcp-cert&apos;</span><br></pre></td></tr></table></figure></p>
+<p>导入后调用依然出现异常：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javax.net.ssl.SSLException: Certificate for XXX doesn&apos;t match common name of the certificate subject: XXX</span><br></pre></td></tr></table></figure></p>
+<p>原因：需要连接服务器的域名或IP和证书中的common name不一致。<br>重新生成证书，Common Name 填服务器IP。</p>
+<blockquote>
+<p>证书文件也可以通过命令请求远端站点获取</p>
+</blockquote>
+<ol>
+<li><p>获取远程网站（服务器）的根证书和中间证书</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl s_client -showcerts -connect 10.146.50.22:443</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>保存证书文件<br>保存证书hash（上图中包含–BEGIN CERTIFICATE–到–END CERTIFICATE–部分）<br>为文件，例如server.crt</p>
+</li>
+<li>证书导入keystore<br>使用keytool import 命令导入根证书和中间证书到JAVA信任的根证书中（通常叫cacerts)<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo keytool -importcert -keystore $&#123;JAVA_HOME&#125;/jre/lib/security/cacerts -storepass changeit -file ~/server.crt -alias &quot;5022-cert&quot;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>证书添加到keystore<br><a href="https://docs.oracle.com/cd/E19830-01/819-4712/ablqw/index.html" target="_blank" rel="noopener">参考文章</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/08/HTTPS证书及Nginx配置相关/" data-id="cjv2bg0c800067z2pxyrvqxh2" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/HTTPS/">HTTPS</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-从接口调用安全考虑" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/05/17/从接口调用安全考虑/" class="article-date">
@@ -107,7 +196,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/17/从接口调用安全考虑/" data-id="cjnk0jz0k000m2v2pmr90likf" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/05/17/从接口调用安全考虑/" data-id="cjv2bg0cn000r7z2pnc0tqas8" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/接口设计/">接口设计</a></li></ul>
@@ -297,7 +386,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/14/常见的Web安全漏洞介绍及解决办法/" data-id="cjnk0jz0s00112v2pw2dgc8c1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/08/14/常见的Web安全漏洞介绍及解决办法/" data-id="cjv2bg0ct00117z2pvvfmssv2" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web安全/">Web安全</a></li></ul>
@@ -387,7 +476,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/10/Linux下离线安装node和npm/" data-id="cjnk0jz09000b2v2per3m8ftz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/08/10/Linux下离线安装node和npm/" data-id="cjv2bg0cg000f7z2pz62ih4nj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端环境/">前端环境</a></li></ul>
@@ -430,7 +519,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/07/31/基于VUE-VUEX-ELEMENT-UI的项目结构/" data-id="cjnk0jz0o000u2v2pf5x04o7n" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/07/31/基于VUE-VUEX-ELEMENT-UI的项目结构/" data-id="cjv2bg0cr000y7z2pfn9en2y2" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/">vue</a></li></ul>
@@ -490,7 +579,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/07/31/webpack中文文档摘要/" data-id="cjnk0jz0h000i2v2p40oaj9rb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/07/31/webpack中文文档摘要/" data-id="cjv2bg0cj000l7z2pv03w2l0i" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/webpack/">webpack</a></li></ul>
@@ -556,7 +645,7 @@ CNAME          @           默认        MGTfang.github.io.
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/07/25/利用travis自动化部署博客项目/" data-id="cjnk0jz0l000o2v2p02vmx09n" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/07/25/利用travis自动化部署博客项目/" data-id="cjv2bg0cp000t7z2pjk5feni3" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/自动化部署-博客/">自动化部署 博客</a></li></ul>
@@ -593,7 +682,7 @@ CNAME          @           默认        MGTfang.github.io.
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/">Hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web安全/">Web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webcola/">webcola</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/书单/">书单</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端环境/">前端环境</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异常解决/">异常解决</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/接口设计/">接口设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据入库/">数据入库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/竞争力/">竞争力</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化部署-博客/">自动化部署 博客</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/">Hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web安全/">Web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webcola/">webcola</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/书单/">书单</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端环境/">前端环境</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异常解决/">异常解决</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/接口设计/">接口设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据入库/">数据入库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/源码分析/">源码分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/竞争力/">竞争力</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化部署-博客/">自动化部署 博客</a></li></ul>
     </div>
   </div>
 
@@ -603,7 +692,7 @@ CNAME          @           默认        MGTfang.github.io.
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/D3-js/" style="font-size: 20px;">D3.js</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Hbase/" style="font-size: 15px;">Hbase</a> <a href="/tags/Web安全/" style="font-size: 10px;">Web安全</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/webcola/" style="font-size: 10px;">webcola</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/书单/" style="font-size: 10px;">书单</a> <a href="/tags/前端环境/" style="font-size: 10px;">前端环境</a> <a href="/tags/异常解决/" style="font-size: 10px;">异常解决</a> <a href="/tags/接口设计/" style="font-size: 10px;">接口设计</a> <a href="/tags/数据入库/" style="font-size: 10px;">数据入库</a> <a href="/tags/竞争力/" style="font-size: 10px;">竞争力</a> <a href="/tags/自动化部署-博客/" style="font-size: 10px;">自动化部署 博客</a>
+      <a href="/tags/D3-js/" style="font-size: 20px;">D3.js</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Hbase/" style="font-size: 15px;">Hbase</a> <a href="/tags/Web安全/" style="font-size: 10px;">Web安全</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/webcola/" style="font-size: 10px;">webcola</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/书单/" style="font-size: 10px;">书单</a> <a href="/tags/前端环境/" style="font-size: 10px;">前端环境</a> <a href="/tags/异常解决/" style="font-size: 10px;">异常解决</a> <a href="/tags/接口设计/" style="font-size: 10px;">接口设计</a> <a href="/tags/数据入库/" style="font-size: 10px;">数据入库</a> <a href="/tags/源码分析/" style="font-size: 10px;">源码分析</a> <a href="/tags/竞争力/" style="font-size: 10px;">竞争力</a> <a href="/tags/自动化部署-博客/" style="font-size: 10px;">自动化部署 博客</a>
     </div>
   </div>
 
@@ -612,7 +701,7 @@ CNAME          @           默认        MGTfang.github.io.
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li></ul>
     </div>
   </div>
 
@@ -623,6 +712,10 @@ CNAME          @           默认        MGTfang.github.io.
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/04/29/IE下将Web中的SVG导出PNG图片/">IE下将Web中的SVG导出PNG图片</a>
+          </li>
         
           <li>
             <a href="/2018/10/22/记一次crontab执行scp异常解决/">记一次crontab执行scp异常解决</a>
@@ -640,10 +733,6 @@ CNAME          @           默认        MGTfang.github.io.
             <a href="/2018/09/18/怎样更有竞争力/">怎样更有竞争力</a>
           </li>
         
-          <li>
-            <a href="/2018/09/12/webcola介绍/">webcola介绍</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -656,7 +745,7 @@ CNAME          @           默认        MGTfang.github.io.
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2018 Peng Fang<br>
+      &copy; 2019 Peng Fang<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
