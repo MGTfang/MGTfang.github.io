@@ -1,0 +1,330 @@
+<!DOCTYPE HTML>
+<html lang="">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="青桥雨之木芳">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://www.haoming.fun">
+    <!--SEO-->
+
+    <meta name="keywords" content="经验总结">
+
+
+    <meta name="description" content="某些场景，比如切换TAB、关闭窗口或手动触发中止时，我们想取消正在执行中的HTTP请求，特别当上传大文件时候会有中止上传的需求。开始以为中断通信，当socket传输数据时比较好处理。后来一查原来...">
+
+
+
+<meta name="robots" content="all">
+<meta name="google" content="all">
+<meta name="googlebot" content="all">
+<meta name="verify" content="all">
+
+    <!--Title-->
+
+
+<title>中止HTTP请求或文件上传的方法解析 | 青桥雨之木芳</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="青桥雨之木芳" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
+</head>
+
+</html>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='Peng Fang'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://www.haoming.fun">青桥雨之木芳</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>Home</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="中止HTTP请求或文件上传的方法解析">
+            
+	            中止HTTP请求或文件上传的方法解析
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/前端/">前端</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/经验总结/">经验总结</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/06/30</span>
+        </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <p>某些场景，比如切换TAB、关闭窗口或手动触发中止时，我们想取消正在执行中的HTTP请求，特别当上传大文件时候会有中止上传的需求。开始以为中断通信，当socket传输数据时比较好处理。后来一查原来ajax请求中也能处理。</p>
+<ol>
+<li>先看用原生js如何中断http请求<br>API：<code>XMLHttpRequest.abort()</code><br>如果该请求已被发出，XMLHttpRequest.abort() 方法将终止该请求。当一个请求被终止，它的 readyState 属性将被置为0（ UNSENT )。<br>示例：<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest(),</span><br><span class="line">    method = <span class="string">"GET"</span>,</span><br><span class="line">    url = <span class="string">"https://developer.mozilla.org/"</span>;</span><br><span class="line">xhr.open(method,url,<span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">xhr.send();</span><br><span class="line"></span><br><span class="line">xhr.abort();</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>然后想到axios拦截器应该也能中断请求吧</p>
+<ol start="2">
+<li>Axios拦截器如何中止HTTP请求<br>Axios能使用一个取消token来取消一个请求<blockquote>
+<p>Axios 取消token API 基于 <a href="https://github.com/tc39/proposal-cancelable-promises" target="_blank" rel="noopener">JS可取消去异步操作的建议</a></p>
+</blockquote>
+</li>
+</ol>
+<p>可以使用<code>CancelToken.source</code>工厂来生成一个cancel token：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> CancelToken = axios.CancelToken;</span><br><span class="line"><span class="keyword">const</span> source = CancelToken.source();</span><br><span class="line"></span><br><span class="line">axios.get(<span class="string">'/user/12345'</span>, &#123;</span><br><span class="line">  cancelToken: source.token</span><br><span class="line">&#125;).catch(<span class="function"><span class="keyword">function</span> (<span class="params">thrown</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (axios.isCancel(thrown)) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'Request canceled'</span>, thrown.message);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// handle error</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">axios.post(<span class="string">'/user/12345'</span>, &#123;</span><br><span class="line">  name: <span class="string">'new name'</span></span><br><span class="line">&#125;, &#123;</span><br><span class="line">  cancelToken: source.token</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// cancel the request (the message parameter is optional)</span></span><br><span class="line">source.cancel(<span class="string">'Operation canceled by the user.'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>注意，get请求的时候，cancelToken是放在第二个参数里；post的时候，cancelToken是放在第三个参数里。<br>每次执行<code>CancelToken.source()</code>，就会返回一个包含新的“CancelToken”的对象。<br>调用<code>source.cancel()</code>以后，实际执行的是以下函数：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">cancel</span>(<span class="params">message</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (token.reason) &#123;</span><br><span class="line">        <span class="comment">// Cancellation has already been requested</span></span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">     &#125;</span><br><span class="line">    token.reason = <span class="keyword">new</span> Cancel(message);</span><br><span class="line">     resolvePromise(token.reason);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面方法一旦resolvePromise以后，就会触发promise的then方法：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (config.cancelToken) &#123;</span><br><span class="line">     <span class="comment">// Handle cancellation</span></span><br><span class="line">     config.cancelToken.promise.then(<span class="function"><span class="keyword">function</span> <span class="title">onCanceled</span>(<span class="params">cancel</span>) </span>&#123;</span><br><span class="line">         <span class="keyword">if</span> (!request) &#123;</span><br><span class="line">             <span class="keyword">return</span>;</span><br><span class="line">         &#125;</span><br><span class="line">         request.abort();</span><br><span class="line">         reject(cancel);</span><br><span class="line">         <span class="comment">// Clean up request</span></span><br><span class="line">         request = <span class="literal">null</span>;</span><br><span class="line">     &#125;);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p> 实际上执行abort方法来中止请求，同时调用reject让外层的promise失败。</p>
+<ol start="3">
+<li>jQuery上传文件中执行取消<br>jQuery通常上传文件会用到<code>jquery.fileupload.js</code>，那么用它上传文件的时候，怎么取消呢？<br>同第一点那样可以通过<code>XMLHttpRequest.abort()</code>来取消，示例代码如下：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">$( &apos;#fileUpload&apos; ).fileupload( &#123;</span><br><span class="line">        dataType: &apos;json&apos;,</span><br><span class="line">        add: function( e, data ) &#123;</span><br><span class="line">            var abortBtn = $( &apos;&lt;a/&gt;&apos; )</span><br><span class="line">                .attr( &apos;href&apos;, &apos;javascript:void(0)&apos; )</span><br><span class="line">                .append( &apos;Abort&apos; )</span><br><span class="line">                .click( function() &#123;</span><br><span class="line">                    data.abort();</span><br><span class="line">                    data.context.remove();</span><br><span class="line">                &#125; );</span><br><span class="line"></span><br><span class="line">            data.context = $( &apos;&lt;div/&gt;&apos; )</span><br><span class="line">                .appendTo( document.body );</span><br><span class="line"></span><br><span class="line">            data.context.append( $( &apos;&lt;p/&gt;&apos; ) )</span><br><span class="line">                .append( &apos;Uploading &apos; + data.files[0].name )</span><br><span class="line">                .append( abortBtn );</span><br><span class="line"></span><br><span class="line">            data.submit();</span><br><span class="line">        &#125;,</span><br><span class="line">        done: function( e, data ) &#123;</span><br><span class="line">            /* ... */</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>上面介绍了中止HTTP请求或文件上传的两种请情况。</p>
+<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/abort" target="_blank" rel="noopener">https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/abort</a></p>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/abort" target="_blank" rel="noopener">https://github.com/axios/axios#cancellation</a></p>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/abort" target="_blank" rel="noopener">http://www.qiutianaimeili.com/html/page/2019/03/8grudzwvfmq.html</a></p>
+<p><a href="https://stackoverflow.com/questions/26218571/how-to-add-a-cancel-upload-button-to-jquery-file-upload-basic-plugin" target="_blank" rel="noopener">https://stackoverflow.com/questions/26218571/how-to-add-a-cancel-upload-button-to-jquery-file-upload-basic-plugin</a></p>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2019/06/30/如何使用GraphQL-Koa和MongoDB建立强大的API/" class="next-post btn btn-default" title='如何使用GraphQL,Koa和MongoDB建立强大的API'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">如何使用GraphQL,Koa和MongoDB建立强大的API</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+            appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: true,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: ''.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">Table of Contents</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#参考文献"><span class="toc-text">参考文献</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>

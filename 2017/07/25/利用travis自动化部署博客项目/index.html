@@ -1,96 +1,186 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  
+<!DOCTYPE HTML>
+<html lang="">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="青桥雨之木芳">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://www.haoming.fun">
+    <!--SEO-->
 
-  
-  <title>利用travis自动化部署博客项目 | 青桥雨之木芳</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="目的本文记录如何用travis实现自动化部署GitHub仓库中的博客项目，并完成域名访问。 travis登录和授权travis可以用GitHub账号登录，登录后在profile页授权允许travis访问的仓库。   比如我这里的GitHub仓库是vue-ghpages-blog，也是我准备部署的博客项目。  GitHub pages的一点概念搭建项目站点的两种方式：  一种是创建一个名为 GitH">
-<meta name="keywords" content="自动化部署 博客">
-<meta property="og:type" content="article">
-<meta property="og:title" content="利用travis自动化部署博客项目">
-<meta property="og:url" content="http://yoursite.com/2017/07/25/利用travis自动化部署博客项目/index.html">
-<meta property="og:site_name" content="青桥雨之木芳">
-<meta property="og:description" content="目的本文记录如何用travis实现自动化部署GitHub仓库中的博客项目，并完成域名访问。 travis登录和授权travis可以用GitHub账号登录，登录后在profile页授权允许travis访问的仓库。   比如我这里的GitHub仓库是vue-ghpages-blog，也是我准备部署的博客项目。  GitHub pages的一点概念搭建项目站点的两种方式：  一种是创建一个名为 GitH">
-<meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-10-22T08:24:25.215Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="利用travis自动化部署博客项目">
-<meta name="twitter:description" content="目的本文记录如何用travis实现自动化部署GitHub仓库中的博客项目，并完成域名访问。 travis登录和授权travis可以用GitHub账号登录，登录后在profile页授权允许travis访问的仓库。   比如我这里的GitHub仓库是vue-ghpages-blog，也是我准备部署的博客项目。  GitHub pages的一点概念搭建项目站点的两种方式：  一种是创建一个名为 GitH">
-  
+    <meta name="keywords" content="自动化部署 博客">
+
+
+    <meta name="description" content="目的本文记录如何用travis实现自动化部署GitHub仓库中的博客项目，并完成域名访问。
+travis登录和授权travis可以用GitHub账号登录，登录后在profile页授权允许trav...">
+
+
+
+<meta name="robots" content="all">
+<meta name="google" content="all">
+<meta name="googlebot" content="all">
+<meta name="verify" content="all">
+
+    <!--Title-->
+
+
+<title>利用travis自动化部署博客项目 | 青桥雨之木芳</title>
+
+
     <link rel="alternate" href="/atom.xml" title="青桥雨之木芳" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-  <link rel="stylesheet" href="/css/style.css">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
 </head>
 
+</html>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">青桥雨之木芳</a>
-      </h1>
-      
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='Peng Fang'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+    	</div>
     </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
-      </div>
-    </div>
-  </div>
 </header>
-      <div class="outer">
-        <section id="main"><article id="post-利用travis自动化部署博客项目" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/07/25/利用travis自动化部署博客项目/" class="article-date">
-  <time datetime="2017-07-25T09:36:00.000Z" itemprop="datePublished">2017-07-25</time>
-</a>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://www.haoming.fun">青桥雨之木芳</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>Home</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="利用travis自动化部署博客项目">
+            
+	            利用travis自动化部署博客项目
+            
+        </h1>
+        <div class="post-meta">
     
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/博客/">博客</a>
-  </div>
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/博客/">博客</a>
+        </span>
+    
 
-  </div>
-  <div class="article-inner">
     
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/自动化部署-博客/">自动化部署 博客</a>
+                
+            </span>
+        </span>
     
-      <header class="article-header">
+
+    
         
-  
-    <h1 class="article-title" itemprop="name">
-      利用travis自动化部署博客项目
-    </h1>
-  
-
-      </header>
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2017/07/25</span>
+        </span>
+        
     
-    <div class="article-entry" itemprop="articleBody">
-      
+</div>
+            
+            
+            <p class="fa fa-exclamation-triangle warning">
+                本文于<strong>705</strong>天之前发表，文中内容可能已经过时。
+            </p>
+        
+    </div>
+    
+    <div class="post-body post-content">
         <h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>本文记录如何用travis实现自动化部署GitHub仓库中的博客项目，并完成域名访问。</p>
 <h2 id="travis登录和授权"><a href="#travis登录和授权" class="headerlink" title="travis登录和授权"></a>travis登录和授权</h2><p>travis可以用GitHub账号登录，登录后在profile页授权允许travis访问的仓库。 </p>
 <blockquote>
@@ -100,158 +190,137 @@
 <blockquote>
 <p>一种是创建一个名为 <code>GitHub用户名.github.io</code>的仓库，在外网以该仓库名作为地址进行访问就可以访问到仓库里面的静态页面了。<br>另一种是给仓库创建一个gh-pages分支，将运行<code>npm run build</code>命令编译生成到项目dist目录下的文件push到gh-pages分支。访问<code>GitHub用户名.github.io/仓库名</code>如<code>https://github.com/MGTfang/vue-ghpages-blog</code>，也能访问到编译项目生成的静态文件。</p>
 </blockquote>
-<h2 id="travis自动化部署的条件"><a href="#travis自动化部署的条件" class="headerlink" title="travis自动化部署的条件"></a>travis自动化部署的条件</h2><p>在授权travis访问仓库（项目）的前提下，还需要在仓库的根目录下有个.travis.yml文件，部分内容如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">script:</span><br><span class="line">  - npm test</span><br><span class="line"></span><br><span class="line">after_success:</span><br><span class="line">  - npm run build</span><br><span class="line">  - cd dist</span><br><span class="line">  - echo <span class="string">"dtechvoi.com"</span> &gt; CNAME</span><br><span class="line">  - cp index.html <span class="number">404.</span>html</span><br><span class="line">  - git add --all .</span><br><span class="line">  - git commit --message <span class="string">"Automatically update from travis-ci"</span></span><br><span class="line">  - git push --quiet <span class="string">"https://$&#123;GH_TOKEN&#125;@$&#123;GH_REF&#125;"</span> gh-pages:gh-pages</span><br><span class="line"></span><br><span class="line"># Note: you should set Environment Variables here or 'Settings' on travis-ci.org</span><br><span class="line">env:</span><br><span class="line">  global:</span><br><span class="line">    - GH_REF: github.com/MGTfang/vue-ghpages-blog.git</span><br><span class="line">    # - GH_TOKEN: 'Your GitHub Personal access tokens, via https://github.com/settings/tokens'</span><br></pre></td></tr></table></figure></p>
+<h2 id="travis自动化部署的条件"><a href="#travis自动化部署的条件" class="headerlink" title="travis自动化部署的条件"></a>travis自动化部署的条件</h2><p>在授权travis访问仓库（项目）的前提下，还需要在仓库的根目录下有个.travis.yml文件，部分内容如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">script:</span><br><span class="line">  - npm test</span><br><span class="line"></span><br><span class="line">after_success:</span><br><span class="line">  - npm run build</span><br><span class="line">  - cd dist</span><br><span class="line">  - echo <span class="string">"dtechvoi.com"</span> &gt; CNAME</span><br><span class="line">  - cp index.html <span class="number">404.</span>html</span><br><span class="line">  - git add --all .</span><br><span class="line">  - git commit --message <span class="string">"Automatically update from travis-ci"</span></span><br><span class="line">  - git push --quiet <span class="string">"https://$&#123;GH_TOKEN&#125;@$&#123;GH_REF&#125;"</span> gh-pages:gh-pages</span><br><span class="line"></span><br><span class="line"># Note: you should set Environment Variables here or 'Settings' on travis-ci.org</span><br><span class="line">env:</span><br><span class="line">  global:</span><br><span class="line">    - GH_REF: github.com/MGTfang/vue-ghpages-blog.git</span><br><span class="line">    # - GH_TOKEN: 'Your GitHub Personal access tokens, via https://github.com/settings/tokens'</span><br></pre></td></tr></table></figure>
+
 <p>当将更改的文件push到远端仓库（这里是vue-ghpages-blog的develop分支）的时候，travis会自动执行一次build，build操作根据.travis.yml内容来进行。例如根据上面的脚本（有部分省去了），先设置环境变量GH_REF、GH_TOKEN，再更新nvm，运行npm install、npm test。</p>
 <blockquote>
 <pre><code>我这里报错：没有找到electron这个包，因此运行`npm install electron --save`进行安装
 在`npm run test`成功以后，会将build生成的文件推送到gh-pages分支。
-这里可能会出现没权限访问远端仓库的error，这样需要通过`https://github.com/settings/tokens`来设置访问token，特别主要要将repo勾选，不然照样没有权限。
-</code></pre></blockquote>
+这里可能会出现没权限访问远端仓库的error，这样需要通过`https://github.com/settings/tokens`来设置访问token，特别主要要将repo勾选，不然照样没有权限。</code></pre></blockquote>
 <h2 id="域名绑定"><a href="#域名绑定" class="headerlink" title="域名绑定"></a>域名绑定</h2><p>在域名的解析设置下添加三条记录：</p>
 <blockquote>
 <pre><code>记录类型     主机记录     解析线路(运营商)     记录值
 CNAME          @           默认        MGTfang.github.io.
     A          www         默认        192.30.252.153
-    A          www         默认        192.30.252.154
-</code></pre></blockquote>
+    A          www         默认        192.30.252.154</code></pre></blockquote>
 <p>包括两条A记录和一条CNAME记录，A记录指向以www开头的域名，记录值是GitHub的IP地址，CNAME的记录值是可以访问GitHub pages的地址。<br>除了绑定域名，还需要在访问仓库额根目录下创建一个CNAME文件，并在其中写入绑定的域名，这样直接访问域名就能访问gh-pages分支下的静态页面。</p>
 
-      
     </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/07/25/利用travis自动化部署博客项目/" data-id="cjv2bg0cp000t7z2pjk5feni3" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/自动化部署-博客/">自动化部署 博客</a></li></ul>
-
-    </footer>
-  </div>
-  
     
-<nav id="article-nav">
-  
-    <a href="/2017/07/31/webpack中文文档摘要/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          webpack中文文档摘要
-        
-      </div>
-    </a>
-  
-  
-</nav>
-
-  
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
 </article>
 
-</section>
-        
-          <aside id="sidebar">
-  
+<div class="article-nav prev-next-wrap clearfix">
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
+        <a href="/2017/07/31/webpack中文文档摘要/" class="pre-post btn btn-default" title='webpack中文文档摘要'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">webpack中文文档摘要</span>
+        </a>
+    
+    
+</div>
+
+
+    <div id="comments">
+        
+	
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+            appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: true,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: ''.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Nginx/">Nginx</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web安全/">Web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue/">vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/webpack/">webpack</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/博客/">博客</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/可视化/">可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/基础科学/">基础科学</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/感悟/">感悟</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据可视化/">数据可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/环境安装/">环境安装</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/系统设计/">系统设计</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/运维/">运维</a></li></ul>
+        <h3 class="title">Table of Contents</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#目的"><span class="toc-text">目的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#travis登录和授权"><span class="toc-text">travis登录和授权</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GitHub-pages的一点概念"><span class="toc-text">GitHub pages的一点概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#travis自动化部署的条件"><span class="toc-text">travis自动化部署的条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#域名绑定"><span class="toc-text">域名绑定</span></a></li></ol>
+        
     </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/">Hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web安全/">Web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webcola/">webcola</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/书单/">书单</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端环境/">前端环境</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异常解决/">异常解决</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/接口设计/">接口设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据入库/">数据入库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/源码分析/">源码分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/竞争力/">竞争力</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化部署-博客/">自动化部署 博客</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/D3-js/" style="font-size: 20px;">D3.js</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Hbase/" style="font-size: 15px;">Hbase</a> <a href="/tags/Web安全/" style="font-size: 10px;">Web安全</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/webcola/" style="font-size: 10px;">webcola</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/书单/" style="font-size: 10px;">书单</a> <a href="/tags/前端环境/" style="font-size: 10px;">前端环境</a> <a href="/tags/异常解决/" style="font-size: 10px;">异常解决</a> <a href="/tags/接口设计/" style="font-size: 10px;">接口设计</a> <a href="/tags/数据入库/" style="font-size: 10px;">数据入库</a> <a href="/tags/源码分析/" style="font-size: 10px;">源码分析</a> <a href="/tags/竞争力/" style="font-size: 10px;">竞争力</a> <a href="/tags/自动化部署-博客/" style="font-size: 10px;">自动化部署 博客</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2019/04/29/IE下将Web中的SVG导出PNG图片/">IE下将Web中的SVG导出PNG图片</a>
-          </li>
-        
-          <li>
-            <a href="/2018/10/22/记一次crontab执行scp异常解决/">记一次crontab执行scp异常解决</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/19/Hive2Hbase入库逻辑/">Hive2Hbase入库逻辑</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/18/2018-2019技术书单/">2018-2019技术书单</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/18/怎样更有竞争力/">怎样更有竞争力</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
 </aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2019 Peng Fang<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
     </div>
-  </div>
 </footer>
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
     
+</div>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
 
 
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
 
 
 
-  </div>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
 </body>
 </html>

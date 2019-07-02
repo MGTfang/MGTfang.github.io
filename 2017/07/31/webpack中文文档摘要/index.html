@@ -1,98 +1,190 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  
+<!DOCTYPE HTML>
+<html lang="">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="青桥雨之木芳">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://www.haoming.fun">
+    <!--SEO-->
 
-  
-  <title>webpack中文文档摘要 | 青桥雨之木芳</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="首先给出webpack中文文档的地址这是我目前见过的翻译最好的webpack文档，清晰明了。 webpack在webpack之前，前端开发人员会使用grunt和gulp等工具来处理资源，并将它们从/src文件夹移动到/dist或/build目录中。同样的方式也被用于Javascript模块。但是像webpack这样的工具，将动态打包所有的依赖项（创建所谓的依赖图），避免打包未使用的模块。webpa">
-<meta name="keywords" content="webpack">
-<meta property="og:type" content="article">
-<meta property="og:title" content="webpack中文文档摘要">
-<meta property="og:url" content="http://yoursite.com/2017/07/31/webpack中文文档摘要/index.html">
-<meta property="og:site_name" content="青桥雨之木芳">
-<meta property="og:description" content="首先给出webpack中文文档的地址这是我目前见过的翻译最好的webpack文档，清晰明了。 webpack在webpack之前，前端开发人员会使用grunt和gulp等工具来处理资源，并将它们从/src文件夹移动到/dist或/build目录中。同样的方式也被用于Javascript模块。但是像webpack这样的工具，将动态打包所有的依赖项（创建所谓的依赖图），避免打包未使用的模块。webpa">
-<meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-10-22T08:24:25.216Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="webpack中文文档摘要">
-<meta name="twitter:description" content="首先给出webpack中文文档的地址这是我目前见过的翻译最好的webpack文档，清晰明了。 webpack在webpack之前，前端开发人员会使用grunt和gulp等工具来处理资源，并将它们从/src文件夹移动到/dist或/build目录中。同样的方式也被用于Javascript模块。但是像webpack这样的工具，将动态打包所有的依赖项（创建所谓的依赖图），避免打包未使用的模块。webpa">
-  
+    <meta name="keywords" content="webpack">
+
+
+    <meta name="description" content="首先给出webpack中文文档的地址这是我目前见过的翻译最好的webpack文档，清晰明了。
+webpack在webpack之前，前端开发人员会使用grunt和gulp等工具来处理资源，并将它们...">
+
+
+
+<meta name="robots" content="all">
+<meta name="google" content="all">
+<meta name="googlebot" content="all">
+<meta name="verify" content="all">
+
+    <!--Title-->
+
+
+<title>webpack中文文档摘要 | 青桥雨之木芳</title>
+
+
     <link rel="alternate" href="/atom.xml" title="青桥雨之木芳" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-  <link rel="stylesheet" href="/css/style.css">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
 </head>
 
+</html>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">青桥雨之木芳</a>
-      </h1>
-      
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='Peng Fang'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+    	</div>
     </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
-      </div>
-    </div>
-  </div>
 </header>
-      <div class="outer">
-        <section id="main"><article id="post-webpack中文文档摘要" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/07/31/webpack中文文档摘要/" class="article-date">
-  <time datetime="2017-07-31T09:49:00.000Z" itemprop="datePublished">2017-07-31</time>
-</a>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://www.haoming.fun">青桥雨之木芳</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>Home</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="webpack中文文档摘要">
+            
+	            webpack中文文档摘要
+            
+        </h1>
+        <div class="post-meta">
     
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/webpack/">webpack</a>
-  </div>
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/webpack/">webpack</a>
+        </span>
+    
 
-  </div>
-  <div class="article-inner">
     
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/webpack/">webpack</a>
+                
+            </span>
+        </span>
     
-      <header class="article-header">
+
+    
         
-  
-    <h1 class="article-title" itemprop="name">
-      webpack中文文档摘要
-    </h1>
-  
-
-      </header>
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2017/07/31</span>
+        </span>
+        
     
-    <div class="article-entry" itemprop="articleBody">
-      
+</div>
+            
+            
+            <p class="fa fa-exclamation-triangle warning">
+                本文于<strong>699</strong>天之前发表，文中内容可能已经过时。
+            </p>
+        
+    </div>
+    
+    <div class="post-body post-content">
         <p>首先给出webpack中文文档的<a href="https://doc.webpack-china.org/guides/getting-started/#-" target="_blank" rel="noopener">地址</a><br>这是我目前见过的翻译最好的webpack文档，清晰明了。</p>
-<h2 id="webpack"><a href="#webpack" class="headerlink" title="webpack"></a>webpack</h2><p>在webpack之前，前端开发人员会使用grunt和gulp等工具来处理资源，并将它们从/src文件夹移动到/dist或/build目录中。同样的方式也被用于Javascript模块。但是像webpack这样的工具，将动态打包所有的依赖项（创建所谓的依赖图），避免打包未使用的模块。webpack最出色的功能之一就是除了JavaScript，还可以通过loader因人员任何其他类型的文件。<br>webpack打包命令默认选择使用一个配置文件叫webpack.config.js，改文件存在于根目录下。配置文件具有更强的灵活性，我们可以通过配置方式指定loader规则(loader rules)、插件(plugins)、解析选项(resolve options)，以及许多其他增强功能。<br>初始化npm (npm init -y)会生成一个package.json，其中可以配npm 脚本和项目所需的依赖等。使用npm的scripts，我们可以通过模块名，来引用本地安装的npm包，而不是写出完整路径。例如：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="string">"scripts"</span>: &#123;</span><br><span class="line">    <span class="string">"build"</span>: <span class="string">"webpack"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="webpack"><a href="#webpack" class="headerlink" title="webpack"></a>webpack</h2><p>在webpack之前，前端开发人员会使用grunt和gulp等工具来处理资源，并将它们从/src文件夹移动到/dist或/build目录中。同样的方式也被用于Javascript模块。但是像webpack这样的工具，将动态打包所有的依赖项（创建所谓的依赖图），避免打包未使用的模块。webpack最出色的功能之一就是除了JavaScript，还可以通过loader因人员任何其他类型的文件。<br>webpack打包命令默认选择使用一个配置文件叫webpack.config.js，改文件存在于根目录下。配置文件具有更强的灵活性，我们可以通过配置方式指定loader规则(loader rules)、插件(plugins)、解析选项(resolve options)，以及许多其他增强功能。<br>初始化npm (npm init -y)会生成一个package.json，其中可以配npm 脚本和项目所需的依赖等。使用npm的scripts，我们可以通过模块名，来引用本地安装的npm包，而不是写出完整路径。例如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="string">"scripts"</span>: &#123;</span><br><span class="line">    <span class="string">"build"</span>: <span class="string">"webpack"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>我们直接调用webpack这样的别名，而不是去调用./node_modules/.bin/webpack<br>通过向npm run build命令和我们的参数之间添加两个中横线，可以将自定义参数传递给webpack，例如: npm run build – –colors</p>
 <h2 id="管理输出"><a href="#管理输出" class="headerlink" title="管理输出"></a>管理输出</h2><h3 id="加载CSS"><a href="#加载CSS" class="headerlink" title="加载CSS"></a>加载CSS</h3><p>为了从JavaScript模块中import一个css文件，你需要在webpack.config.js的module配置中安装并添加style-loader和css-loader。webpack根据正则表达式，来确定应该查找哪些文件，并将其提供给指定的loader。这样可以在依赖此样式的文件中import某个样式文件，当模块运行时，含有CSS字符串的<code>&lt;style&gt;</code>标签将被插入到HTML文件的<code>&lt;head&gt;</code>中。</p>
 <blockquote>
@@ -107,150 +199,131 @@
 <blockquote>
 <p>在使用d3等工具来实现某些数据可视化时，预加载数据会非常有用。构建过程中将数据提前载入并打包到模块中，以便浏览器加载模块后，可以立即从模块中解析数据。</p>
 </blockquote>
-<h3 id="全局资源"><a href="#全局资源" class="headerlink" title="全局资源"></a>全局资源</h3><p>上述内容最出色之处是，以这种方式加载资源，可以更直观地将模块和资源组合在一起，无需依赖于含有全部资源的/asset目录，而是将资源与代码组合在一起。例如：类似这样的结构非常有用：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+ |– /components</span><br><span class="line">+ |  |– /my-component</span><br><span class="line">+ |  |  |– index.jsx</span><br><span class="line">+ |  |  |– index.css</span><br><span class="line">+ |  |  |– icon.svg</span><br><span class="line">+ |  |  |– img.png</span><br></pre></td></tr></table></figure></p>
+<h3 id="全局资源"><a href="#全局资源" class="headerlink" title="全局资源"></a>全局资源</h3><p>上述内容最出色之处是，以这种方式加载资源，可以更直观地将模块和资源组合在一起，无需依赖于含有全部资源的/asset目录，而是将资源与代码组合在一起。例如：类似这样的结构非常有用：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+ |– /components</span><br><span class="line">+ |  |– /my-component</span><br><span class="line">+ |  |  |– index.jsx</span><br><span class="line">+ |  |  |– index.css</span><br><span class="line">+ |  |  |– icon.svg</span><br><span class="line">+ |  |  |– img.png</span><br></pre></td></tr></table></figure>
+
 <p>这种配置方式会使你的代码更具备可移植性，现有统一放置的方式会造成所有资源紧密耦合在一起。假如在想在另一个项目中使用/my-component，只需将其复制或移动到/components目录下。只要你安装了扩展依赖，并且配置过相同的loader，那么项目应该可以良好运行。<br>但是这样的缺点是无法使用新的开发方式或者在多个组件之间共享资源。仍然可以将这些资源存储在公共目录中，甚至配合使用alias来使它们更方便导入。</p>
 
-      
     </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/07/31/webpack中文文档摘要/" data-id="cjv2bg0cj000l7z2pv03w2l0i" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/webpack/">webpack</a></li></ul>
-
-    </footer>
-  </div>
-  
     
-<nav id="article-nav">
-  
-    <a href="/2017/07/31/基于VUE-VUEX-ELEMENT-UI的项目结构/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          基于VUE+VUEX+ELEMENT-UI的项目结构
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2017/07/25/利用travis自动化部署博客项目/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">利用travis自动化部署博客项目</div>
-    </a>
-  
-</nav>
-
-  
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
 </article>
 
-</section>
-        
-          <aside id="sidebar">
-  
+<div class="article-nav prev-next-wrap clearfix">
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
+        <a href="/2017/07/31/基于VUE-VUEX-ELEMENT-UI的项目结构/" class="pre-post btn btn-default" title='基于VUE+VUEX+ELEMENT-UI的项目结构'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">基于VUE+VUEX+ELEMENT-UI的项目结构</span>
+        </a>
+    
+    
+        <a href="/2017/07/25/利用travis自动化部署博客项目/" class="next-post btn btn-default" title='利用travis自动化部署博客项目'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">利用travis自动化部署博客项目</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+            appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: true,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: ''.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Nginx/">Nginx</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web安全/">Web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue/">vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/webpack/">webpack</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/博客/">博客</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/可视化/">可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/基础科学/">基础科学</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/感悟/">感悟</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据可视化/">数据可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/环境安装/">环境安装</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/系统设计/">系统设计</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/运维/">运维</a></li></ul>
+        <h3 class="title">Table of Contents</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#webpack"><span class="toc-text">webpack</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#管理输出"><span class="toc-text">管理输出</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#加载CSS"><span class="toc-text">加载CSS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#加载图片"><span class="toc-text">加载图片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#加载字体"><span class="toc-text">加载字体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#加载数据"><span class="toc-text">加载数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#全局资源"><span class="toc-text">全局资源</span></a></li></ol></li></ol>
+        
     </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/">Hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web安全/">Web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webcola/">webcola</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/书单/">书单</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端环境/">前端环境</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异常解决/">异常解决</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/接口设计/">接口设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据入库/">数据入库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/源码分析/">源码分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/竞争力/">竞争力</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化部署-博客/">自动化部署 博客</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/D3-js/" style="font-size: 20px;">D3.js</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Hbase/" style="font-size: 15px;">Hbase</a> <a href="/tags/Web安全/" style="font-size: 10px;">Web安全</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/webcola/" style="font-size: 10px;">webcola</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/书单/" style="font-size: 10px;">书单</a> <a href="/tags/前端环境/" style="font-size: 10px;">前端环境</a> <a href="/tags/异常解决/" style="font-size: 10px;">异常解决</a> <a href="/tags/接口设计/" style="font-size: 10px;">接口设计</a> <a href="/tags/数据入库/" style="font-size: 10px;">数据入库</a> <a href="/tags/源码分析/" style="font-size: 10px;">源码分析</a> <a href="/tags/竞争力/" style="font-size: 10px;">竞争力</a> <a href="/tags/自动化部署-博客/" style="font-size: 10px;">自动化部署 博客</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2019/04/29/IE下将Web中的SVG导出PNG图片/">IE下将Web中的SVG导出PNG图片</a>
-          </li>
-        
-          <li>
-            <a href="/2018/10/22/记一次crontab执行scp异常解决/">记一次crontab执行scp异常解决</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/19/Hive2Hbase入库逻辑/">Hive2Hbase入库逻辑</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/18/2018-2019技术书单/">2018-2019技术书单</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/18/怎样更有竞争力/">怎样更有竞争力</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
 </aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2019 Peng Fang<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
     </div>
-  </div>
 </footer>
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
     
+</div>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
 
 
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
 
 
 
-  </div>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
 </body>
 </html>

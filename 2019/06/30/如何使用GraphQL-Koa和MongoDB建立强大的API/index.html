@@ -1,0 +1,401 @@
+<!DOCTYPE HTML>
+<html lang="">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="青桥雨之木芳">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://www.haoming.fun">
+    <!--SEO-->
+
+    <meta name="keywords" content="API,GraphQL,Koa,MongoDB">
+
+
+    <meta name="description" content="构建API是很有趣的，特别当你可以在项目中使用诸如koa、graphql和mongodb等技术的时候。
+和Express一样，koa是一个Node框架，很多功能需要借助第三方中间件解决，由于其基...">
+
+
+
+<meta name="robots" content="all">
+<meta name="google" content="all">
+<meta name="googlebot" content="all">
+<meta name="verify" content="all">
+
+    <!--Title-->
+
+
+<title>如何使用GraphQL,Koa和MongoDB建立强大的API | 青桥雨之木芳</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="青桥雨之木芳" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
+</head>
+
+</html>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='Peng Fang'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://www.haoming.fun">青桥雨之木芳</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>Home</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="如何使用GraphQL,Koa和MongoDB建立强大的API">
+            
+	            如何使用GraphQL,Koa和MongoDB建立强大的API
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/前端/">前端</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/API/">API</a> <a class="tag-link" href="/tags/GraphQL/">GraphQL</a> <a class="tag-link" href="/tags/Koa/">Koa</a> <a class="tag-link" href="/tags/MongoDB/">MongoDB</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/06/30</span>
+        </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <p>构建API是很有趣的，特别当你可以在项目中使用诸如koa、graphql和mongodb等技术的时候。</p>
+<p>和Express一样，koa是一个Node框架，很多功能需要借助第三方中间件解决，由于其基于ES6 generator特性的异步流程控制，解决了”回调地狱”和麻烦的错误处理问题，大受开发者欢迎。Express采用callback来处理异步，Koa v1采用generator，Koa v2采用async/await。<br>enerator和async/await使用同步的写法来处理异步，明显好于callback和promise，而async/await在语义化上又要比generator更强。</p>
+<p><img src="https://www.haoming.fun/images/koa.png" alt="koa"></p>
+<p><a href="https://github.com/koajs/koa" target="_blank" rel="noopener">Koa Github 仓库</a><br><a href="https://github.com/expressjs/express" target="_blank" rel="noopener">Express Github 仓库</a></p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>构建API的先决条件如下：</p>
+<ul>
+<li>安装Node</li>
+<li>IDE，建议VS code</li>
+<li>命令行终端</li>
+<li>浏览器</li>
+</ul>
+<p>如果具备了上述的条件，可以继续下面的工作了；如果没有的话，请安装它们。</p>
+<p>打开终端，创建一个node项目，像这样：<br><img src="https://www.haoming.fun/images/init.png" alt="init project"><br>目前为止， 我们创建了项目目录，初始化一个新的node项目。接下来我们通过npm包来安装Koa、Mongo和GraphQL。<br>首先安装koa：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i koa</span><br></pre></td></tr></table></figure>
+
+<p>启动一个新的Koa服务非常简单。我们需要一个<code>server.js</code>文件，它的内容如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Koa = <span class="built_in">require</span>(<span class="string">'koa'</span>);</span><br><span class="line"><span class="keyword">const</span> app = <span class="keyword">new</span> Koa();</span><br><span class="line">app.listen(<span class="number">9000</span>);</span><br><span class="line">app.on(<span class="string">'error'</span>, err =&gt; &#123;</span><br><span class="line">  log.error(<span class="string">'server error'</span>, err)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>用Node启动项目：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">node server.js</span><br></pre></td></tr></table></figure>
+
+<h2 id="GraphQL"><a href="#GraphQL" class="headerlink" title="GraphQL"></a>GraphQL</h2><p>我们需要使用<code>koa-mount</code>和<code>koa-graphql</code>两个包来安装GraphQL，后者创建Graphql HTTP服务，前者将Koa应用挂载为中间件（挂载到某个路径上）,然后安装依赖包<code>graphql</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i koa-mount koa-graphql graphql</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://www.haoming.fun/images/koa-mount.png" alt="koa-mount"><br><img src="https://www.haoming.fun/images/koa-graphql.png" alt="koa-graphql"><br>GraphQL需要传递初始的模式（schema）给GraphQL服务。下面创建一个：将Graphql schema放到<code>graphql/schema.js</code>里面。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; buildSchema &#125; = <span class="built_in">require</span>(<span class="string">'graphql'</span>);</span><br><span class="line"><span class="keyword">const</span> schema = buildSchema(<span class="string">`</span></span><br><span class="line"><span class="string">  type Query &#123;</span></span><br><span class="line"><span class="string">    hello: String</span></span><br><span class="line"><span class="string">  &#125;</span></span><br><span class="line"><span class="string">`</span>);</span><br><span class="line"><span class="built_in">module</span>.exports = schema;</span><br></pre></td></tr></table></figure>
+
+<p>将Query类传给buildSchema函数，这里它的参数使用了模版字符串。<br>现在我们能将初始的schema传给graphql服务了。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">app.use(mount(<span class="string">'/graphql'</span>, graphqlHTTP(&#123;</span><br><span class="line">  schema: schema,</span><br><span class="line">  graphiql: <span class="literal">true</span></span><br><span class="line">&#125;)))</span><br></pre></td></tr></table></figure>
+
+<p>不要忘了导入<code>koa-mount</code>、<code>koa-graphql</code>，以及<code>schema.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> mount = <span class="built_in">require</span>(<span class="string">'koa-mount'</span>);</span><br><span class="line"><span class="keyword">const</span> graphqlHTTP = <span class="built_in">require</span>(<span class="string">'koa-graphql'</span>);</span><br><span class="line"><span class="keyword">const</span> schema = <span class="built_in">require</span>(<span class="string">'https://www.haoming.fun/images/graphql/schema'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>通过node启动<code>server.js</code>以后，在浏览器地址栏访问<code>localhost:9000/graphql</code><br><img src="https://www.haoming.fun/images/graphql-query.png" alt="access graphql"><br>最初的构建完成，但还不是很有用。我们还想通过 grahql API 来查询 MongoDB 保存的数据。</p>
+<h2 id="安装MongoDB"><a href="#安装MongoDB" class="headerlink" title="安装MongoDB"></a>安装MongoDB</h2><p>为了使用GraphQL来读写数据，我们需要有个读写的来源，这就是MongoDB。下面介绍如何在Centos上安装MongoDB。</p>
+<h3 id="创建yum源文件"><a href="#创建yum源文件" class="headerlink" title="创建yum源文件"></a>创建yum源文件</h3><p><code>vim /etc/yum.repos.d/mongodb-org-4.0.repo</code><br>添加以下内容</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[mongodb-org-4.0]</span><br><span class="line">name=MongoDB Repository</span><br><span class="line">baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.0/x86_64/</span><br><span class="line">gpgcheck=1</span><br><span class="line">enabled=1</span><br><span class="line">gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-yum-安装MongoDB"><a href="#使用-yum-安装MongoDB" class="headerlink" title="使用 yum 安装MongoDB"></a>使用 yum 安装MongoDB</h3><p><code>yum install -y mongodb-org</code></p>
+<h3 id="配置MongoDB"><a href="#配置MongoDB" class="headerlink" title="配置MongoDB"></a>配置MongoDB</h3><p><code>vim /etc/mongod.conf</code><br>配置<code>mongod.conf</code>来开启远程连接： 把第30行<code>bindIp: 127.0.0.1</code>改为<code>bindIp: 0.0.0.0</code></p>
+<h3 id="启动MongoDB服务"><a href="#启动MongoDB服务" class="headerlink" title="启动MongoDB服务"></a>启动MongoDB服务</h3><p><code>systemctl start mongod</code><br>服务器本地连接测试<br><code>mongo --host 127.0.0.1 --port 27017</code></p>
+<h3 id="本地连接MongoDB需要开启防火墙访问策略："><a href="#本地连接MongoDB需要开启防火墙访问策略：" class="headerlink" title="本地连接MongoDB需要开启防火墙访问策略："></a>本地连接MongoDB需要开启防火墙访问策略：</h3><p><img src="https://www.haoming.fun/images/open-firewall.png" alt="open firewall"></p>
+<h3 id="另外附上：启用-停止-重启-MongoDB-服务的命令"><a href="#另外附上：启用-停止-重启-MongoDB-服务的命令" class="headerlink" title="另外附上：启用/停止/重启 MongoDB 服务的命令"></a>另外附上：启用/停止/重启 MongoDB 服务的命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">systemctl start mongod.service　　</span><br><span class="line">systemctl stop  mongod.service　　</span><br><span class="line">systemctl restart mongod.service</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建MongoDB用户"><a href="#创建MongoDB用户" class="headerlink" title="创建MongoDB用户"></a>创建MongoDB用户</h3><p>创建数据库用户，可以参考<a href="https://www.cnblogs.com/damingge/p/6507605.html" target="_blank" rel="noopener">MongoDB 用户权限管理</a></p>
+<h3 id="创建数据库"><a href="#创建数据库" class="headerlink" title="创建数据库"></a>创建数据库</h3><p>在 MongoDB 中默认数据库是：test。 如果还没有创建过任何数据库，则集合/文档将存储在test数据库中。新建数据库可以参考<a href="https://www.cnblogs.com/haoliansheng/p/4390267.html" target="_blank" rel="noopener">怎么创建MongoDB数据库</a></p>
+<h2 id="数据库连接测试"><a href="#数据库连接测试" class="headerlink" title="数据库连接测试"></a>数据库连接测试</h2><p>连接MongoDB的客户端很多，这里选择Robo 3T，新建MongoDB连接如下：<br><img src="https://www.haoming.fun/images/connect1.png" alt="连接"><br><img src="https://www.haoming.fun/images/connect2.png" alt="认证"></p>
+<p>现在我们能使用Mongoose来和MongoDB配对。远程连接数据库的URL像这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mongodb:<span class="comment">//$&#123;mongoAuth.user&#125;:$&#123;mongoAuth.pass&#125;@$&#123;ip&#125;:$&#123;port&#125;/$&#123;db&#125;&amp;authMechanism=SCRAM-SHA-256?authSource=admin</span></span><br></pre></td></tr></table></figure>
+
+<p>安装mongoose</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i mongoose</span><br></pre></td></tr></table></figure>
+
+<p>创建一个专门用来连接数据库的文件<code>database.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> mongoose = <span class="built_in">require</span>(<span class="string">'mongoose'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> initDB = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  mongoose.connect(</span><br><span class="line">    <span class="string">'mongodb://admin:password@47.99.xx.xx/test?authSource=admin&amp;authMechanism=SCRAM-SHA-256'</span>,</span><br><span class="line">    &#123; <span class="attr">useNewUrlParser</span>: <span class="literal">true</span> &#125;</span><br><span class="line">  );</span><br><span class="line">  mongoose.connection.once(<span class="string">'open'</span>, () =&gt; &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'connected to database'</span>);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = initDB;</span><br></pre></td></tr></table></figure>
+
+<p>注意：MongoDB的连接字符串保证是能验证通过的。上面的代码块完成数据库连接的测试。我们需要将<code>database.js</code>引入到<code>server.js</code>，并调用initDB。<code>server.js</code>加入以下代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> initDB = <span class="built_in">require</span>(<span class="string">'https://www.haoming.fun/images/database'</span>);</span><br><span class="line"></span><br><span class="line">initDB();</span><br></pre></td></tr></table></figure>
+
+<p>如果以上的各个步骤都正确完成，控制台会打印“connected to databse”。<br><img src="https://www.haoming.fun/images/connect3.png" alt="connect success"></p>
+<p>怎样可以不用每次修改代码以后，重新启动server呢？我们可以安装<a href="https://github.com/Unitech/pm2" target="_blank" rel="noopener">PM2</a>来达到热加载的目的。先全局安装pm2包。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install pm2 -g</span><br></pre></td></tr></table></figure>
+
+<p>再在<code>package.json</code>中添加启动脚本如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"scripts"</span>: &#123;</span><br><span class="line">    <span class="string">"start"</span>: <span class="string">"pm2 start server.js"</span></span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+
+<p>执行<code>yarn run start</code>命令来启动我们的node服务。<br><img src="https://www.haoming.fun/images/pm2.png" alt="pm2 start server"><br>这样服务就在后台运行了，如果想杀掉进程，可以使用<code>pm2 kill</code>。现在我们不必一直重启我们的服务，pm2会自动刷新服务。</p>
+<h2 id="MongoDB-模型"><a href="#MongoDB-模型" class="headerlink" title="MongoDB 模型"></a>MongoDB 模型</h2><p>如果你以前使用过Mongo，你应该知道MongoDB让我们为数据创建模型。对于我们来说，这是一个很好的方法来构造数据的结构。<br>创建一个models目录，下面创建一个文件<code>gadget.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> mongoose = <span class="built_in">require</span>(<span class="string">'mongoose'</span>);</span><br><span class="line"><span class="keyword">const</span> Schema = mongoose.Schema;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  注意这里没有ID字段. 因为MongoDB会为所有Schema分配默认ID</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">const</span> GadgetSchema = <span class="keyword">new</span> Schema(&#123;</span><br><span class="line">  name: <span class="built_in">String</span>,</span><br><span class="line">  release_date: <span class="built_in">Date</span>,</span><br><span class="line">  by_company: <span class="built_in">String</span>,</span><br><span class="line">  price: <span class="built_in">Number</span>,</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = mongoose.model(<span class="string">'Gadget'</span>, GadgetSchema);</span><br></pre></td></tr></table></figure>
+
+<p>接下来需要在数据库添加一个集合和一次测试数据，对应的集合名必须是复数，这里用<code>gadgets</code>.<br><img src="https://www.haoming.fun/images/gadgets1.png" alt="gadgets"></p>
+<h2 id="GraphQL-查询"><a href="#GraphQL-查询" class="headerlink" title="GraphQL 查询"></a>GraphQL 查询</h2><p>GrpahQL需要我们创建类型，可以将它类比为计算机指令一样。<br><code>https://www.haoming.fun/images/graphql/gadgetType.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> graphql = <span class="built_in">require</span>(<span class="string">'graphql'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> &#123; GraphQLObjectType, GraphQLString &#125; = graphql;</span><br><span class="line"><span class="keyword">const</span> GadgetType = <span class="keyword">new</span> GraphQLObjectType(&#123;</span><br><span class="line">  name: <span class="string">'Gadget'</span>,</span><br><span class="line">  fields: <span class="function"><span class="params">()</span> =&gt;</span> (&#123;</span><br><span class="line"></span><br><span class="line">  &#125;)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = GadgetType;</span><br></pre></td></tr></table></figure>
+
+<p>我们创建了一个graphql类型，然后再具体定义给定类型内部的属性。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> graphql = <span class="built_in">require</span>(<span class="string">'graphql'</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; GraphQLObjectType, GraphQLString &#125; = graphql;</span><br><span class="line"><span class="keyword">const</span> GadgetType = <span class="keyword">new</span> GraphQLObjectType(&#123;</span><br><span class="line">  name: <span class="string">'Gadget'</span>,</span><br><span class="line">  fields: <span class="function"><span class="params">()</span> =&gt;</span> (&#123;</span><br><span class="line">    id: &#123; <span class="attr">type</span>: GraphQLString &#125;,</span><br><span class="line">    name: &#123; <span class="attr">type</span>: GraphQLString &#125;,</span><br><span class="line">    release_date: &#123; <span class="attr">type</span>: GraphQLString &#125;,</span><br><span class="line">    by_company: &#123; <span class="attr">type</span>: GraphQLString &#125;,</span><br><span class="line">    price: &#123; <span class="attr">type</span>: GraphQLString &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = GadgetType;</span><br></pre></td></tr></table></figure>
+
+<p>注意将<code>GraphQLObjectType</code>和<code>GraphQLObjectType</code>从graphql解构出来，它们是graphql的基本类型。创建GraphQL类型使得创建查询语句时会有类型提示。</p>
+<p>最后一件事情是重构<code>schema.js</code>。我们想通过id查询gadget。向<code>schema.js</code>导入模型Gadget，从graphql导入``GraphQLSchema<code>、</code>GraphQLObjectType<code>、</code>GraphQLString<code>，以及导入graphql类型</code>gadgetGraphQLType`。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; GraphQLSchema, GraphQLObjectType, GraphQLString&#125; = <span class="built_in">require</span>(<span class="string">'graphql'</span>);</span><br><span class="line"><span class="keyword">const</span> gadgetGraphQLType =  <span class="built_in">require</span>(<span class="string">'https://www.haoming.fun/images/gadgetType'</span>);</span><br><span class="line"><span class="keyword">const</span> Gadget = <span class="built_in">require</span>(<span class="string">'.https://www.haoming.fun/images/models/gadget'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>接下来需要一个根查询，每个graphql查询都以花括号开头。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> RootQuery = <span class="keyword">new</span> GraphQLObjectType(&#123;</span><br><span class="line">  name: <span class="string">'RootQueryType'</span>,</span><br><span class="line">  fields: &#123;</span><br><span class="line">    gadget: &#123;</span><br><span class="line">      type: gadgetGraphQLType,</span><br><span class="line">      args: &#123; <span class="attr">id</span>: &#123; <span class="attr">type</span>: GraphQLString &#125;&#125;,</span><br><span class="line">      resolve(parent, args) &#123;</span><br><span class="line">        <span class="keyword">return</span> Gadget.findById(args.id)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>gadget查询里面有三个属性：</p>
+<ul>
+<li>type-查询的类型</li>
+<li>args-提供给graphql查询的参数</li>
+<li>resolve-查询完成后要做什么？这里是按照id返回gadget</li>
+</ul>
+<p>最后导出schema：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = <span class="keyword">new</span> GraphQLSchema(&#123;</span><br><span class="line">  query: RootQuery</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>在浏览器地址栏输入 <a href="http://localhost:9000/graphql" target="_blank" rel="noopener">http://localhost:9000/graphql</a> ，然后编写查询语句：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    gadget(id: <span class="string">"5cc5109a41aedb25d85c211d"</span>) &#123;</span><br><span class="line">        name</span><br><span class="line">        price</span><br><span class="line">        by_company</span><br><span class="line">        release_date</span><br><span class="line">        id</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后的查询结果应该是这样：<br><img src="https://www.haoming.fun/images/query.png" alt="graphql query"></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cnblogs.com/sybboy/p/6418526.html" target="_blank" rel="noopener">https://www.cnblogs.com/sybboy/p/6418526.html</a><br><a href="https://www.cnblogs.com/haoliansheng/p/4390267.html" target="_blank" rel="noopener">https://www.cnblogs.com/haoliansheng/p/4390267.html</a><br><a href="https://www.cnblogs.com/damingge/p/6507605.html" target="_blank" rel="noopener">https://www.cnblogs.com/damingge/p/6507605.html</a><br><a href="https://www.yiibai.com/mongodb/mongodb_create_database.html" target="_blank" rel="noopener">https://www.yiibai.com/mongodb/mongodb_create_database.html</a><br><a href="https://www.strilliant.com/2019/01/27/how-to-setup-a-powerful-api-with-graphql-koa-and-mongodb/" target="_blank" rel="noopener">https://www.strilliant.com/2019/01/27/how-to-setup-a-powerful-api-with-graphql-koa-and-mongodb/</a></p>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2019/06/30/中止HTTP请求或文件上传的方法解析/" class="pre-post btn btn-default" title='中止HTTP请求或文件上传的方法解析'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">中止HTTP请求或文件上传的方法解析</span>
+        </a>
+    
+    
+        <a href="/2019/04/29/IE下将Web中的SVG导出PNG图片/" class="next-post btn btn-default" title='IE下将Web中的SVG导出PNG图片'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">IE下将Web中的SVG导出PNG图片</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+            appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: true,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: ''.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">Table of Contents</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#准备工作"><span class="toc-text">准备工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GraphQL"><span class="toc-text">GraphQL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装MongoDB"><span class="toc-text">安装MongoDB</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#创建yum源文件"><span class="toc-text">创建yum源文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用-yum-安装MongoDB"><span class="toc-text">使用 yum 安装MongoDB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#配置MongoDB"><span class="toc-text">配置MongoDB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#启动MongoDB服务"><span class="toc-text">启动MongoDB服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#本地连接MongoDB需要开启防火墙访问策略："><span class="toc-text">本地连接MongoDB需要开启防火墙访问策略：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#另外附上：启用-停止-重启-MongoDB-服务的命令"><span class="toc-text">另外附上：启用/停止/重启 MongoDB 服务的命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#创建MongoDB用户"><span class="toc-text">创建MongoDB用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#创建数据库"><span class="toc-text">创建数据库</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据库连接测试"><span class="toc-text">数据库连接测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MongoDB-模型"><span class="toc-text">MongoDB 模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GraphQL-查询"><span class="toc-text">GraphQL 查询</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-text">参考</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>

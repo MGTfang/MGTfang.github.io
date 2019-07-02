@@ -1,96 +1,185 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  
+<!DOCTYPE HTML>
+<html lang="">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="青桥雨之木芳">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://www.haoming.fun">
+    <!--SEO-->
 
-  
-  <title>Hive2Hbase入库逻辑 | 青桥雨之木芳</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Parquet格式hdfs文件根据规则生成HFile 创建和设置habse参数 清楚输出目录下HFile文件 创建mapreduce job 设置mapper：job.setJarByClass, job.setMapperClass, job.setMapOutputKeyClass, job.setMapOutputValueClass； 设置Parquet格式的解析器； 设置合并方法：job">
-<meta name="keywords" content="Hbase,数据入库">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Hive2Hbase入库逻辑">
-<meta property="og:url" content="http://yoursite.com/2018/09/19/Hive2Hbase入库逻辑/index.html">
-<meta property="og:site_name" content="青桥雨之木芳">
-<meta property="og:description" content="Parquet格式hdfs文件根据规则生成HFile 创建和设置habse参数 清楚输出目录下HFile文件 创建mapreduce job 设置mapper：job.setJarByClass, job.setMapperClass, job.setMapOutputKeyClass, job.setMapOutputValueClass； 设置Parquet格式的解析器； 设置合并方法：job">
-<meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-10-22T08:24:25.217Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hive2Hbase入库逻辑">
-<meta name="twitter:description" content="Parquet格式hdfs文件根据规则生成HFile 创建和设置habse参数 清楚输出目录下HFile文件 创建mapreduce job 设置mapper：job.setJarByClass, job.setMapperClass, job.setMapOutputKeyClass, job.setMapOutputValueClass； 设置Parquet格式的解析器； 设置合并方法：job">
-  
+    <meta name="keywords" content="Hbase,数据入库">
+
+
+    <meta name="description" content="Parquet格式hdfs文件根据规则生成HFile
+创建和设置habse参数
+清楚输出目录下HFile文件
+创建mapreduce job
+设置mapper：job.setJarByClass...">
+
+
+
+<meta name="robots" content="all">
+<meta name="google" content="all">
+<meta name="googlebot" content="all">
+<meta name="verify" content="all">
+
+    <!--Title-->
+
+
+<title>Hive2Hbase入库逻辑 | 青桥雨之木芳</title>
+
+
     <link rel="alternate" href="/atom.xml" title="青桥雨之木芳" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-  <link rel="stylesheet" href="/css/style.css">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
 </head>
 
+</html>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">青桥雨之木芳</a>
-      </h1>
-      
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='Peng Fang'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+    	</div>
     </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
-      </div>
-    </div>
-  </div>
 </header>
-      <div class="outer">
-        <section id="main"><article id="post-Hive2Hbase入库逻辑" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/19/Hive2Hbase入库逻辑/" class="article-date">
-  <time datetime="2018-09-19T12:21:00.000Z" itemprop="datePublished">2018-09-19</time>
-</a>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://www.haoming.fun">青桥雨之木芳</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>Home</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="Hive2Hbase入库逻辑">
+            
+	            Hive2Hbase入库逻辑
+            
+        </h1>
+        <div class="post-meta">
     
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/大数据/">大数据</a>
-  </div>
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/大数据/">大数据</a>
+        </span>
+    
 
-  </div>
-  <div class="article-inner">
     
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/Hbase/">Hbase</a> <a class="tag-link" href="/tags/数据入库/">数据入库</a>
+                
+            </span>
+        </span>
     
-      <header class="article-header">
+
+    
         
-  
-    <h1 class="article-title" itemprop="name">
-      Hive2Hbase入库逻辑
-    </h1>
-  
-
-      </header>
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2018/09/19</span>
+        </span>
+        
     
-    <div class="article-entry" itemprop="articleBody">
-      
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
         <h3 id="Parquet格式hdfs文件根据规则生成HFile"><a href="#Parquet格式hdfs文件根据规则生成HFile" class="headerlink" title="Parquet格式hdfs文件根据规则生成HFile"></a>Parquet格式hdfs文件根据规则生成HFile</h3><ol>
 <li>创建和设置habse参数</li>
 <li>清楚输出目录下HFile文件</li>
@@ -100,158 +189,141 @@
 <li>设置合并方法：job.setCombinerClass(Combiner.class)，Combiner继承自Reducer，reduce方法用于数据去重；</li>
 <li>设置写HFile的reduce：HFileOutputFormat2.configureIncrementalLoad, HFileOutputFormat2.setOutputPath; job.setReducerClass(KeyValueSortReducer.class)：设置reducer class, 如KeyValue、Put、Text，以正确地对输入值进行排序。configureIncrementalLoad中会根据前面设置的MapOutputKeyClass来设置ReducerClass，见下面的源代码。</li>
 <li>提交job，轮询等到其完成，退出程序执行。<br>第7步configureIncrementalLoad源代码：   <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">configureIncrementalLoad</span><span class="params">(Job job, HTableDescriptor tableDescriptor,</span></span></span><br><span class="line"><span class="function"><span class="params">                                     RegionLocator regionLocator, Class&lt;? extends OutputFormat&lt;?, ?&gt;&gt; cls)</span> <span class="keyword">throws</span> IOException,</span></span><br><span class="line"><span class="function">        UnsupportedEncodingException </span>&#123;</span><br><span class="line">    Configuration conf = job.getConfiguration();</span><br><span class="line">    job.setOutputKeyClass(ImmutableBytesWritable.class);</span><br><span class="line">    job.setOutputValueClass(KeyValue.class);</span><br><span class="line">    job.setOutputFormatClass(cls);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Based on the configured map output class, set the correct reducer to properly</span></span><br><span class="line">    <span class="comment">// sort the incoming values.</span></span><br><span class="line">    <span class="comment">// TODO it would be nice to pick one or the other of these formats.</span></span><br><span class="line">    <span class="keyword">if</span> (KeyValue.class.equals(job.getMapOutputValueClass())) &#123;</span><br><span class="line">        job.setReducerClass(KeyValueSortReducer.class);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Put.class.equals(job.getMapOutputValueClass())) &#123;</span><br><span class="line">        job.setReducerClass(PutSortReducer.class);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Text.class.equals(job.getMapOutputValueClass())) &#123;</span><br><span class="line">        job.setReducerClass(TextSortReducer.class);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        LOG.warn(<span class="string">"Unknown map output value type:"</span> + job.getMapOutputValueClass());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    conf.setStrings(<span class="string">"io.serializations"</span>, conf.get(<span class="string">"io.serializations"</span>),</span><br><span class="line">            MutationSerialization.class.getName(), ResultSerialization.class.getName(),</span><br><span class="line">            KeyValueSerialization.class.getName());</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Use table's region boundaries for TOP split points.</span></span><br><span class="line">    LOG.info(<span class="string">"Looking up current regions for table "</span> + tableDescriptor.getTableName());</span><br><span class="line">    List&lt;ImmutableBytesWritable&gt; startKeys = getRegionStartKeys(regionLocator);</span><br><span class="line">    LOG.info(<span class="string">"Configuring "</span> + startKeys.size() + <span class="string">" reduce partitions "</span> +</span><br><span class="line">            <span class="string">"to match current region count"</span>);</span><br><span class="line">    job.setNumReduceTasks(startKeys.size());</span><br><span class="line"></span><br><span class="line">    configurePartitioner(job, startKeys);</span><br><span class="line">    <span class="comment">// Set compression algorithms based on column families</span></span><br><span class="line">    configureCompression(conf, tableDescriptor);</span><br><span class="line">    configureBloomType(tableDescriptor, conf);</span><br><span class="line">    configureBlockSize(tableDescriptor, conf);</span><br><span class="line">    configureDataBlockEncoding(tableDescriptor, conf);</span><br><span class="line"></span><br><span class="line">    TableMapReduceUtil.addDependencyJars(job);</span><br><span class="line">    TableMapReduceUtil.initCredentials(job);</span><br><span class="line">    LOG.info(<span class="string">"Incremental table "</span> + regionLocator.getName() + <span class="string">" output configured."</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 </li>
 </ol>
 <h3 id="加载HFile到HBase表"><a href="#加载HFile到HBase表" class="headerlink" title="加载HFile到HBase表"></a>加载HFile到HBase表</h3><ol>
 <li>加载配置文件hbase-site.xml</li>
 <li>读取hdfs配置文件hbase-hdfs-site.xml，然后配置hbase-site.xml的一些参数：<br>● 配置dfs.ha.namenodes.[nameservice ID]，让DataNode知道每个集群的所有NameNode<br>● 配置dfs.client.failover.proxy.provider.[nameservice    ID]，该参数定义HDFS客户端用来和活动的namenode节目联系的java类。配置的java类是用来给HDFS客户端判断哪个namenode节点是活动的，当前是哪个namenode处理客户端的请求。<br>● 配置dfs.namenode.rpc-address.[nameservice ID].[name node ID] ， 即配置每个namenode监听的RPC地址。<br>● 配置dfs.nameservices–自定义的HDFS服务名，在NameNode节点的集群中，对HDFS集群访问的入口是NameNode所在的服务器。但是在两个NameNode节点的HA集群中，无法配置单一服务器入口。所以需要指定一个逻辑上的服务名，这个服务名是自定义的。当外界访问HDFS集群时，入口就变为这个服务。用户不必关心当前具体是哪台服务器在提供服务（Active状态），只要访问这个服务就可以了。<br>● 配置mapreduce.job.hdfs-servers.token-renewal.exclude为名字服务id的数组，ResourceManager为应用程序更新委托令牌。只有当令牌的更新者是非空字符串时，此行为才被更新为令牌。MapReduce作业可以指示ResourceManager通过指定具有配置mapreduce.job.hdfs-servers.token-renewal.exclude = <host1>，<host2>，..，<hostn>的主机来跳过从某些主机获取的令牌的更新。   </hostn></host2></host1></li>
 <li>向HBASE表加载数据<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HTable table = <span class="keyword">new</span> HTable(conf, tableB);</span><br><span class="line">LoadIncrementalHFile loader = <span class="keyword">new</span> LoadIncrementalHFile(conf);</span><br><span class="line">loader.doBulkLoad(<span class="keyword">new</span> Path(outputPathOnHbase), table);  <span class="comment">// outputPathOnHbase是HBASE的hdfs上HFile的路径</span></span><br></pre></td></tr></table></figure>
+
 </li>
 </ol>
-<p>API解释如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Class LoadIncrementalHFiles：Tool to load the output of HFileOutputFormat into an existing table.</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doBulkLoad</span><span class="params">(org.apache.hadoop.fs.Path hfofDir,</span></span></span><br><span class="line"><span class="function"><span class="params">              Admin admin,</span></span></span><br><span class="line"><span class="function"><span class="params">              Table table,</span></span></span><br><span class="line"><span class="function"><span class="params">              RegionLocator regionLocator)</span></span></span><br><span class="line"><span class="function">                <span class="keyword">throws</span> TableNotFoundException,</span></span><br><span class="line"><span class="function">                       IOException</span></span><br><span class="line"><span class="function">Perform a bulk load of the given directory into the given pre-existing table. This method is not threadsafe.</span></span><br><span class="line"><span class="function">Parameters:</span></span><br><span class="line"><span class="function">hfofDir - the directory that was provided as the output path of a job using HFileOutputFormat</span></span><br><span class="line"><span class="function">table - the table to load into</span></span><br><span class="line"><span class="function">Throws:</span></span><br><span class="line"><span class="function">TableNotFoundException - <span class="keyword">if</span> table does not yet exist</span></span><br><span class="line"><span class="function">IOException</span></span><br></pre></td></tr></table></figure></p>
+<p>API解释如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Class LoadIncrementalHFiles：Tool to load the output of HFileOutputFormat into an existing table.</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doBulkLoad</span><span class="params">(org.apache.hadoop.fs.Path hfofDir,</span></span></span><br><span class="line"><span class="function"><span class="params">              Admin admin,</span></span></span><br><span class="line"><span class="function"><span class="params">              Table table,</span></span></span><br><span class="line"><span class="function"><span class="params">              RegionLocator regionLocator)</span></span></span><br><span class="line"><span class="function">                <span class="keyword">throws</span> TableNotFoundException,</span></span><br><span class="line"><span class="function">                       IOException</span></span><br><span class="line"><span class="function">Perform a bulk load of the given directory into the given pre-existing table. This method is not threadsafe.</span></span><br><span class="line"><span class="function">Parameters:</span></span><br><span class="line"><span class="function">hfofDir - the directory that was provided as the output path of a job using HFileOutputFormat</span></span><br><span class="line"><span class="function">table - the table to load into</span></span><br><span class="line"><span class="function">Throws:</span></span><br><span class="line"><span class="function">TableNotFoundException - <span class="keyword">if</span> table does not yet exist</span></span><br><span class="line"><span class="function">IOException</span></span><br></pre></td></tr></table></figure>
+
 <h4 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h4><p><a href="https://blog.csdn.net/book_mmicky/article/details/25714339" target="_blank" rel="noopener">https://blog.csdn.net/book_mmicky/article/details/25714339</a><br><a href="https://segmentfault.com/a/1190000007239743" target="_blank" rel="noopener">https://segmentfault.com/a/1190000007239743</a><br><a href="http://www.searchdoc.cn/hadoop/hadoop.apache.org/docs/r3.0.0-alpha1/hadoop-project-dist/hadoop-common/release/3.0.0-alpha1/RELEASENOTES.3.0.0-alpha1.com.coder114.cn.html" target="_blank" rel="noopener">http://www.searchdoc.cn/hadoop/hadoop.apache.org/docs/r3.0.0-alpha1/hadoop-project-dist/hadoop-common/release/3.0.0-alpha1/RELEASENOTES.3.0.0-alpha1.com.coder114.cn.html</a><br><a href="https://www.programcreek.com/java-api-examples/index.php?api=org.apache.hadoop.hbase.mapreduce.KeyValueSortReducer" target="_blank" rel="noopener">https://www.programcreek.com/java-api-examples/index.php?api=org.apache.hadoop.hbase.mapreduce.KeyValueSortReducer</a></p>
 
-      
     </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/19/Hive2Hbase入库逻辑/" data-id="cjv2bg0cd000b7z2pl17pzb6k" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hbase/">Hbase</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/数据入库/">数据入库</a></li></ul>
-
-    </footer>
-  </div>
-  
     
-<nav id="article-nav">
-  
-    <a href="/2018/10/22/记一次crontab执行scp异常解决/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          记一次crontab执行scp异常解决
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2018/09/18/2018-2019技术书单/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">2018-2019技术书单</div>
-    </a>
-  
-</nav>
-
-  
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
 </article>
 
-</section>
-        
-          <aside id="sidebar">
-  
+<div class="article-nav prev-next-wrap clearfix">
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
+        <a href="/2018/10/22/记一次crontab执行scp异常解决/" class="pre-post btn btn-default" title='记一次crontab执行scp异常解决'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">记一次crontab执行scp异常解决</span>
+        </a>
+    
+    
+        <a href="/2018/09/18/2018-2019技术书单/" class="next-post btn btn-default" title='2018-2019技术书单'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">2018-2019技术书单</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+            appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: true,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: ''.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Nginx/">Nginx</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web安全/">Web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue/">vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/webpack/">webpack</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/博客/">博客</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/可视化/">可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/基础科学/">基础科学</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/感悟/">感悟</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据可视化/">数据可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/环境安装/">环境安装</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/系统设计/">系统设计</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/运维/">运维</a></li></ul>
+        <h3 class="title">Table of Contents</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Parquet格式hdfs文件根据规则生成HFile"><span class="toc-text">Parquet格式hdfs文件根据规则生成HFile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#加载HFile到HBase表"><span class="toc-text">加载HFile到HBase表</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#参考："><span class="toc-text">参考：</span></a></li></ol></li></ol>
+        
     </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/">Hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web安全/">Web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webcola/">webcola</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/书单/">书单</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端环境/">前端环境</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异常解决/">异常解决</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/接口设计/">接口设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据入库/">数据入库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/源码分析/">源码分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/竞争力/">竞争力</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化部署-博客/">自动化部署 博客</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/D3-js/" style="font-size: 20px;">D3.js</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Hbase/" style="font-size: 15px;">Hbase</a> <a href="/tags/Web安全/" style="font-size: 10px;">Web安全</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/webcola/" style="font-size: 10px;">webcola</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/书单/" style="font-size: 10px;">书单</a> <a href="/tags/前端环境/" style="font-size: 10px;">前端环境</a> <a href="/tags/异常解决/" style="font-size: 10px;">异常解决</a> <a href="/tags/接口设计/" style="font-size: 10px;">接口设计</a> <a href="/tags/数据入库/" style="font-size: 10px;">数据入库</a> <a href="/tags/源码分析/" style="font-size: 10px;">源码分析</a> <a href="/tags/竞争力/" style="font-size: 10px;">竞争力</a> <a href="/tags/自动化部署-博客/" style="font-size: 10px;">自动化部署 博客</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2019/04/29/IE下将Web中的SVG导出PNG图片/">IE下将Web中的SVG导出PNG图片</a>
-          </li>
-        
-          <li>
-            <a href="/2018/10/22/记一次crontab执行scp异常解决/">记一次crontab执行scp异常解决</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/19/Hive2Hbase入库逻辑/">Hive2Hbase入库逻辑</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/18/2018-2019技术书单/">2018-2019技术书单</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/18/怎样更有竞争力/">怎样更有竞争力</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
 </aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2019 Peng Fang<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
     </div>
-  </div>
 </footer>
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
     
+</div>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
 
 
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
 
 
 
-  </div>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
 </body>
 </html>

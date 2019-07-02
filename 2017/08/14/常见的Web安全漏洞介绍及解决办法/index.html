@@ -1,96 +1,188 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  
+<!DOCTYPE HTML>
+<html lang="">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="青桥雨之木芳">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://www.haoming.fun">
+    <!--SEO-->
 
-  
-  <title>常见的Web安全漏洞介绍及解决办法 | 青桥雨之木芳</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="本文对常见的Web漏洞的原因、关注点、解决办法做简要介绍，整理自Web安全培训笔记。 SQL注入解决办法：参数化查询 失效的身份认证和会话管理 原因：Session相关的数据没有被完整替换导致的安全问题   关注点：Login通过后，立刻把当前Session（包含Session、Cache、Cookie）失效掉，把需要保持到Session的value重新开一个Session保存；Logout功能中">
-<meta name="keywords" content="Web安全">
-<meta property="og:type" content="article">
-<meta property="og:title" content="常见的Web安全漏洞介绍及解决办法">
-<meta property="og:url" content="http://yoursite.com/2017/08/14/常见的Web安全漏洞介绍及解决办法/index.html">
-<meta property="og:site_name" content="青桥雨之木芳">
-<meta property="og:description" content="本文对常见的Web漏洞的原因、关注点、解决办法做简要介绍，整理自Web安全培训笔记。 SQL注入解决办法：参数化查询 失效的身份认证和会话管理 原因：Session相关的数据没有被完整替换导致的安全问题   关注点：Login通过后，立刻把当前Session（包含Session、Cache、Cookie）失效掉，把需要保持到Session的value重新开一个Session保存；Logout功能中">
-<meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-10-22T08:24:25.218Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="常见的Web安全漏洞介绍及解决办法">
-<meta name="twitter:description" content="本文对常见的Web漏洞的原因、关注点、解决办法做简要介绍，整理自Web安全培训笔记。 SQL注入解决办法：参数化查询 失效的身份认证和会话管理 原因：Session相关的数据没有被完整替换导致的安全问题   关注点：Login通过后，立刻把当前Session（包含Session、Cache、Cookie）失效掉，把需要保持到Session的value重新开一个Session保存；Logout功能中">
-  
+    <meta name="keywords" content="Web安全">
+
+
+    <meta name="description" content="本文对常见的Web漏洞的原因、关注点、解决办法做简要介绍，整理自Web安全培训笔记。
+SQL注入解决办法：参数化查询
+失效的身份认证和会话管理
+原因：Session相关的数据没有被完整替换导致的...">
+
+
+
+<meta name="robots" content="all">
+<meta name="google" content="all">
+<meta name="googlebot" content="all">
+<meta name="verify" content="all">
+
+    <!--Title-->
+
+
+<title>常见的Web安全漏洞介绍及解决办法 | 青桥雨之木芳</title>
+
+
     <link rel="alternate" href="/atom.xml" title="青桥雨之木芳" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-  <link rel="stylesheet" href="/css/style.css">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
 </head>
 
+</html>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">青桥雨之木芳</a>
-      </h1>
-      
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='Peng Fang'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+    	</div>
     </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
-      </div>
-    </div>
-  </div>
 </header>
-      <div class="outer">
-        <section id="main"><article id="post-常见的Web安全漏洞介绍及解决办法" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/08/14/常见的Web安全漏洞介绍及解决办法/" class="article-date">
-  <time datetime="2017-08-14T10:01:00.000Z" itemprop="datePublished">2017-08-14</time>
-</a>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://www.haoming.fun">青桥雨之木芳</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>Home</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="常见的Web安全漏洞介绍及解决办法">
+            
+	            常见的Web安全漏洞介绍及解决办法
+            
+        </h1>
+        <div class="post-meta">
     
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Web安全/">Web安全</a>
-  </div>
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/Web安全/">Web安全</a>
+        </span>
+    
 
-  </div>
-  <div class="article-inner">
     
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/Web安全/">Web安全</a>
+                
+            </span>
+        </span>
     
-      <header class="article-header">
+
+    
         
-  
-    <h1 class="article-title" itemprop="name">
-      常见的Web安全漏洞介绍及解决办法
-    </h1>
-  
-
-      </header>
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2017/08/14</span>
+        </span>
+        
     
-    <div class="article-entry" itemprop="articleBody">
-      
+</div>
+            
+            
+            <p class="fa fa-exclamation-triangle warning">
+                本文于<strong>685</strong>天之前发表，文中内容可能已经过时。
+            </p>
+        
+    </div>
+    
+    <div class="post-body post-content">
         <p>本文对常见的Web漏洞的原因、关注点、解决办法做简要介绍，整理自Web安全培训笔记。</p>
 <h3 id="SQL注入"><a href="#SQL注入" class="headerlink" title="SQL注入"></a>SQL注入</h3><p>解决办法：参数化查询</p>
 <h3 id="失效的身份认证和会话管理"><a href="#失效的身份认证和会话管理" class="headerlink" title="失效的身份认证和会话管理"></a>失效的身份认证和会话管理</h3><ul>
@@ -103,6 +195,7 @@
 <li>简介：XSS是指攻击者利用网站程序对用户输入过滤不足，输入可以显示子在页面上对其他用户造成影响的HTML代码，从而盗取用户资料、利用用户身份进行某种动作或者对访问者进行病毒侵害的一种攻击方式。</li>
 <li>关注点：HTML输入输出编码、JavaScript的编码、URL的编码</li>
 <li>解决办法：对用户输出的数据要过滤特殊字符，对输出到客户端的数据也要过滤特殊字符。HTML、js、URL过滤方法不同。js中使用escape函数来过滤特殊字符，包括元素value、元素Attribute，都有encode起来，相关函数有escape、encodeURI、encodeURIComponent。PHP中有htmlspecialchars 函数。下面是js中特殊字符编码的一种写法：<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">escapeHtml</span>(<span class="params">text</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> map = &#123;</span><br><span class="line">    <span class="string">'&amp;'</span>: <span class="string">'&amp;amp;'</span>,</span><br><span class="line">    <span class="string">'&lt;'</span>: <span class="string">'&amp;lt;'</span>,</span><br><span class="line">    <span class="string">'&gt;'</span>: <span class="string">'&amp;gt;'</span>,</span><br><span class="line">    <span class="string">'"'</span>: <span class="string">'&amp;quot;'</span>,</span><br><span class="line">    <span class="string">"'"</span>: <span class="string">'&amp;#039;'</span></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> text.replace(<span class="regexp">/[&amp;&lt;&gt;"']/g</span>, <span class="function"><span class="keyword">function</span>(<span class="params">m</span>) </span>&#123; <span class="keyword">return</span> map[m]; &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 </li>
 </ul>
 <p>另外一种办法是增加cookie安全：启用httponly和secure</p>
@@ -222,15 +315,19 @@
 <p>用户身份认证尝试超限锁定功能<br>如果用户名易被猜测，对同一ip多次认证失败锁定<br>认证期间不透露用户ID是否存在<br>关键系统双因子认证<br>认证需要采用有效挑战应答机制  </p>
 </blockquote>
 <h3 id="注意的漏洞"><a href="#注意的漏洞" class="headerlink" title="注意的漏洞"></a>注意的漏洞</h3><ol>
-<li>Struts2框架任意代码执行  </li>
-<li>Java反序列化化漏洞  </li>
-<li>容错处理不当致信息泄露  </li>
+<li><p>Struts2框架任意代码执行  </p>
+</li>
+<li><p>Java反序列化化漏洞  </p>
+</li>
+<li><p>容错处理不当致信息泄露  </p>
+</li>
 <li><p>mybatis(ibatis)框架存在的SQL注入，正确的写法：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> username <span class="keyword">like</span> <span class="keyword">concat</span>(<span class="string">'%'</span>,#username#,<span class="string">'%'</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> username <span class="keyword">like</span> <span class="keyword">concat</span>(<span class="string">'%'</span>,<span class="comment">#username#,'%')</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>mybatis框架$存在的SQL注入<br>尽量使用#描述参数，如果一定要使用$，则需要自己过滤用户输入。因为使用$参数MyBatis不会修改或转义字符串。</p>
 </li>
-<li>Hibernate存在的SQL注入<br>正确的写法：</li>
+<li><p>Hibernate存在的SQL注入<br>正确的写法：</p>
+</li>
 </ol>
 <ul>
 <li><p>名称绑定</p>
@@ -240,147 +337,126 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String queryString = <span class="string">"from Item item where item.description like ? and item.date &gt; ?"</span>;</span><br><span class="line">List result = session.createQuery(queryString).setString(<span class="number">0</span>, searchString).setDate(<span class="number">1</span>, minDate).list();</span><br></pre></td></tr></table></figure></li>
 </ul>
 
-      
     </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/14/常见的Web安全漏洞介绍及解决办法/" data-id="cjv2bg0ct00117z2pvvfmssv2" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web安全/">Web安全</a></li></ul>
-
-    </footer>
-  </div>
-  
     
-<nav id="article-nav">
-  
-    <a href="/2018/05/17/从接口调用安全考虑/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          从接口调用安全考虑
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2017/08/10/Linux下离线安装node和npm/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">Linux下离线安装node和npm</div>
-    </a>
-  
-</nav>
-
-  
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
 </article>
 
-</section>
-        
-          <aside id="sidebar">
-  
+<div class="article-nav prev-next-wrap clearfix">
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
+        <a href="/2018/05/17/从接口调用安全考虑/" class="pre-post btn btn-default" title='从接口调用安全考虑'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">从接口调用安全考虑</span>
+        </a>
+    
+    
+        <a href="/2017/08/10/Linux下离线安装node和npm/" class="next-post btn btn-default" title='Linux下离线安装node和npm'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">Linux下离线安装node和npm</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+            appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: true,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: ''.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Nginx/">Nginx</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web安全/">Web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue/">vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/webpack/">webpack</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/博客/">博客</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/可视化/">可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/基础科学/">基础科学</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/感悟/">感悟</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据可视化/">数据可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/环境安装/">环境安装</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/系统设计/">系统设计</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/运维/">运维</a></li></ul>
+        <h3 class="title">Table of Contents</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#SQL注入"><span class="toc-text">SQL注入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#失效的身份认证和会话管理"><span class="toc-text">失效的身份认证和会话管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#XSS（跨站脚本）"><span class="toc-text">XSS（跨站脚本）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#敏感数据暴露"><span class="toc-text">敏感数据暴露</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CSRF（跨站请求伪造）"><span class="toc-text">CSRF（跨站请求伪造）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#未验证的重定向和转发"><span class="toc-text">未验证的重定向和转发</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#会话安全"><span class="toc-text">会话安全</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安全基础"><span class="toc-text">安全基础</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#输入验证"><span class="toc-text">输入验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#防范元字符攻击"><span class="toc-text">防范元字符攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据库连接安全"><span class="toc-text">数据库连接安全</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#减少编码逻辑漏洞"><span class="toc-text">减少编码逻辑漏洞</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件安全"><span class="toc-text">文件安全</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#严格控制文件上传"><span class="toc-text">严格控制文件上传</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#严格分配文件访问权限策略"><span class="toc-text">严格分配文件访问权限策略</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#安全的临时文件"><span class="toc-text">安全的临时文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#访问竞争条件"><span class="toc-text">访问竞争条件</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#开发调试"><span class="toc-text">开发调试</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#日志"><span class="toc-text">日志</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#调试"><span class="toc-text">调试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#错误日志"><span class="toc-text">错误日志</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#错误处理"><span class="toc-text">错误处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#不安全的加密存储"><span class="toc-text">不安全的加密存储</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#不安全的通讯"><span class="toc-text">不安全的通讯</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#限制敏感数据的生命周期"><span class="toc-text">限制敏感数据的生命周期</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#问题"><span class="toc-text">问题</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#不要在客户端存储未经加密的数据"><span class="toc-text">不要在客户端存储未经加密的数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#确保安全敏感方法被调用时参数经过验证"><span class="toc-text">确保安全敏感方法被调用时参数经过验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#不要使用不安全的弱加密算法"><span class="toc-text">不要使用不安全的弱加密算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#身份鉴别"><span class="toc-text">身份鉴别</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#用户ID管理"><span class="toc-text">用户ID管理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#密码管理"><span class="toc-text">密码管理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#认证限制"><span class="toc-text">认证限制</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#注意的漏洞"><span class="toc-text">注意的漏洞</span></a></li></ol>
+        
     </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/">Hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web安全/">Web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webcola/">webcola</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/书单/">书单</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端环境/">前端环境</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异常解决/">异常解决</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/接口设计/">接口设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据入库/">数据入库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/源码分析/">源码分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/竞争力/">竞争力</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化部署-博客/">自动化部署 博客</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/D3-js/" style="font-size: 20px;">D3.js</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Hbase/" style="font-size: 15px;">Hbase</a> <a href="/tags/Web安全/" style="font-size: 10px;">Web安全</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/webcola/" style="font-size: 10px;">webcola</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/书单/" style="font-size: 10px;">书单</a> <a href="/tags/前端环境/" style="font-size: 10px;">前端环境</a> <a href="/tags/异常解决/" style="font-size: 10px;">异常解决</a> <a href="/tags/接口设计/" style="font-size: 10px;">接口设计</a> <a href="/tags/数据入库/" style="font-size: 10px;">数据入库</a> <a href="/tags/源码分析/" style="font-size: 10px;">源码分析</a> <a href="/tags/竞争力/" style="font-size: 10px;">竞争力</a> <a href="/tags/自动化部署-博客/" style="font-size: 10px;">自动化部署 博客</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2019/04/29/IE下将Web中的SVG导出PNG图片/">IE下将Web中的SVG导出PNG图片</a>
-          </li>
-        
-          <li>
-            <a href="/2018/10/22/记一次crontab执行scp异常解决/">记一次crontab执行scp异常解决</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/19/Hive2Hbase入库逻辑/">Hive2Hbase入库逻辑</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/18/2018-2019技术书单/">2018-2019技术书单</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/18/怎样更有竞争力/">怎样更有竞争力</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
 </aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2019 Peng Fang<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
     </div>
-  </div>
 </footer>
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
     
+</div>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
 
 
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
 
 
 
-  </div>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
 </body>
 </html>

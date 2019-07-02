@@ -1,101 +1,181 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  
+<!DOCTYPE HTML>
+<html lang="">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="青桥雨之木芳">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://www.haoming.fun">
+    <!--SEO-->
 
-  
-  <title>Hbase基础知识点梳理 | 青桥雨之木芳</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="整体架构从HBase部署架构来说，HBase有两种服务器：Master服务器和RegionServer服务器。一般一个HBase集群有一个Master服务器和几个RegionServer服务器。Master服务器负责维护表结构信息，Master挂到后还能查询数据，只是不能新建表或修改表。实际的数据存储在RegionServer服务器上，RegionServer保存的表数据是直接存储在Hadoop的">
-<meta name="keywords" content="Hbase">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Hbase基础知识点梳理">
-<meta property="og:url" content="http://yoursite.com/2018/09/10/Hbase基础知识点梳理/index.html">
-<meta property="og:site_name" content="青桥雨之木芳">
-<meta property="og:description" content="整体架构从HBase部署架构来说，HBase有两种服务器：Master服务器和RegionServer服务器。一般一个HBase集群有一个Master服务器和几个RegionServer服务器。Master服务器负责维护表结构信息，Master挂到后还能查询数据，只是不能新建表或修改表。实际的数据存储在RegionServer服务器上，RegionServer保存的表数据是直接存储在Hadoop的">
-<meta property="og:locale" content="default">
-<meta property="og:image" content="http://207.148.69.56/pub/imgs/arch/full_arch.png">
-<meta property="og:image" content="http://207.148.69.56/pub/imgs/arch/storage_arch.png">
-<meta property="og:image" content="http://207.148.69.56/pub/imgs/arch/table_struct.png">
-<meta property="og:image" content="http://207.148.69.56/pub/imgs/arch/query_arch.png">
-<meta property="og:updated_time" content="2018-10-22T08:24:25.212Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hbase基础知识点梳理">
-<meta name="twitter:description" content="整体架构从HBase部署架构来说，HBase有两种服务器：Master服务器和RegionServer服务器。一般一个HBase集群有一个Master服务器和几个RegionServer服务器。Master服务器负责维护表结构信息，Master挂到后还能查询数据，只是不能新建表或修改表。实际的数据存储在RegionServer服务器上，RegionServer保存的表数据是直接存储在Hadoop的">
-<meta name="twitter:image" content="http://207.148.69.56/pub/imgs/arch/full_arch.png">
-  
+    <meta name="keywords" content="Hbase">
+
+
+    <meta name="description" content="整体架构从HBase部署架构来说，HBase有两种服务器：Master服务器和RegionServer服务器。一般一个HBase集群有一个Master服务器和几个RegionServer服务器。...">
+
+
+
+<meta name="robots" content="all">
+<meta name="google" content="all">
+<meta name="googlebot" content="all">
+<meta name="verify" content="all">
+
+    <!--Title-->
+
+
+<title>Hbase基础知识点梳理 | 青桥雨之木芳</title>
+
+
     <link rel="alternate" href="/atom.xml" title="青桥雨之木芳" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-  <link rel="stylesheet" href="/css/style.css">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
 </head>
 
+</html>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">青桥雨之木芳</a>
-      </h1>
-      
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='Peng Fang'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+    	</div>
     </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
-      </div>
-    </div>
-  </div>
 </header>
-      <div class="outer">
-        <section id="main"><article id="post-Hbase基础知识点梳理" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/10/Hbase基础知识点梳理/" class="article-date">
-  <time datetime="2018-09-10T12:09:00.000Z" itemprop="datePublished">2018-09-10</time>
-</a>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://www.haoming.fun">青桥雨之木芳</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>Home</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="Hbase基础知识点梳理">
+            
+	            Hbase基础知识点梳理
+            
+        </h1>
+        <div class="post-meta">
     
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/大数据/">大数据</a>
-  </div>
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/大数据/">大数据</a>
+        </span>
+    
 
-  </div>
-  <div class="article-inner">
     
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/Hbase/">Hbase</a>
+                
+            </span>
+        </span>
     
-      <header class="article-header">
+
+    
         
-  
-    <h1 class="article-title" itemprop="name">
-      Hbase基础知识点梳理
-    </h1>
-  
-
-      </header>
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2018/09/10</span>
+        </span>
+        
     
-    <div class="article-entry" itemprop="articleBody">
-      
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
         <h3 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h3><p>从HBase部署架构来说，HBase有两种服务器：Master服务器和RegionServer服务器。<br>一般一个HBase集群有一个Master服务器和几个RegionServer服务器。<br>Master服务器负责维护表结构信息，Master挂到后还能查询数据，只是不能新建表或修改表。<br>实际的数据存储在RegionServer服务器上，RegionServer保存的表数据是直接存储在Hadoop的HDFS上。客户端获取数据是由客户端直接连接RegionServer服务器。<br>RegionServer非常依赖ZooKeeper服务。ZooKeeper在HBase中扮演管家角色，管理了HBase所有RegionServer的信息，包括具体的数据段存放在哪个RegionServer上。<br>客户端每次与HBase连接，先与ZooKeeper通信，查询出需要与哪个RegionServer连接，然后再连接RegionServer。<br>整体架构图如下：<br><img src="http://207.148.69.56/pub/imgs/arch/full_arch.png" alt="整体架构图"></p>
 <h4 id="Region是什么"><a href="#Region是什么" class="headerlink" title="Region是什么"></a>Region是什么</h4><p>Region就是一段数据的集合。HBase中的表一般拥有一个到多个Region。Region有几个特性：</p>
 <ul>
@@ -127,32 +207,42 @@
 </li>
 <li><p>scan<br>scan ‘表名’，这样输入的话，会从第一条数据开始把所有数据全部显示一遍。<br>在HBase中我们用起始行（STARTROW）和结束行（ENDROW）来限制记录的条数。<br>scan ‘test’,{STARTROW=&gt;’row3’} # 显示所有rowkey大于等于row3的记录<br>scan ‘test’,{ENDROW=&gt;’row4’} # 小于row4(不包括)的记录<br>两个参数一起用就是显示 &gt;= STARTROW 并且 &lt;ENDROW中的那段数据<br>scan ‘表名’,{COLUMNS=&gt;[‘列1’,’列2’,…]} # 只遍历指定列<br>scan ‘表名’,{STARTROW=&gt;’起始行键’,ENDROW=&gt;’结束行键’} # 指定行键范围<br>scan ‘表名’,{LIMIT=&gt;行数量} # 指定最大返回行数量<br>scan ‘表名’,{TIMERANGE=&gt;[最小时间戳,最大时间戳]} # 找出单元格的历史版本数据<br>scan ’表名’,{VERSION=&gt;’版本数’} # 指定版本数，显示单元格多个版本值<br>scan ‘表名’,{FILTER=&gt;’过滤器’} # scan ‘table1’ { FILTER=&gt; “PrefixFilter(‘row1’)” }   </p>
 </li>
-<li>get<br>scan可以查询表的多条数据，get只能查询一个单元格的记录。在数据量大的时候，get的查询熟读远远高于scan。<br>get ‘test’,’row7’,’cf:name’ # 查询某个单元格的记录<br>get ‘test’,’row7’,{COLUMN=&gt;’cf:name’,VERSION=&gt;5} # 把查询版本数设定为5<br>scan ‘test’,{VERSION=&gt;5} # scan跟上VERSIONS参数也可以查询出多个版本的数据   </li>
-<li>count<br>计算表的行数  </li>
-<li>delete<br>delete ‘表名’,’行键’,’列名’<br>delete ‘表名’,’行键’,’列名’,时间戳   </li>
-<li>split<br>拆分(split)指定的Region，除了可以等到Region大小达到阈值后触发自动拆分机制来拆分Region，还可以手动拆分指定的Region，如 split ‘region名’。   </li>
-<li>merge_region<br>合并（merge）两个Region和一个Region   </li>
-<li>compact<br>调用指定表的所有Region或者指定列族的所有Region的合并（compact）机制。通过compact机制可以合并该Region或者Region的列族下的所有HFile（StoreFile），以此来提高读取性能。<br>compact跟合并（merge）并不一样。merge操作是合并2个Region为1个，而compact操作更新的单元StoreFile，一个Region可以含有一个或多个StoreFile，compact操作的目的在于减少StoreFile的数量以增加读取性能。</li>
+<li><p>get<br>scan可以查询表的多条数据，get只能查询一个单元格的记录。在数据量大的时候，get的查询熟读远远高于scan。<br>get ‘test’,’row7’,’cf:name’ # 查询某个单元格的记录<br>get ‘test’,’row7’,{COLUMN=&gt;’cf:name’,VERSION=&gt;5} # 把查询版本数设定为5<br>scan ‘test’,{VERSION=&gt;5} # scan跟上VERSIONS参数也可以查询出多个版本的数据   </p>
+</li>
+<li><p>count<br>计算表的行数  </p>
+</li>
+<li><p>delete<br>delete ‘表名’,’行键’,’列名’<br>delete ‘表名’,’行键’,’列名’,时间戳   </p>
+</li>
+<li><p>split<br>拆分(split)指定的Region，除了可以等到Region大小达到阈值后触发自动拆分机制来拆分Region，还可以手动拆分指定的Region，如 split ‘region名’。   </p>
+</li>
+<li><p>merge_region<br>合并（merge）两个Region和一个Region   </p>
+</li>
+<li><p>compact<br>调用指定表的所有Region或者指定列族的所有Region的合并（compact）机制。通过compact机制可以合并该Region或者Region的列族下的所有HFile（StoreFile），以此来提高读取性能。<br>compact跟合并（merge）并不一样。merge操作是合并2个Region为1个，而compact操作更新的单元StoreFile，一个Region可以含有一个或多个StoreFile，compact操作的目的在于减少StoreFile的数量以增加读取性能。</p>
+</li>
 <li><p>快照<br>快照就是表在某个时刻的结构和数据。可以使用快照来将表恢复到某个时刻的结构和数据，恢复过程很快，往往只有数秒。HBase是怎么做到的呢？其实快照并不直接复制数据，而是保持一份文件列表，通过修改表所链接的文件夹来改变表的数据，好处是：速度极快；不额外占用磁盘空间。<br>HBase要求在恢复快照之前必须要先停用（disable）需要恢复的表，才能恢复快照，避免不必要的麻烦。先停用，然后恢复快照，再启用（enable）。<br>通过snapshot命令可以创建指定表的快照。<br>disable ‘mgdmcredit:userblack_temp’<br>snapshot ‘mgdmcredit:userblack_temp’, ‘userblack_temp_snapshot’<br>disable ‘mgdmcredit:userblack’<br>drop ‘mgdmcredit:userblack’<br>clone_snapshot ‘userblack_temp_snapshot’ ‘mgdmcredit:userblack’<br>enable ‘mgdmcredit:userblack_temp’<br>truncate ‘mgdmcredit:userblack_temp’<br>delete_snapshot ‘userblack_temp_snapshot’<br>clone_snapshot使用快照的数据创建一张新表，创建的过程很快，因为使用的方式不是复制数据，并且修改新表的数据不会影响旧表的数据。   </p>
 <h3 id="客户端API"><a href="#客户端API" class="headerlink" title="客户端API"></a>客户端API</h3><p>在HBase中有一个理念：所有数据皆为bytes。在HBase中数据最终都会被序列化为bytes[]保存。</p>
 <ul>
 <li>put方法<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>(Connection connection = ConnectionFactory.createConnection(config)) &#123;</span><br><span class="line">    Table table = connection.getTable(TableName.valueOf(<span class="string">"myTable"</span>));</span><br><span class="line">    Put put = <span class="keyword">new</span> Put(Bytes.toBytes(<span class="string">"row1"</span>));</span><br><span class="line">    put.addColumn(Bytes.toBytes(<span class="string">"mycf"</span>), Bytes.toBytes(<span class="string">"name"</span>), Bytes.toBytes(<span class="string">"ted"</span>));</span><br><span class="line">    table.put(put);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 </li>
 </ul>
 <p>新增和修改类型，修改就是往同一个rowkey再执行一次put操作，将之前的数据覆盖掉。<br>JDK的try-with-resources，上面例子中看到try(…){….}，{….}中的代码执行完毕会自动释放资源，不需要手动写finally语句块了。</p>
 </li>
 <li><p>get方法<br>get不像scan，并不能用多种条件去查找，只能用行键去查找。不过HBase一行有可能很大，我们可以通过设置参数让get只获取其中一部分的数据，以提高查询性能。   </p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Get get = <span class="keyword">new</span> Get(Bytes.toBytes(<span class="string">"row1"</span>));</span><br><span class="line">get.setMaxVersions(<span class="number">10</span>);</span><br><span class="line">Result result = table.get(get);</span><br><span class="line">List&lt;Cell&gt; cells = result.getColumnCells(Bytes.toBytes(<span class="string">"mycf"</span>), Bytes.toBytes(<span class="string">"name"</span>));</span><br><span class="line"><span class="keyword">for</span>(Cell c: cells) &#123;</span><br><span class="line">    <span class="comment">// 用CellUtil.cloneValue来获取数据而不是getValue</span></span><br><span class="line">    bytes[] cValue = CellUtil.cloneValue(c);</span><br><span class="line">    System.out.println(Bytes.toString(cValue));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 </li>
 </ul>
 <p>用CellUtil.cloneValue来获取数据而不用getValue的原因：根据目前getValue的实现代码，每次调用它都会获取整个Cell的数组备份，比较消耗性能。所以当需要获取Cell中的值时，请使用CellUtil.cloneValue方法。   </p>
 <ul>
 <li>Scan扫描<br>查询多条数据我们会想到用scan。默认的scan是从表头一直遍历到表尾，非常耗时好性能，实际工作中，我们至少要定义一下遍历的起始rowkey，如果知道遍历的结束rowkey就好了。<br>举个栗子：<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Scan scan = <span class="keyword">new</span> Scan(Bytes.toBytes(<span class="string">"row1"</span>));</span><br><span class="line">ResultScanner rs = table.getScanner(scan);</span><br><span class="line">...</span><br><span class="line">rs.close(); <span class="comment">// 使用完了关闭</span></span><br></pre></td></tr></table></figure>
+
 </li>
 </ul>
 <p>这里为什么是getScanner()而不是scan()？因为Table通过传入scan之后返回的结果扫描器（ResultScanner）并不是实际的查询结果。获取结果扫描器（ResultScanner）的时候并没有实际去查询数据。真正要获取数据的时候要打开扫描器，然后遍历它，这个时候才真正地查询了数据。<br>这个ResultScanner就像关系型数据库中的ResultSet一样是需要持续占用资源的，所以用完后务必记得关闭它。</p>
 <ul>
 <li>缓存<br>HBase在扫描的时候已经默认开启了缓存。具体来讲，每一次的next()操作都会产生一次完整的RPC请求，而这次RPC请求可以获取多少数据是通过hbase-site.xml中的hbase.client.scanner.caching参数配置的。比如配置为1，遍历了10个结果就会发送10次请求。<br>可以在表的层面修改缓存条数，也可以在扫描层面去修改。表的层面修改时通过hbase-site.xml中的配置:   <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">name</span>&gt;</span>hbase.client.scanner.caching<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">value</span>&gt;</span>1000<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
 </li>
 </ul>
 <p>hbase.client.scanner.caching的默认配置是100.<br>在扫描层面修改缓存可以使用Scan.setCaching(int caching)方法设置一次next获取的数据条数，这个配置的优先级比配置文件内的hbase.client.scanner.caching高。   </p>
@@ -189,147 +279,126 @@
 </ul>
 <h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><p>《Mysql不睡觉书》</p>
 
-      
     </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/10/Hbase基础知识点梳理/" data-id="cjv2bg0cb000a7z2pprqqu4g7" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hbase/">Hbase</a></li></ul>
-
-    </footer>
-  </div>
-  
     
-<nav id="article-nav">
-  
-    <a href="/2018/09/12/webcola介绍/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          webcola介绍
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2018/07/01/D3-js数据可视化实践（精简）/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">D3.js数据可视化实践（精简）</div>
-    </a>
-  
-</nav>
-
-  
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
 </article>
 
-</section>
-        
-          <aside id="sidebar">
-  
+<div class="article-nav prev-next-wrap clearfix">
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
+        <a href="/2018/09/12/webcola介绍/" class="pre-post btn btn-default" title='webcola介绍'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">webcola介绍</span>
+        </a>
+    
+    
+        <a href="/2018/07/01/D3-js数据可视化实践（精简）/" class="next-post btn btn-default" title='D3.js数据可视化实践（精简）'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">D3.js数据可视化实践（精简）</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+            appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: true,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: ''.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Nginx/">Nginx</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web安全/">Web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue/">vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/webpack/">webpack</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/博客/">博客</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/可视化/">可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/基础科学/">基础科学</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/感悟/">感悟</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据可视化/">数据可视化</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/环境安装/">环境安装</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/系统设计/">系统设计</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/运维/">运维</a></li></ul>
+        <h3 class="title">Table of Contents</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#整体架构"><span class="toc-text">整体架构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Region是什么"><span class="toc-text">Region是什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RegionServer是什么"><span class="toc-text">RegionServer是什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Master是什么"><span class="toc-text">Master是什么</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#存储架构"><span class="toc-text">存储架构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#行键是什么"><span class="toc-text">行键是什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#列族是什么"><span class="toc-text">列族是什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#单元格是什么"><span class="toc-text">单元格是什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Region跟行的关系"><span class="toc-text">Region跟行的关系</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#讲讲ZooKeeper"><span class="toc-text">讲讲ZooKeeper</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HBase常用命令"><span class="toc-text">HBase常用命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#客户端API"><span class="toc-text">客户端API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HBase二层查询架构"><span class="toc-text">HBase二层查询架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#过滤器"><span class="toc-text">过滤器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#前缀过滤器"><span class="toc-text">前缀过滤器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Region的拆分"><span class="toc-text">Region的拆分</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IncreasingToUpperBounRegionSplitPolicy策略（默认）"><span class="toc-text">IncreasingToUpperBounRegionSplitPolicy策略（默认）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Region的合并"><span class="toc-text">Region的合并</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HFile的合并"><span class="toc-text">HFile的合并</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#0-96版本之后的合并算法"><span class="toc-text">0.96版本之后的合并算法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#待合并文件挑选条件"><span class="toc-text">待合并文件挑选条件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#以组合作为计算单元"><span class="toc-text">以组合作为计算单元</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#读取性能优化"><span class="toc-text">读取性能优化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#参考"><span class="toc-text">参考</span></a></li></ol></li></ol>
+        
     </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/">Hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web安全/">Web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webcola/">webcola</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/书单/">书单</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端环境/">前端环境</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异常解决/">异常解决</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/接口设计/">接口设计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据入库/">数据入库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/源码分析/">源码分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/竞争力/">竞争力</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自动化部署-博客/">自动化部署 博客</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/D3-js/" style="font-size: 20px;">D3.js</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Hbase/" style="font-size: 15px;">Hbase</a> <a href="/tags/Web安全/" style="font-size: 10px;">Web安全</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/webcola/" style="font-size: 10px;">webcola</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/书单/" style="font-size: 10px;">书单</a> <a href="/tags/前端环境/" style="font-size: 10px;">前端环境</a> <a href="/tags/异常解决/" style="font-size: 10px;">异常解决</a> <a href="/tags/接口设计/" style="font-size: 10px;">接口设计</a> <a href="/tags/数据入库/" style="font-size: 10px;">数据入库</a> <a href="/tags/源码分析/" style="font-size: 10px;">源码分析</a> <a href="/tags/竞争力/" style="font-size: 10px;">竞争力</a> <a href="/tags/自动化部署-博客/" style="font-size: 10px;">自动化部署 博客</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2019/04/29/IE下将Web中的SVG导出PNG图片/">IE下将Web中的SVG导出PNG图片</a>
-          </li>
-        
-          <li>
-            <a href="/2018/10/22/记一次crontab执行scp异常解决/">记一次crontab执行scp异常解决</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/19/Hive2Hbase入库逻辑/">Hive2Hbase入库逻辑</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/18/2018-2019技术书单/">2018-2019技术书单</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/18/怎样更有竞争力/">怎样更有竞争力</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
 </aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2019 Peng Fang<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
     </div>
-  </div>
 </footer>
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
     
+</div>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
 
 
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
 
 
 
-  </div>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
 </body>
 </html>
