@@ -1,0 +1,339 @@
+<!DOCTYPE HTML>
+<html lang="">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="青桥雨之木芳">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://www.haoming.fun">
+    <!--SEO-->
+
+    <meta name="keywords" content="">
+
+
+    <meta name="description" content="JavaScript 异步编程回顾传统的 Web 是单线程的。一条条命令会按顺序执行，完成一条再开始下一条。同步 API 简化了我们的脚本编写工作，在上一条命令完成之前不会发生任何事情。Web ...">
+
+
+
+<meta name="robots" content="all">
+<meta name="google" content="all">
+<meta name="googlebot" content="all">
+<meta name="verify" content="all">
+
+    <!--Title-->
+
+
+<title>Web Workers 和 Comlink 的使用 | 青桥雨之木芳</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="青桥雨之木芳" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
+</head>
+
+</html>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='Peng Fang'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://www.haoming.fun">青桥雨之木芳</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>Home</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="Web Workers 和 Comlink 的使用">
+            
+	            Web Workers 和 Comlink 的使用
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/前端/">前端</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/08/29</span>
+        </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <h2 id="JavaScript-异步编程回顾"><a href="#JavaScript-异步编程回顾" class="headerlink" title="JavaScript 异步编程回顾"></a>JavaScript 异步编程回顾</h2><p>传统的 Web 是单线程的。一条条命令会按顺序执行，完成一条再开始下一条。同步 API 简化了我们的脚本编写工作，在上一条命令完成之前不会发生任何事情。Web 中的异步 API 比如说从磁盘读取、访问网络资源，这些 API 经常依赖事件或回调来处理这些资源。Node.js 是服务端 JavaScript 环境，使用了大量异步代码，通常使用回调模式进行异步操作。</p>
+<p>虽然回调非常有用，但遗憾的是它们会依赖于先前异步函数的结果。为了解决 “回调地狱” 这个问题，比较新的 API 往往既不使用回调也不使用事件，而是使用 Promise。Promise 使用.then 语法使回调看起来更具可读性：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">fetch(<span class="string">'/data.json'</span>)</span><br><span class="line">    .then(<span class="function"><span class="params">response</span> =&gt;</span> response.json())</span><br><span class="line">    .then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(data);</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>Promise 的功能和回调是一样的，但前者更具可读性，结合箭头函数可以清楚表达Promise的每一步是怎样转换上一步的输出的。Promise 的真正优势在于，他是ES7 中 async/await 语法的基础之一。</p>
+<p>在 async 函数中，await 语句将暂停函数的执行，直到它们等待的 promise 完成或拒绝。代码写法看起来是同步的，但是行为却是异步的，不会阻塞主线程。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">getData</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> response = <span class="keyword">await</span> fetch(<span class="string">'data.json'</span>);</span><br><span class="line">    <span class="keyword">const</span> data = <span class="keyword">await</span> response.json();</span><br><span class="line">    <span class="built_in">console</span>.log(data);</span><br><span class="line">&#125;;</span><br><span class="line">getData();</span><br></pre></td></tr></table></figure>
+
+<p>async 函数将返回一个 promise，它本身可以在其他 async 函数中与 await 并用。</p>
+<h2 id="Web-Workers"><a href="#Web-Workers" class="headerlink" title="Web Workers"></a>Web Workers</h2><p>目前为止我们谈的都是单线程编程。就是说我们的代码运行在一个CPU线程上，这个线程复制运行JS、解析CSS、网站布局和绘图。如果JS需要运行很长时间将会阻止其他部分的工作，导致比较糟糕的用户体验。</p>
+<p>为了绕过单个线程运行内容的限制，Web 可以通过 Web Workers 来利用多个线程。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> worker = <span class="keyword">new</span> Worker(<span class="string">'/first-worker.js'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码将下载JS文件运行在不同的线程中，使得在不阻塞主线程的前提下运行复杂的JS程序。需要注意的是，Worker 本身是无法显示数字的，因为它无法访问主脚本的变量或文档本身，它所能做的只有传回计算的最终结果。这是线程的性质决定的，它只能访问同一线程内存中的内容。</p>
+<h2 id="进程与线程"><a href="#进程与线程" class="headerlink" title="进程与线程"></a>进程与线程</h2><p>真正的并行执行多任务只能在多核CPU上实现，但是，由于任务数量远远多于CPU的核心数量，所以，操作系统也会自动把很多任务轮流调度到每个核心上执行。</p>
+<p>对于操作系统来说，一个任务就是一个进程（Process），比如打开一个浏览器就是启动一个浏览器进程，打开一个记事本就启动了一个记事本进程，打开两个记事本就启动了两个记事本进程，打开一个Word就启动了一个Word进程。</p>
+<p>有些进程还不止同时干一件事，比如Word，它可以同时进行打字、拼写检查、打印等事情。在一个进程内部，要同时干多件事，就需要同时运行多个“子任务”，我们把进程内的这些“子任务”称为线程（Thread）。</p>
+<p>由于每个进程至少要干一件事，所以，一个进程至少有一个线程。当然，像Word这种复杂的进程可以有多个线程，多个线程可以同时执行，多线程的执行方式和多进程是一样的，也是由操作系统在多个线程之间快速切换，让每个线程都短暂地交替运行，看起来就像同时执行一样。当然，真正地同时执行多线程需要多核CPU才可能实现。</p>
+<p>线程共享的进程环境包括：进程代码段、进程的公有资源（如全局变量，利用这些共享的数据，线程很容易的实现相互之间的通信）、进程打开的文件描述符、消息队列、信号的处理器、进程的当前目录、进程用户ID、进程组ID。</p>
+<p>线程独占资源：线程ID、寄存器组的值、用户栈、内核栈、错误返回码、线程的信号屏蔽码、线程的优先级。</p>
+<p>一个进程中的所有线程有它们各自独立的（私有的）栈(stack)。堆(heap)的分配与栈有所不同，一般是一个进程有一个运行时堆，这个堆为本进程中所有线程共享。线程切换的时候实际上切换的是一个可以称之为线程控制块的结构，里面保存所有将来用于恢复线程环境必须的信息，包括所有必须保存的寄存器集，线程的状态等。</p>
+<p>一个进程的线程共享堆区，堆在操作系统对进程初始化的时候分配，运行过程中也可以向系统要额外的堆，但是记得用完了要还给操作系统，要不然就是内存泄漏。</p>
+<p>栈是个线程独有的，保存其运行状态和局部自动变量的。栈在线程开始的时候初始化，每个线程的栈互相独立，因此，栈是线程安全的。操作系统在切换线程的时候会自动的切换栈，就是切换 SS / ESP 寄存器。栈空间不需要在高级语言里面显式的分配和释放。</p>
+<h2 id="共享数据"><a href="#共享数据" class="headerlink" title="共享数据"></a>共享数据</h2><p>不同线程之间可以基于事件来交换信息，每个线程都会侦听message事件，并可以使用postMessage API 发送消息。利用postMessage可以共享数组、对象、字符串。发送这些数据时，浏览器以特殊的序列化格式制作数据结构的副本，然后在另一个线程中重建：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// In the worker:</span></span><br><span class="line">self.postMessage(someObject);</span><br><span class="line"><span class="comment">// In the main thread:</span></span><br><span class="line">worker.addEventListener(<span class="string">'message'</span>, msg =&gt; <span class="built_in">console</span>.log(msg.data));</span><br></pre></td></tr></table></figure>
+
+<p>someObject 被克隆变转变成可传递的形式，然后主线程接收后再转换成原始对象的副本，这个过程开销比较大。常见的共享数据时传递的对象类型是ArrayBuffer。使用 postMessage 传输 ArrayBuffer 时要小心。一旦它被传输后，它在原始线程中就不能再读取或写入了，并且如果你尝试使用它将抛出错误。</p>
+<h2 id="使用Comlink"><a href="#使用Comlink" class="headerlink" title="使用Comlink"></a>使用Comlink</h2><p>Comlink 将 postMessage 转换成了基于 Promise 的异步 API，它体积非常小，消除了使用postMessage 的顾虑，隐藏使用 workers 的事实，它是 postMessage 和 ES6 代理的 RPC 实现。</p>
+<p>可以这样使用：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123;wrap&#125; <span class="keyword">from</span> <span class="string">'/comlink/comlink.js'</span>;</span><br><span class="line"><span class="comment">// This web worker uses Comlink's expose to expose a function</span></span><br><span class="line"><span class="keyword">const</span> MyMathLibrary = wrap(<span class="keyword">new</span> Worker(<span class="string">'/mymath.js'</span>));</span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> myMath = <span class="keyword">await</span> <span class="keyword">new</span> MyMathLibrary();</span><br><span class="line">    <span class="keyword">const</span> result1 = <span class="keyword">await</span> myMath.add(<span class="number">2</span>,<span class="number">2</span>);</span><br><span class="line">    <span class="keyword">const</span> result2 = <span class="keyword">await</span> myMath.add(<span class="number">3</span>,<span class="number">7</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">await</span> myMath.multiply(result1, result2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 Comlink 可以带来的另一大性能提升是利用 ArrayBuffer 之类的可传递对象，不用再复制它们。这会显著提升性能，但用的时候也要小心，因为一旦它们被传递后就不能在原始线程中使用了。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> data = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>];</span><br><span class="line"><span class="keyword">await</span> (<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> toSend = <span class="built_in">Int16Array</span>.from(data);</span><br><span class="line">    <span class="keyword">return</span> myMath.addArray(</span><br><span class="line">        Comlink.transfer(toSend.buffer, [toSend.buffer])</span><br><span class="line">    );</span><br><span class="line">&#125;());</span><br></pre></td></tr></table></figure>
+
+<p>Comlink 的一大好处是它让开发人员可以方便地把一部分应用放到 Worker 中，而无需对代码库做大幅度改动。w我们要做的工作主要是把同步函数转换为异步函数，在 await 后调用 Worker 暴露的 api。</p>
+<p>参考文章：</p>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzUxMzcxMzE5Ng==&mid=2247492293&idx=1&sn=dbe2e19c6bfc8c13de59bc83a54c4934&chksm=f9525786ce25de900cae3ac55c762462421bf43863a138297cfea96cad161534d5e022e344a8&mpshare=1&scene=1&srcid=0827kUyWlRRbf3mF1DotaQKJ&sharer_sharetime=1566905344586&sharer_shareid=5d586b1751e23a5d55eb059fa2bd5d8c&key=6a52e6304f29e3a7d719b0845ffba593201a8dd97738bac43e1d4a11c38958361b7090319c8a79cbac520e89856f121c76d62382dbe6111ee441cf1d776fcdba3b0b1f2f5b367a0f354681c4644e03c1&ascene=1&uin=MjE0Njk2MzQ2MA%3D%3D&devicetype=Windows+10&version=62060833&lang=zh_CN&pass_ticket=hBWsvE6Yp10hztc9%2Fx2LmKvLtqZmKd%2FxVsWK45TywcXtnvVU5VvNFknoYmdqPmTE" target="_blank" rel="noopener">Web单线程终结者：Web Workers</a></p>
+<p><a href="ttps://www.nowcoder.com/questionTerminal/1ecf3ca506d74384be091b1d6a6d1cb9?toCommentId=1537528" target="_blank" rel="noopener">同一个进程的不同线程，哪个是不能共享的</a></p>
+<p><a href="https://www.liaoxuefeng.com/wiki/1016959663602400/1017627212385376" target="_blank" rel="noopener">进程和线程</a></p>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2019/08/30/Vue-nextTick-原理分析/" class="pre-post btn btn-default" title='Vue nextTick 原理分析'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">Vue nextTick 原理分析</span>
+        </a>
+    
+    
+        <a href="/2019/08/27/数组：在给定的成对整数数组中找出所有总和等于给定数字的组合/" class="next-post btn btn-default" title='数组：在给定的成对整数数组中找出所有总和等于给定数字的组合'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">数组：在给定的成对整数数组中找出所有总和等于给定数字的组合</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'h86n5PYEWOScNNTc5l7r8Ma1-gzGzoHsz',
+            appKey: 'Sc1o9I3OBfSjWqmvxjFwvlbw',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: true,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: ''.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">Table of Contents</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#JavaScript-异步编程回顾"><span class="toc-text">JavaScript 异步编程回顾</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Web-Workers"><span class="toc-text">Web Workers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#进程与线程"><span class="toc-text">进程与线程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#共享数据"><span class="toc-text">共享数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用Comlink"><span class="toc-text">使用Comlink</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>

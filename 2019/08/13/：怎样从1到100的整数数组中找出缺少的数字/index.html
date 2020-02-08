@@ -1,0 +1,319 @@
+<!DOCTYPE HTML>
+<html lang="">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="青桥雨之木芳">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://www.haoming.fun">
+    <!--SEO-->
+
+    <meta name="keywords" content="面试题精选">
+
+
+    <meta name="description" content="前言编程面试中最常被问及的问题之一是，编写一个程序来查找数组中缺少的数字。这种编码面试问题不仅在小型初创企业中被问到，而且在谷歌、亚马逊、Facebook、微软等一些最大的技术公司中也被问到，大...">
+
+
+
+<meta name="robots" content="all">
+<meta name="google" content="all">
+<meta name="googlebot" content="all">
+<meta name="verify" content="all">
+
+    <!--Title-->
+
+
+<title>数组：怎样从1到100的整数数组中找出缺少的数字 | 青桥雨之木芳</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="青桥雨之木芳" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
+</head>
+
+</html>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='Peng Fang'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://www.haoming.fun">青桥雨之木芳</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>Home</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="数组：怎样从1到100的整数数组中找出缺少的数字">
+            
+	            数组：怎样从1到100的整数数组中找出缺少的数字
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/算法与数据结构/">算法与数据结构</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/面试题精选/">面试题精选</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/08/13</span>
+        </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>编程面试中最常被问及的问题之一是，编写一个程序来查找数组中缺少的数字。这种编码面试问题不仅在小型初创企业中被问到，而且在谷歌、亚马逊、Facebook、微软等一些最大的技术公司中也被问到，大多是这些公司在校园招聘毕业生时会被问到。</p>
+<p>这个问题最简单的版本是在100个整数的区域中查找缺少的元素，该区域包含1到100之间的数字。这可以通过使用n（n+1）/2计算序列的和很容易地解决，这也是最快和最有效的方法之一，但如果数组包含多个缺少的数字或数组包含重复的数字，则不能使用它。</p>
+<p>这时面试官可以提出后续问题，以考查候选人不同条件下解决问题的能力。所以，如果你通过了这个，他们会要求你在一个重复的数组中找到丢失的数字。这可能很棘手，但您很快就会发现在数组中查找丢失和重复数字的另一种方法是对其进行排序。</p>
+<p>在已排序的数组中，可以比较一个数字是否等于预期的下一个数字。或者，您也可以使用Java中的BitSet来解决这个问题。</p>
+<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>我们将1到100之间的数字放入一个整数数组中，找出缺少哪个数字的最佳方法是什么？如果面试官特别提到1到100，那么你也可以使用上面的技巧来计算这个系列的总和，如下所示。如果它有多个丢失的元素，那么您可以使用位集类，当然，只有在您的面试官允许的情况下。</p>
+<p>1）级数和：公式：n（n+1）/2（但只适用于缺少的一个数）</p>
+<p>2）如果数组缺少多个元素，则使用位集。</p>
+<p>我提供了另一个目的的位集解决方案，以介绍这个不错的实用程序类。在许多采访中，我曾向Java开发人员询问过这个类，但许多人甚至没有意识到这一点。我认为这个问题是学习如何在Java中使用BITSET的好方法。</p>
+<p>顺便说一句，如果你要去面试，除了这个问题，它还很好地知道如何在数组和程序中找到重复的数字，以在整数数组中找到第二个最高的数字。通常情况下，这些问题都会在这之后作为后续问题被问到。</p>
+<h2 id="问题解答"><a href="#问题解答" class="headerlink" title="问题解答"></a>问题解答</h2><p>参考代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">import</span> java.util.BitSet;</span><br><span class="line"> </span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Java program to find missing elements in a Integer array containing </span></span><br><span class="line"><span class="comment"> * numbers from 1 to 100.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">file</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// one missing number</span></span><br><span class="line">        printMissingNumber(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">6</span>&#125;, <span class="number">6</span>);</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// two missing number</span></span><br><span class="line">        printMissingNumber(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">8</span>, <span class="number">10</span>&#125;, <span class="number">10</span>);</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// three missing number</span></span><br><span class="line">        printMissingNumber(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">9</span>, <span class="number">8</span>&#125;, <span class="number">10</span>);</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// four missing number</span></span><br><span class="line">        printMissingNumber(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">9</span>, <span class="number">8</span>&#125;, <span class="number">10</span>);</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// Only one missing number in array</span></span><br><span class="line">        <span class="keyword">int</span>[] iArray = <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>&#125;;</span><br><span class="line">        <span class="keyword">int</span> missing = getMissingNumber(iArray, <span class="number">5</span>);</span><br><span class="line">        System.out.printf(<span class="string">"Missing number in array %s is %d %n"</span>, </span><br><span class="line">                           Arrays.toString(iArray), missing);</span><br><span class="line">    &#125;</span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * A general method to find missing values from an integer array in Java.</span></span><br><span class="line"><span class="comment">    * This method will work even if array has more than one missing element.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">printMissingNumber</span><span class="params">(<span class="keyword">int</span>[] numbers, <span class="keyword">int</span> count)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> missingCount = count - numbers.length;</span><br><span class="line">        BitSet bitSet = <span class="keyword">new</span> BitSet(count);</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> number : numbers) &#123;</span><br><span class="line">            bitSet.set(number - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        System.out.printf(<span class="string">"Missing numbers in integer array %s, with total number %d is %n"</span>,</span><br><span class="line">        Arrays.toString(numbers), count);</span><br><span class="line">        <span class="keyword">int</span> lastMissingIndex = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; missingCount; i++) &#123;</span><br><span class="line">            lastMissingIndex = bitSet.nextClearBit(lastMissingIndex);</span><br><span class="line">            System.out.println(++lastMissingIndex);</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">    &#125;</span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Java method to find missing number in array of size n containing</span></span><br><span class="line"><span class="comment">    * numbers from 1 to n only.</span></span><br><span class="line"><span class="comment">    * can be used to find missing elements on integer array of </span></span><br><span class="line"><span class="comment">    * numbers from 1 to 100 or 1 - 1000</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getMissingNumber</span><span class="params">(<span class="keyword">int</span>[] numbers, <span class="keyword">int</span> totalCount)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> expectedSum = totalCount * ((totalCount + <span class="number">1</span>) / <span class="number">2</span>);</span><br><span class="line">        <span class="keyword">int</span> actualSum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i : numbers) &#123;</span><br><span class="line">            actualSum += i;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">return</span> expectedSum - actualSum;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Missing numbers in integer array [1, 2, 3, 4, 6], with total number 6 is </span><br><span class="line">5</span><br><span class="line">Missing numbers in integer array [1, 2, 3, 4, 6, 7, 9, 8, 10], with total number 10 is </span><br><span class="line">5</span><br><span class="line">Missing numbers in integer array [1, 2, 3, 4, 6, 9, 8], with total number 10 is </span><br><span class="line">5</span><br><span class="line">7</span><br><span class="line">10</span><br><span class="line">Missing numbers in integer array [1, 2, 3, 4, 9, 8], with total number 10 is </span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">10</span><br><span class="line">Missing number in array [1, 2, 3, 5] is 4</span><br></pre></td></tr></table></figure>
+
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>您可以看到如何使用正确的数据结构轻松地解决问题，这是这个问题的关键收获，对于更多的编码问题，您可以查看<a href="https://aax-us-east.amazon-adsystem.com/x/c/Qu4OnSO4Lds0KdQhnHOM5-kAAAFsiYVQswEAAAFKAS9ktN4/https://assoc-redirect.amazon.com/g/r/http://www.amazon.com/Cracking-Coding-Interview-6th-Edition/dp/0984782850/?creativeASIN=0984782850&linkCode=w61&imprToken=ynLT416dutVM5EAZv6sv-g&slotNum=0&tag=javamysqlanta-20" target="_blank" rel="noopener">《the Cracking the Coding Interviews》</a>，这是来自谷歌、亚马逊、微软等科技公司编程面试的189个编码问题的集合。</p>
+<p>这就是在一个由100个元素组成的数组中查找缺失元素的全部内容。正如我所说，了解这个技巧是很好的，它只需要计算数字的和，然后从实际和中减去它，但是如果数组中有多个缺少的数字，就不能使用这个技巧。另一方面，BitSet解决方案更通用，因为您可以使用它在整数数组中查找多个缺少的值。</p>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2019/08/13/数组：怎样不使用Java集合API从数组移除重复元素/" class="pre-post btn btn-default" title='数组：怎样不使用Java集合API从数组移除重复元素'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">数组：怎样不使用Java集合API从数组移除重复元素</span>
+        </a>
+    
+    
+        <a href="/2019/08/13/风格官方指南整理/" class="next-post btn btn-default" title='Vue 编码风格官方指南整理'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">Vue 编码风格官方指南整理</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'h86n5PYEWOScNNTc5l7r8Ma1-gzGzoHsz',
+            appKey: 'Sc1o9I3OBfSjWqmvxjFwvlbw',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: true,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: ''.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">Table of Contents</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#问题描述"><span class="toc-text">问题描述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#问题解答"><span class="toc-text">问题解答</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#结语"><span class="toc-text">结语</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>

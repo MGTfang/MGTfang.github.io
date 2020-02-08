@@ -1,0 +1,343 @@
+<!DOCTYPE HTML>
+<html lang="">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="青桥雨之木芳">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://www.haoming.fun">
+    <!--SEO-->
+
+    <meta name="keywords" content="H5">
+
+
+    <meta name="description" content="前言&emsp;&emsp;本文对近期开发移动端 H5 过程中解决的体验问题进行梳理汇总。内容涉及移动端适配、网络状态监听、DOM元素位置属性的计算、与原生通信、用户行为埋点、包体积优化等。通过...">
+
+
+
+<meta name="robots" content="all">
+<meta name="google" content="all">
+<meta name="googlebot" content="all">
+<meta name="verify" content="all">
+
+    <!--Title-->
+
+
+<title>H5 体验优化总结（一） | 青桥雨之木芳</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="青桥雨之木芳" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
+</head>
+
+</html>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='Peng Fang'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://www.haoming.fun">青桥雨之木芳</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>Home</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="H5 体验优化总结（一）">
+            
+	            H5 体验优化总结（一）
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/移动端开发/">移动端开发</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/H5/">H5</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2020/02/02</span>
+        </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>&emsp;&emsp;本文对近期开发移动端 H5 过程中解决的体验问题进行梳理汇总。内容涉及移动端适配、网络状态监听、DOM元素位置属性的计算、与原生通信、用户行为埋点、包体积优化等。通过小的问题案例，来讲解开发中问题的解决及如何提升用户体验。如果本文有任何不确切的地方，欢迎指正！<br>&emsp;&emsp;本文分为两部分，第一部分包含页面优化、设计优化、性能优化；第二部分包含功能优化。本文内容概要如下：</p>
+<p><img src="https://www.haoming.fun/images/20200123190647.png" alt="本文概览"></p>
+<h2 id="移动端适配"><a href="#移动端适配" class="headerlink" title="移动端适配"></a>移动端适配</h2><p>&emsp;&emsp;为了适配不同手机终端的屏幕尺寸，之前开发移动端 H5 的时候，页面字体、间距等属性设置的单位采用rem。最近参与的项目中采用的单位是 vw，据说一些低版本手机浏览器对 viewport-units 的支持不太理想（IOS 8+, Android 4.4+ 支持，见 <a href="https://caniuse.com/#feat=viewport-units" target="_blank" rel="noopener">caniuse</a>），但是就目前的应用场景来看支持还好。H5 页面适配以 rem 和 vw 这两种单位最为常见。<br>&emsp;&emsp;<code>vw</code> 和 <code>rem</code> 的方案的本质都是“等比例缩放”，适合于视觉组件种类较多，视觉设计对元素位置的相对关系依赖较强的移动端页面。但对于文本内容较多，或者说希望引导用户沉浸浏览的页面，有人不推荐完全使用等比缩放的方案，并且在新闻，社区等可阅读内容较多的场景，px 方案可以让大屏幕手机展示出更多的内容，更符合人们的阅读习惯。<br>&emsp;&emsp;<code>rem</code> 是相对于根元素（HTML标签），而 <code>vw</code> 是相对于视口的宽度。下面说说两种方案的计算。</p>
+<h3 id="REM"><a href="#REM" class="headerlink" title="REM"></a>REM</h3><p>&emsp;&emsp;大多数浏览器中，默认的字体大小是 16px，rem 单位的计算是以这个为基准（em以父元素的字体大小为基准）。如果用户将这个根元素的字体大小改成 14px,那么 1rem = 14px (1 * 14)，这样用户通过调整浏览器的默认字体大小，来控制每个元素的相对（缩放）比例。假如为了适配 1920 x 1080 以上尺寸的大屏，我们可以先求得设备像素比 dpr，然后基于 dpr 设置根元素的字体大小为 <code>dpr * 100px</code>。那么设计稿中 12 像素大小的文字，代码中该 <code>font-size</code> 设置为 0.12rem。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> docEle = <span class="built_in">document</span>.documentElement;</span><br><span class="line">docEle.style.minWidth = <span class="string">'1920px'</span>;</span><br><span class="line"><span class="keyword">const</span> dpr = docEle.offsetWidth / <span class="number">1920</span>;</span><br><span class="line">docEle.setAttribute(<span class="string">"data-dpr"</span>, dpr + <span class="string">''</span>);</span><br><span class="line">docEle.style.fontSize = dpr * <span class="number">100</span> + <span class="string">'px'</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Viewport-units"><a href="#Viewport-units" class="headerlink" title="Viewport units"></a>Viewport units</h3><p>&emsp;&emsp;Viewport units 代表当前浏览器视口的一个百分比，和 % 单位相似，区别是视口单位按浏览器当前视口大小的百分比计算；而百分比单位是以父元素的百分比计算的。假如一个 375 x 667 的手机（iPhone6），那么1 vw = 1% of the viewport’s width (or 3.75px)。如果 UI 给的高保真宽为 375px，高为 667px，其中有一个按钮，宽为 64px，高为 16px，那么在给这个按钮设定样式的时候 width 属性应该为 <code>(64 / (375/100)) vw</code>。<br>&emsp;&emsp;如果我想在代码中就用 <code>px</code>，有没有插件能帮我们做这个事情呢？经过一番查找发现，<a href="https://github.com/evrone/postcss-px-to-viewport" target="_blank" rel="noopener">postcss-px-to-viewport</a>能解决这个问题，但是这个配置是全局的，也就是所有的px单位都会被转换，除非在它的exclude配置项中配置要排除的文件。如果我们有的地方就想采用px，不需要被转换，并且这种需要忽略的文件比较多怎么办？因此考虑到这些，在实际的应用中没有采用这种方案。<br>&emsp;&emsp;然后又考虑说，能否通过less 的mixins类似的特性，通过less定义方法来实现转换，在写样式的时候简单调用一下，如<code>font-size: px2vw(14)</code>这样就能实现转换呢。翻阅文档发现，less 有提供 <a href="https://less.bootcss.com/features/#plugin-atrules-feature-writing-your-first-plugin" target="_blank" rel="noopener">plugin</a> 功能，另外<a href="https://github.com/seven-phases-max/less-plugin-functions" target="_blank" rel="noopener">less-plugin-functions</a>，也提供类似功能，相当于 css 执行 js 的逻辑。当时由于时间紧，尝试利用 less plugin 来实现没能成功，只能以后再试一下了。<br>&emsp;&emsp;最后还是利用工具来转换的，推荐<a href="https://khaledkzy.github.io/pixel-vh-vw-converter/" target="_blank" rel="noopener">pixel-vh-vw-converter</a>这个工具，注意转换前按下 <code>F12</code>,切换设备为手机模式，然后选择手机尺寸。</p>
+<h2 id="关于等宽字体"><a href="#关于等宽字体" class="headerlink" title="关于等宽字体"></a>关于等宽字体</h2><p>&emsp;&emsp;关于什么是等宽字体，先来了解什么是不等宽字体。我们通常看到的大多字体都是不等宽字体，也就是因为英文的数字1和英文的数字9是不等宽的。那为什么需要字体是等宽的呢，比如用表格来展示各种数据值，数据靠左或靠右显示的情况下，如果字体不等宽，各位数字是对不齐的，不美观且不便于比较。<br>&emsp;&emsp;通常的等宽字体有：Consolas, Monaco, monospace，这些字体可能只对英文字符生效，对中文无效。此外我们也可以让 UI 同学提供他们认为美观的与高保真一致的字体文件，比如“DIN-RegularAlternate.ttf”。示例图如下：  </p>
+<div align="center">
+    <img src="https://www.haoming.fun/images/20200123100422.png" width="60%" height="60%">
+</div>
+
+<h2 id="关于编码规范"><a href="#关于编码规范" class="headerlink" title="关于编码规范"></a>关于编码规范</h2><p>&emsp;&emsp;在H5的开发过程中，适配各种机型是不可避免的，因此系统测试可能会发现一些兼容性问题。具以往经验，一部分兼容问题是不规范的CSS或JS编码造成，比如样式属性用简写，比如js用一些较新的方法，都可能是造成不兼容的原因，特别在低端机容易出现，它不识别某些写法。下面来看一个例子，我们 H5 的一个页面在ios上滑动出现卡顿，经排查和我们写的样式有关系。<br>&emsp;&emsp;以下是示例代码：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.sticky-wrapper</span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    &amp; + <span class="selector-tag">div</span>&#123; <span class="comment">/* 去掉就OK了 */</span></span><br><span class="line">        <span class="attribute">overflow-x</span>: hidden;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="用户事件埋点"><a href="#用户事件埋点" class="headerlink" title="用户事件埋点"></a>用户事件埋点</h2><p>&emsp;&emsp;用户埋点的目的是统计一般的PV和UV，以及对用户的操作进行记录，方便我们统计出用户的行为轨迹、喜欢看的数据、搜索的关键字等等。方便我们有针对性地了解用户的喜好和行为习惯，帮助开发出更加符合用户需求，令用户满意的产品。<br>&emsp;&emsp;起初我们接入的系统埋点能符合一般的需要，但是对于一些个性化的统计还暂不满足。所以后来我们设计了接口，通过代码中埋点调接口的方式，来记录用户行为。<br>&emsp;&emsp;因此通过 Vue 的 mixins 来定义埋点的功能方法：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> userTrack = &#123;</span><br><span class="line">    methods: &#123;</span><br><span class="line">        trackEvent(params) &#123;</span><br><span class="line">            <span class="keyword">const</span> actions = [<span class="string">'click'</span>];</span><br><span class="line">            <span class="keyword">const</span> categories = [<span class="string">'pageView'</span>];</span><br><span class="line">            <span class="keyword">const</span> options = &#123;</span><br><span class="line">                appId: <span class="string">'xxxxxx'</span>, <span class="comment">// 约定appId</span></span><br><span class="line">                userName: localStorage.user, <span class="comment">// 登录用户名</span></span><br><span class="line">                category: categories[<span class="number">0</span>], <span class="comment">// 要监控的目标的类型名称</span></span><br><span class="line">                action: actions[<span class="number">0</span>], <span class="comment">// 用户行为，默认点击</span></span><br><span class="line">                pageId: store.state.moduleName.id, <span class="comment">// 访问页面ID，这里传模块ID</span></span><br><span class="line">                pageName: store.state.moduleName.name, <span class="comment">// 访问页面名称，这里传模块名</span></span><br><span class="line">                eventTime: util.dateFormat(<span class="string">'yyyy-MM-dd HH:mm:ss'</span>, <span class="keyword">new</span> <span class="built_in">Date</span>()), <span class="comment">// 记录事件时间</span></span><br><span class="line">                ...params <span class="comment">// 传入的事件参数</span></span><br><span class="line">            &#125;;</span><br><span class="line">            <span class="comment">// JSON对象转字符串，后端需要</span></span><br><span class="line">            options.values &amp;&amp; (options.values = <span class="built_in">JSON</span>.stringify(options.values));</span><br><span class="line">            api.trackEvent(options);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="包体积优化"><a href="#包体积优化" class="headerlink" title="包体积优化"></a>包体积优化</h2><p>&emsp;&emsp;接手项目构建后的前端包比较大，因此着手进行优化，尽量缩小包的体积大小。优化围绕两个原则，第一个是插件的按需引入，第二个去掉页面文件中没有用到引入。<br>&emsp;&emsp;先减小打包后大的 js 文件的体积，要减小大文件，就得利用 Webpack 分析构建后的 js 文件中哪些插件占用空间大，为多大。我们通过在 <code>package.json</code> <code>的scripts</code> 下配置命令：<code>&quot;analyze&quot;: &quot;cross-env NODE_ENV=production npm_config_report=true npm run build&quot;</code>，然后执行 <code>npm run analyze</code>，在打开的页面中进行包分析。</p>
+<ul>
+<li><p>Echarts 按需引入</p>
+  <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// main.js</span></span><br><span class="line"><span class="keyword">import</span> echarts <span class="keyword">from</span> <span class="string">'echarts/lib/echarts'</span>;</span><br><span class="line">Vue.prototype.$echarts = echarts;</span><br></pre></td></tr></table></figure>
+
+  <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ChartPie.vue 等页面按需引入</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">'echarts/lib/chart/pie'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'echarts/lib/component/tooltip'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'echarts/lib/component/legend'</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>lodash 按需引入</p>
+<p>运行 npm 命令安装依赖：<code>npm install babel-plugin-lodash lodash-webpack-plugin --save-dev</code></p>
+<p>修改<code>.babelrc</code>文件，plugins 中添加 lodash，我的项目添加完成如下：<code>&quot;plugins&quot;: [transform-runtime&quot;, [&quot;import&quot;, {...}], &quot;lodash&quot;]</code></p>
+<p>修改 webpack.base.config.js</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> LodashModuleReplacementPlugin = <span class="built_in">require</span>(<span class="string">'lodash-webpack-plugin'</span>);</span><br><span class="line"><span class="built_in">module</span>.exports = vuxLoader.merge(webpackConfig, &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">      ...,</span><br><span class="line">      <span class="keyword">new</span> LodashModuleReplacementPlugin()</span><br><span class="line">  ]</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>moments 排除字体包<br>修改 webpack.prod.conf.js</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> webpackConfig = merge(baseWebpackConfig, &#123;</span><br><span class="line">    plugins: [</span><br><span class="line">        ...,</span><br><span class="line">        <span class="keyword">new</span> webpack.IgnorePlugin(<span class="regexp">/^\.\/locale/</span>,/moment$/),</span><br><span class="line">        ...</span><br><span class="line">    ]</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>&emsp;&emsp;优化后某大文件的体积从1370kB 减小到 518KB，减少约62.2%。<br>&emsp;&emsp;然后是去掉不必要的引用：首先是去掉之前引入的 vue-pdf，后面没用了。去掉以后包体积减小了几兆。其次是执行静态代码扫描，将错误修复，特别是定义了没有使用的报错（no-unused-vars error）或者 <span style="color:red"> import 后没有使用</span>。<br>&emsp;&emsp;最后配置生产环境不启用 SourceMap，即打包的时候不生成 SourceMap 文件：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 修改config/index.js</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    build: &#123;</span><br><span class="line">        ...,</span><br><span class="line">        productionSourceMap: <span class="literal">false</span>,</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;经过上述优化，包的大小从最初的 33,446,583 字节减小到 1,876,526 字节，减小94.4%。</p>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p><a href="https://developer.mozilla.org/zh-CN/" target="_blank" rel="noopener">https://developer.mozilla.org/zh-CN/</a><br><a href="https://www.echartsjs.com/zh/option.html#grid.tooltip.axisPointer.crossStyle" target="_blank" rel="noopener">https://www.echartsjs.com/zh/option.html#grid.tooltip.axisPointer.crossStyle</a><br><a href="https://develop.asyncoder.com:8443/docs/solution/module-Default.html" target="_blank" rel="noopener">https://develop.asyncoder.com:8443/docs/solution/module-Default.html</a><br><a href="https://blog.csdn.net/yuzhengfei7/article/details/93468914" target="_blank" rel="noopener">https://blog.csdn.net/yuzhengfei7/article/details/93468914</a><br><a href="https://juejin.im/post/5bc07ebf6fb9a05d026119a9" target="_blank" rel="noopener">https://juejin.im/post/5bc07ebf6fb9a05d026119a9</a><br><a href="https://docs.elementor.com/article/595-difference-between-px-em-rem-percentage-vw-vh" target="_blank" rel="noopener">https://docs.elementor.com/article/595-difference-between-px-em-rem-percentage-vw-vh</a><br><a href="https://www.cnblogs.com/aspwebchh/p/7675539.html" target="_blank" rel="noopener">https://www.cnblogs.com/aspwebchh/p/7675539.html</a><br><a href="https://www.cnblogs.com/savokiss/p/8514868.html" target="_blank" rel="noopener">https://www.cnblogs.com/savokiss/p/8514868.html</a>  </p>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2020/02/02/H5-体验优化总结（二）/" class="pre-post btn btn-default" title='H5 体验优化总结（二）'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">H5 体验优化总结（二）</span>
+        </a>
+    
+    
+        <a href="/2019/08/30/Vue-nextTick-原理分析/" class="next-post btn btn-default" title='Vue nextTick 原理分析'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">Vue nextTick 原理分析</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'h86n5PYEWOScNNTc5l7r8Ma1-gzGzoHsz',
+            appKey: 'Sc1o9I3OBfSjWqmvxjFwvlbw',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: true,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: ''.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">Table of Contents</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#移动端适配"><span class="toc-text">移动端适配</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#REM"><span class="toc-text">REM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Viewport-units"><span class="toc-text">Viewport units</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#关于等宽字体"><span class="toc-text">关于等宽字体</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#关于编码规范"><span class="toc-text">关于编码规范</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#用户事件埋点"><span class="toc-text">用户事件埋点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#包体积优化"><span class="toc-text">包体积优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#参考文档"><span class="toc-text">参考文档</span></a></li></ol></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>

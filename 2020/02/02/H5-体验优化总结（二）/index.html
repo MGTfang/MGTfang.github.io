@@ -1,0 +1,354 @@
+<!DOCTYPE HTML>
+<html lang="">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="青桥雨之木芳">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://www.haoming.fun">
+    <!--SEO-->
+
+    <meta name="keywords" content="">
+
+
+    <meta name="description" content="前言&emsp;&emsp;本文对近期开发移动端 H5 过程中解决的体验问题进行梳理汇总。内容涉及移动端适配、网络状态监听、DOM元素位置属性的计算、与原生通信、用户行为埋点、包体积优化等。通过...">
+
+
+
+<meta name="robots" content="all">
+<meta name="google" content="all">
+<meta name="googlebot" content="all">
+<meta name="verify" content="all">
+
+    <!--Title-->
+
+
+<title>H5 体验优化总结（二） | 青桥雨之木芳</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="青桥雨之木芳" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
+</head>
+
+</html>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='Peng Fang'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://www.haoming.fun">青桥雨之木芳</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>Home</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="H5 体验优化总结（二）">
+            
+	            H5 体验优化总结（二）
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/移动端开发/">移动端开发</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2020/02/02</span>
+        </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>&emsp;&emsp;本文对近期开发移动端 H5 过程中解决的体验问题进行梳理汇总。内容涉及移动端适配、网络状态监听、DOM元素位置属性的计算、与原生通信、用户行为埋点、包体积优化等。通过小的问题案例，来讲解开发中问题的解决及如何提升用户体验。如果本文有任何不确切的地方，欢迎指正！<br>&emsp;&emsp;本文分为两部分，第一部分包含页面优化、设计优化、性能优化；第二部分包含功能优化。本文内容概要如下：</p>
+<p><img src="https://www.haoming.fun/images/20200123190647.png" alt="本文概览"></p>
+<h2 id="网络状态监听"><a href="#网络状态监听" class="headerlink" title="网络状态监听"></a>网络状态监听</h2><p>&emsp;&emsp;H5 通常需要对网络状态进行监听，比如说断网的时候，给用户一个提示，或者跳转到一个指定的提示页面。那么如何对网络状态进行监听呢？答案是可以在页面添加对<code>offline</code>事件的监听。据MDN的解释，当浏览器失去网络连接时，<code>offline</code>事件被处罚。并且<code>navigator.online</code>的值变为false。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">created() &#123;</span><br><span class="line">    <span class="comment">// 添加断网监听</span></span><br><span class="line">    <span class="built_in">window</span>.addEventListener(<span class="string">'offline'</span>, <span class="keyword">this</span>.pushNetworkErrorPage);</span><br><span class="line">&#125;,</span><br><span class="line">beforeDestroy() &#123;</span><br><span class="line">    <span class="comment">// 移除网络状态监听</span></span><br><span class="line">    <span class="built_in">window</span>.removeEventListener(<span class="string">'offline'</span>, <span class="keyword">this</span>.pushNetworkErrorPage);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;断网处理是 APP 比较常见的一个场景，为了提升用户体验，在网络断开或者网络状态不好的时候，及时给出用户提升信息，或者进入到一个类似404的提示页面。我们这里采用后者，用图文来展示断网的提示信息，并且用户通过“点击重试”，可以尝试重连（刷新实际是返回上一页，该过程中如果还是断网状态，又会回到提示页）。</p>
+<h2 id="点击展开按钮，页面自动往上"><a href="#点击展开按钮，页面自动往上" class="headerlink" title="点击展开按钮，页面自动往上"></a>点击展开按钮，页面自动往上</h2><p>&emsp;&emsp;有时候页面内容比较多，一些内容是没有展开的，即便是展开后，内容较长，屏幕长度有限，可能出现下方内容被屏幕遮挡。因此为了提升体验，需要在点击展开按钮的时候，页面能自动往上，滚动到内容区域的起始位置。<br>来看下面的实现代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 展开的时候，滚动到顶部导航下面</span></span><br><span class="line"><span class="comment">// assessmentTableBox 的 offsetParent 是 body，offsetTop 为其到 body 的距离</span></span><br><span class="line"><span class="keyword">const</span> scrollTop = <span class="keyword">this</span>.$refs.assessmentTableBox.offsetTop - <span class="built_in">document</span>.querySelector(<span class="string">'.sticky-wrapper'</span>).clientHeight - <span class="number">40</span>; <span class="comment">// 元素距离顶部的距离 - 顶部 header 高度 - 偏移量</span></span><br><span class="line"><span class="keyword">if</span> (<span class="built_in">document</span>.documentElement.scrollTop) &#123;</span><br><span class="line">    <span class="built_in">document</span>.documentElement.scrollTop = scrollTop;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">document</span>.body.scrollTop = scrollTop;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;为了解释这段代码，首先需要了解几个基本概念：<br>&emsp;&emsp;<code>HTMLElement.offsetParent</code> 是一个只读属性，返回一个指向最近的（指包含层级上的最近）包含该元素的定位元素或者最近的 <code>table,td,th,body</code> 元素。如果这个容器元素未进行CSS定位, 则 <code>offsetParent</code> 属性的取值为body元素的引用。<br>&emsp;&emsp;<code>HTMLElement.offsetTop</code> 为只读属性，它返回当前元素相对于其 <code>offsetParent</code> 元素的顶部内边距的距离。<br>&emsp;&emsp;<code>clientHeight</code>它是元素内部的高度(单位像素)，包含内边距，但不包括水平滚动条、边框和外边距，此属性会四舍五入取整。<br>&emsp;&emsp;<code>Element.scrollTop</code> 属性可以获取或设置一个元素的内容垂直滚动的像素数。这里通过设置 <code>document.documentElement</code> 或者 <code>document.body</code> 设置页面向上滚动的像素数，前者返回的是文档对象的根元素通常指<code>&lt;html&gt;</code>，后者返回当前文档的<code>&lt;body&gt;</code>元素。<br>&emsp;&emsp;这里的办法是先获取到页面向上滚动的距离，这个距离scrollTop = 元素距离顶部的距离 - 顶部 header 高度 - 偏移量，然后设置文档根元素或者body元素的 <code>scrollTop</code> 使得页面向上滚动 <code>scrollTop</code> 像素的距离。</p>
+<h2 id="下方还有内容时，给用户提示"><a href="#下方还有内容时，给用户提示" class="headerlink" title="下方还有内容时，给用户提示"></a>下方还有内容时，给用户提示</h2><p>&emsp;&emsp;有时弹窗区域下面还有内容没显示完全时，需要给用户提示，可以向下滑查看更多内容。我们这里的办法是，下方还有内容时，在最下方位置显示一个向下的有动效的箭头，当用户滚动到最下方的时候，该箭头掉转朝上。下面说说怎么实现。</p>
+<h3 id="判断窗口内容是否可滚动"><a href="#判断窗口内容是否可滚动" class="headerlink" title="判断窗口内容是否可滚动"></a>判断窗口内容是否可滚动</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">watch: &#123;</span><br><span class="line">    isDisplay(nv) &#123;</span><br><span class="line">        <span class="keyword">if</span> (nv) &#123;</span><br><span class="line">            <span class="keyword">this</span>.$nextTick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">                <span class="keyword">const</span> scrollDiv = <span class="keyword">this</span>.$refs.explainContent;</span><br><span class="line">                <span class="keyword">this</span>.scrollable = scrollDiv.scrollHeight &gt; scrollDiv.clientHeight;</span><br><span class="line">                <span class="keyword">this</span>.scrollable &amp;&amp; scrollDiv.addEventListener(<span class="string">'scroll'</span>, <span class="keyword">this</span>.scrollHandler);</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;,</span><br><span class="line">beforeDestroy() &#123;</span><br><span class="line">    <span class="keyword">this</span>.scrollable &amp;&amp; <span class="keyword">this</span>.$refs.explainContent.removeEventListener(<span class="string">'scroll'</span>, <span class="keyword">this</span>.scrollHandler);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;如果元素的 <code>scrollHeight</code> 大于 其<code>clientHeight</code>的话, 我们就说它的内容是可以滚动的。<br>&emsp;&emsp;<code>Element.scrollHeight</code> 这个只读属性是一个元素内容高度的度量，包括由于溢出导致的视图中不可见内容。<br>&emsp;&emsp;<code>scrollHeight</code> 的值等于该元素在不使用滚动条的情况下为了适应视口中所用内容所需的最小高度。 没有垂直滚动条的情况下，<code>scrollHeight</code>值与元素视图填充所有内容所需要的最小值clientHeight相同。包括元素的padding，但不包括元素的border和margin。<code>scrollHeight</code>也包括 ::before 和 ::after这样的伪元素。<br>&emsp;&emsp;<code>clientHeight</code> 表示元素内部的高度(单位像素)，包含padding，但不包括元素的border和margin。</p>
+<h3 id="判断是否滚动到底部"><a href="#判断是否滚动到底部" class="headerlink" title="判断是否滚动到底部"></a>判断是否滚动到底部</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">scrollHandler(e) &#123;</span><br><span class="line">    <span class="keyword">const</span> element = e.target;</span><br><span class="line">    <span class="keyword">this</span>.isScrollBottom = <span class="built_in">Math</span>.round(element.scrollHeight - element.scrollTop) === element.clientHeight ||</span><br><span class="line">                <span class="built_in">Math</span>.round(element.scrollHeight - element.scrollTop) === element.clientHeight - <span class="number">1</span>;</span><br><span class="line">&#125;,</span><br><span class="line">arrowDownClickHandler(e) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.isScrollBottom) &#123;</span><br><span class="line">        <span class="comment">// 如果箭头朝上，点击滚到顶部</span></span><br><span class="line">        <span class="keyword">this</span>.$refs.explainContent.scrollTop = <span class="number">0</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 如果箭头朝下，向下滚一点</span></span><br><span class="line">        <span class="keyword">this</span>.$refs.explainContent.scrollTop = <span class="keyword">this</span>.$refs.explainContent.scrollTop + <span class="number">150</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;判断是否滚动到元素内容的最底部，是比较元素的<code>scrollHeight</code>（不出现滚动条的最小高度）减去其内容垂直滚动的像素数与元素可视区域的高度的高度近似。</p>
+<h3 id="箭头CSS动画"><a href="#箭头CSS动画" class="headerlink" title="箭头CSS动画"></a>箭头CSS动画</h3><p>&emsp;&emsp;效果：箭头Y方向位移，渐入渐出</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.arrow-down</span> &#123;</span><br><span class="line">    <span class="attribute">line-height</span>: <span class="number">0</span>;</span><br><span class="line">    <span class="attribute">padding</span>: <span class="number">15px</span> <span class="number">0</span>;</span><br><span class="line">    <span class="attribute">font-size</span>: <span class="number">20px</span>;</span><br><span class="line">    <span class="attribute">animation</span>: arrow <span class="number">1.5s</span>  ease-in-out  infinite;</span><br><span class="line">    .rotate&#123;</span><br><span class="line">        <span class="selector-tag">transform-origin</span>: <span class="selector-tag">center</span> <span class="selector-tag">center</span>;</span><br><span class="line">        <span class="selector-tag">transform</span>: <span class="selector-tag">rotate</span>(180<span class="selector-tag">deg</span>);</span><br><span class="line">        <span class="selector-tag">transition</span>: <span class="selector-tag">transform</span> 0<span class="selector-class">.2s</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">keyframes</span> arrow &#123;</span><br><span class="line">    0% &#123;</span><br><span class="line">        <span class="attribute">opacity</span>: <span class="number">0</span>;</span><br><span class="line">        <span class="attribute">transform</span>: <span class="built_in">translate</span>(0, 0px)</span><br><span class="line">    &#125;</span><br><span class="line">    50% &#123;</span><br><span class="line">        <span class="attribute">opacity</span>: <span class="number">1</span>;</span><br><span class="line">        <span class="attribute">transform</span>: <span class="built_in">translate</span>(0, -.1rem)</span><br><span class="line">    &#125;</span><br><span class="line">    100% &#123;</span><br><span class="line">        <span class="attribute">opacity</span>: <span class="number">0</span>;</span><br><span class="line">        <span class="attribute">transform</span>: <span class="built_in">translate</span>(0, -.2rem)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="切换页面，显示Loading"><a href="#切换页面，显示Loading" class="headerlink" title="切换页面，显示Loading"></a>切换页面，显示Loading</h2><p>&emsp;&emsp;H5 页面的数据一般分为好几个部分组成，比如有总览，分类详情，有图表等等，每个部分通过不同的接口请求数据，如果每个接口在请求前后显示页面 Loading 转圈的话，那么转圈会显示隐藏多次。这里的解决办法是给页面加一个全局的 Loading，在路由到页面前显示，在路由到页面后关闭。这里用 Vue Router 的全局前置守卫和全局后置钩子来实现，代码如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">loading</span> <span class="attr">v-model</span>=<span class="string">"isLoading"</span>&gt;</span><span class="tag">&lt;/<span class="name">loading</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Router.beforeEach(<span class="function"><span class="keyword">function</span>(<span class="params">to, from, next</span>) </span>&#123;</span><br><span class="line">    store.commit(<span class="string">'updateLoadingStatus'</span>, &#123; <span class="attr">isLoading</span>: <span class="literal">true</span> &#125;);</span><br><span class="line">    next();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">Router.afterEach(<span class="function"><span class="keyword">function</span>(<span class="params">to</span>) </span>&#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        store.commit(<span class="string">'updateLoadingStatus'</span>, &#123; <span class="attr">isLoading</span>: <span class="literal">false</span> &#125;);</span><br><span class="line">    &#125;, <span class="number">500</span>); <span class="comment">// 显示时间长一点</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="设置Tooltip-坐标轴指示器十字线"><a href="#设置Tooltip-坐标轴指示器十字线" class="headerlink" title="设置Tooltip 坐标轴指示器十字线"></a>设置Tooltip 坐标轴指示器十字线</h2><p>&emsp;&emsp;Echarts Tooltip 为轴触发，且坐标轴指示器的类型为“cross”，即十字线，显示效果如下：</p>
+<div align="center">
+    <img src="https://www.haoming.fun/images/20200122162331.png" width="70%" height="70%">
+</div>
+&emsp;&emsp;如果需要是不显示指示器的标签和十字轴线，我们可以这样配置Echarts 的tooltip：
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">tooltip: &#123;</span><br><span class="line">    ...,</span><br><span class="line">    axisPointer: &#123; <span class="comment">// 坐标轴指示器，坐标轴触发有效</span></span><br><span class="line">        type: <span class="string">'cross'</span>, <span class="comment">// 默认为直线，可选为：'line' | 'shadow'</span></span><br><span class="line">        label: &#123;</span><br><span class="line">            color: <span class="string">'#888'</span>,</span><br><span class="line">            show: <span class="literal">false</span> <span class="comment">// 不显示坐标轴指示器标签</span></span><br><span class="line">        &#125;,</span><br><span class="line">        crossStyle: &#123;</span><br><span class="line">            opacity: <span class="number">0</span> <span class="comment">// 不显示坐标轴指示器线</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="限制浮标拖出页面"><a href="#限制浮标拖出页面" class="headerlink" title="限制浮标拖出页面"></a>限制浮标拖出页面</h2><p>&emsp;&emsp;页面有一个模块入口的圆形浮标，这个浮标需要支持可拖动，且拖动限制在页面内。<a href="https://github.com/desandro/draggabilly" target="_blank" rel="noopener">draggabilly</a> 能支持这个功能。可以通过 npm 来安装，使用也比较简单。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// APP.vue</span></span><br><span class="line"><span class="keyword">import</span> draggabilly <span class="keyword">from</span> <span class="string">'draggabilly'</span>;</span><br><span class="line">Vue.prototype.$draggabilly = draggabilly;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> elem = <span class="keyword">this</span>.$refs.entrance;</span><br><span class="line"><span class="keyword">const</span> draggie = <span class="keyword">new</span> <span class="keyword">this</span>.$draggabilly(elem, &#123;</span><br><span class="line">    containment: <span class="built_in">document</span>.getElementById(<span class="string">'app'</span>)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">draggie.on(<span class="string">'dragEnd'</span>, (event, pointer, moveVector) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> elem = <span class="keyword">this</span>.$refs.entrance;</span><br><span class="line">    <span class="keyword">let</span> elemTop = +elem.style.top.replace(<span class="string">'px'</span>, <span class="string">''</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (elemTop &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// 超出屏幕上边界，回到屏幕内</span></span><br><span class="line">        elem.style.top = <span class="number">0</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (elem.offsetHeight + elemTop &gt; <span class="built_in">document</span>.documentElement.clientHeight) &#123;</span><br><span class="line">        <span class="comment">// 超出屏幕下边界，回到屏幕内</span></span><br><span class="line">        elem.style.top = <span class="string">`<span class="subst">$&#123;<span class="built_in">document</span>.documentElement.clientHeight - elem.offsetHeight&#125;</span>px`</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;原本该插件能限制拖动的范围，但是在有的页面可能以为布局的原因，导致浮标能拖动出下方边界。为了不改动现有布局引发新的问题，遂通过JS事件来限制，在拖动结束的时候，如果元素超出屏幕边界，则使之回到屏幕内。<br>&emsp;&emsp;浮标元素是fixed定位的，我们能获取该元素距屏幕顶部的距离，这个距离加上元素的距离如果大于屏幕的高度的话，说明被拖出屏幕下边界，则设置元素的top属性为屏幕的高度减去元素的高度这么多像素。如果元素的top属性值小于0，则说明被拖出了上边界，则设置其样式top属性为0。<br>&emsp;&emsp;元素的 <code>offsetHeight</code> 是一种元素CSS高度的衡量标准，包括元素的边框、内边距和元素的水平滚动条（如果存在且渲染的话），不包含 :before 或 :after 等伪类元素的高度。</p>
+<h2 id="趋势图时环比线条出界"><a href="#趋势图时环比线条出界" class="headerlink" title="趋势图时环比线条出界"></a>趋势图时环比线条出界</h2><p>&emsp;&emsp;有时Echarts绘制出现奇怪的问题，比如线条出界，比如两点之间的连线不平滑，出现拐点。遇到这样匪夷所思的问题，或许我们应该检查下代码，是否是实现逻辑出现问题，除此之外还有个原因可以检查一下，那就是：绘制图表前是否有清空 canvas。一个图表组件会被公用，这种情况如果绘制前不清空画板可能就会出现这样怪异的问题。<br>&emsp;&emsp;原来的代码如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> chart = <span class="keyword">this</span>.$echarts.init(chartBox, <span class="literal">null</span>, &#123;<span class="attr">renderer</span>: <span class="string">'svg'</span>&#125;);</span><br><span class="line">chart.setOption(&#123;</span><br><span class="line">    tooltip: &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;,</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;优化后的代码如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">this</span>.chartObj) &#123;</span><br><span class="line">    <span class="keyword">this</span>.chartObj.clear();</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.chartObj = <span class="keyword">this</span>.$echarts.init(chartBox, <span class="literal">null</span>, &#123;<span class="attr">renderer</span>: <span class="string">'svg'</span>&#125;);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 绘制图表</span></span><br><span class="line"><span class="keyword">this</span>.chartObj.setOption(&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="调用原生"><a href="#调用原生" class="headerlink" title="调用原生"></a>调用原生</h2><p>&emsp;&emsp;APP端通常有PDF预览的需求，比如查看报告等。前端有js或者vue相关的插件可以供我们使用，之前使用过pdf.js，实现出来的体验一般。最近项目中同事也用过vue-pdf，这个插件能用来做 PDF 的预览。我们遇到的情况是，在本地开发的时候没有问题，但是上到测试环境后，拉取PDF数据的请求有发送，但是不显示结果。后来我还发现，使用了这个插件以后，包会增大好几兆，这对H5的性能是不利的。所以后来放弃了使用这些插件，转而调用原生提供的PDF预览功能。  </p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 打开APP原生页面</span></span><br><span class="line"><span class="comment"> * @param &#123;string&#125; urlScheme 原生scheme路径地址，这里约定必须以mgstaff://开头</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">startNativeActivity(urlScheme = <span class="string">''</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (urlScheme.indexOf(<span class="string">'mgstaff://'</span>) === <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">`urlScheme必须以mgstaff://开头`</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.invokeNative(<span class="string">'handleUrlScheme'</span>, &#123; urlScheme &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;H5 使用原生的功能，通过 <code>JSBridge</code> 实现。<code>JSBridge</code> 主要是给 JavaScript 提供调用 Native 功能的接口，让混合开发中的前端部分可以方便地使用 Native 的功能。这个通信可以是双向的。JavaScript 调用 Native的方式主要有两种：注入API 和 拦截URL SCHEME。<br>&emsp;&emsp;注入 API 方式的主要原理是，通过 WebView 提供的接口，向 JavaScript 的 Context（window）中注入对象或者方法，让 JavaScript 调用时，直接执行相应的 Native 代码逻辑，达到 JavaScript 调用 Native 的目的。<br>&emsp;&emsp;URL SCHEME 是一种类似于url的链接，是为了方便app直接互相调用设计的，形式和普通的 url 近似，比如：<code>mgstaff://course_pdf_detail?pdf_id=201912011501&amp;pdf_name=weekly_20191201</code>。H5 发送 URL Scheme 请求之后，Native 拦截到请求并根据 URL SCHEME（包括所带的参数）进行相关操作。<br>&emsp;&emsp;Native 调用 JavaScript 的方式，我们主要是采用 JS 向 window下的对象 注册回调函数的方式。H5 在调用原生能力的同时，向 Window 下的对象注册供原生传参调用的方法。比如我们想开启语音识别并返回识别后的文字：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 开启语音识别并返回识别后的文字</span></span><br><span class="line"><span class="comment"> * @returns &#123;Promise&lt;string&gt;&#125; 识别后的文字</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">recognizeVoice() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="params">resolve</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.openNative(<span class="string">'mgstaff://voice_recognition_dialog'</span>)</span><br><span class="line">        deviceApi.postVoiceRecognition = <span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">            resolve(res.intent &amp;&amp; res.intent.text)</span><br><span class="line">            <span class="keyword">delete</span> deviceApi.postVoiceRecognition</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p><a href="https://developer.mozilla.org/zh-CN/" target="_blank" rel="noopener">https://developer.mozilla.org/zh-CN/</a><br><a href="https://www.echartsjs.com/zh/option.html#grid.tooltip.axisPointer.crossStyle" target="_blank" rel="noopener">https://www.echartsjs.com/zh/option.html#grid.tooltip.axisPointer.crossStyle</a><br><a href="https://develop.asyncoder.com:8443/docs/solution/module-Default.html" target="_blank" rel="noopener">https://develop.asyncoder.com:8443/docs/solution/module-Default.html</a><br><a href="https://blog.csdn.net/yuzhengfei7/article/details/93468914" target="_blank" rel="noopener">https://blog.csdn.net/yuzhengfei7/article/details/93468914</a><br><a href="https://juejin.im/post/5bc07ebf6fb9a05d026119a9" target="_blank" rel="noopener">https://juejin.im/post/5bc07ebf6fb9a05d026119a9</a><br><a href="https://docs.elementor.com/article/595-difference-between-px-em-rem-percentage-vw-vh" target="_blank" rel="noopener">https://docs.elementor.com/article/595-difference-between-px-em-rem-percentage-vw-vh</a><br><a href="https://www.cnblogs.com/aspwebchh/p/7675539.html" target="_blank" rel="noopener">https://www.cnblogs.com/aspwebchh/p/7675539.html</a><br><a href="https://www.cnblogs.com/savokiss/p/8514868.html" target="_blank" rel="noopener">https://www.cnblogs.com/savokiss/p/8514868.html</a></p>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2020/02/08/【工作杂记】20200204/" class="pre-post btn btn-default" title='【工作杂记】20200204'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">【工作杂记】20200204</span>
+        </a>
+    
+    
+        <a href="/2020/02/02/H5-体验优化总结（一）/" class="next-post btn btn-default" title='H5 体验优化总结（一）'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">H5 体验优化总结（一）</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'h86n5PYEWOScNNTc5l7r8Ma1-gzGzoHsz',
+            appKey: 'Sc1o9I3OBfSjWqmvxjFwvlbw',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: true,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: ''.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">Table of Contents</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#网络状态监听"><span class="toc-text">网络状态监听</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#点击展开按钮，页面自动往上"><span class="toc-text">点击展开按钮，页面自动往上</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#下方还有内容时，给用户提示"><span class="toc-text">下方还有内容时，给用户提示</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#判断窗口内容是否可滚动"><span class="toc-text">判断窗口内容是否可滚动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#判断是否滚动到底部"><span class="toc-text">判断是否滚动到底部</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#箭头CSS动画"><span class="toc-text">箭头CSS动画</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#切换页面，显示Loading"><span class="toc-text">切换页面，显示Loading</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#设置Tooltip-坐标轴指示器十字线"><span class="toc-text">设置Tooltip 坐标轴指示器十字线</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#限制浮标拖出页面"><span class="toc-text">限制浮标拖出页面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#趋势图时环比线条出界"><span class="toc-text">趋势图时环比线条出界</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#调用原生"><span class="toc-text">调用原生</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#参考文档"><span class="toc-text">参考文档</span></a></li></ol></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>

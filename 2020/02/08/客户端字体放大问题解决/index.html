@@ -1,0 +1,313 @@
+<!DOCTYPE HTML>
+<html lang="">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="青桥雨之木芳">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://www.haoming.fun">
+    <!--SEO-->
+
+    <meta name="keywords" content="">
+
+
+    <meta name="description" content="华为手机，或者苹果手机能设置手机端的字体大小，字体大小的变动就足以导致页面布局乱掉，导致文本不居中、文字折行、布局混乱等问题。解决办法参考这篇文章  
+现象用户修改手机字体设置大小，影响App里...">
+
+
+
+<meta name="robots" content="all">
+<meta name="google" content="all">
+<meta name="googlebot" content="all">
+<meta name="verify" content="all">
+
+    <!--Title-->
+
+
+<title>客户端字体放大问题解决 | 青桥雨之木芳</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="青桥雨之木芳" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
+</head>
+
+</html>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='Peng Fang'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://www.haoming.fun">青桥雨之木芳</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>Home</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="客户端字体放大问题解决">
+            
+	            客户端字体放大问题解决
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/移动端开发/">移动端开发</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2020/02/08</span>
+        </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <p>华为手机，或者苹果手机能设置手机端的字体大小，字体大小的变动就足以导致页面布局乱掉，导致文本不居中、文字折行、布局混乱等问题。解决办法参考<a href="https://www.cnblogs.com/axl234/p/7753187.html" target="_blank" rel="noopener">这篇文章</a>  </p>
+<h4 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h4><p>用户修改手机字体设置大小，影响App里打开的web页面。</p>
+<h4 id="Android端解决办法"><a href="#Android端解决办法" class="headerlink" title="Android端解决办法"></a>Android端解决办法</h4><p>手机字体设置大小，影响App的页面。<br>Android的可以通过webview配置webview.getSettings().setTextZoom(100)就可以禁止缩放，按照百分百显示。</p>
+<h4 id="H5解决办法"><a href="#H5解决办法" class="headerlink" title="H5解决办法"></a>H5解决办法</h4><p>Android因为改变的是字体的大小，所以可以考虑将字体大小在设置的时候进行等比例缩小。例如，一个文字希望以10px来进行渲染，当webview被放大两倍时，此时font-size会变为20px。因此我们可以在取到这个放大比例之后，对原样式进行等比缩小，比如将原文字大小设置为5px，渲染的时候就变成了10px。</p>
+<p>代码如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 手机字体放大或缩小的情况，恢复根字体的大小</span></span><br><span class="line"><span class="keyword">let</span> $dom = <span class="built_in">document</span>.createElement(<span class="string">'div'</span>);</span><br><span class="line">$dom.style = <span class="string">'font-size:16px;'</span>;</span><br><span class="line"><span class="built_in">document</span>.body.appendChild($dom);</span><br><span class="line"><span class="comment">// 计算出放大后的字体大小</span></span><br><span class="line"><span class="keyword">const</span> scaledFontSize = <span class="built_in">parseInt</span>(<span class="built_in">window</span>.getComputedStyle($dom, <span class="literal">null</span>).getPropertyValue(<span class="string">'font-size'</span>));</span><br><span class="line"><span class="built_in">document</span>.body.removeChild($dom);</span><br><span class="line"><span class="comment">// 计算原字体和放大后字体的比例</span></span><br><span class="line"><span class="keyword">const</span> scaleFactor = <span class="number">16</span> / scaledFontSize;</span><br><span class="line"><span class="comment">// 获取当前已经缩放的根元素字体大小</span></span><br><span class="line"><span class="keyword">const</span> originRootFontSize = <span class="built_in">parseInt</span>(<span class="built_in">window</span>.getComputedStyle(<span class="built_in">document</span>.documentElement, <span class="literal">null</span>).getPropertyValue(<span class="string">'font-size'</span>));</span><br><span class="line"><span class="comment">// 乘以scaledFontSize是原来的html字体大小</span></span><br><span class="line"><span class="comment">// 再次乘以scaledFontSize是为了经过手机缩放后显示为想要的大小</span></span><br><span class="line"><span class="built_in">document</span>.documentElement.style.fontSize = originRootFontSize * scaleFactor * scaleFactor + <span class="string">'px'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>通过改变根元素字体来影响文档中元素字体大小的方法，对字体单位是rem的才有效。因此如果字体单位是vw，该方法并不能一劳永逸。这里能想到的办法是讲显示错乱的地方的字体单位vw转换成rem。怎样转换比较方便呢？我们采用的是less这个css预编译处理语言，能不能写一个单位转换的方法，在less 中调用呢？在网上找到了<a href="https://blog.csdn.net/weixin_34146986/article/details/91430581" target="_blank" rel="noopener">一篇文章</a>，结合这篇文章，我们这里的实现是这样：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.remMixin</span>() &#123;</span><br><span class="line">    @functions: ~`(function() &#123;</span><br><span class="line">        var clientWidth = 375;</span><br><span class="line">        <span class="selector-tag">function</span> <span class="selector-tag">convert</span>(<span class="selector-tag">size</span>) &#123;</span><br><span class="line">            return typeof size === 'string' ?</span><br><span class="line">                +size.replace('px', '').replace('vw', '') : size;</span><br><span class="line">        &#125;</span><br><span class="line">        this.rem = function(size) &#123;</span><br><span class="line">            return (convert(size) / 16).toFixed(3) + 'rem';</span><br><span class="line">        &#125;</span><br><span class="line">        this.vw2rem = function(size) &#123;</span><br><span class="line">            return this.rem(convert(size) * clientWidth / 100);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)()`;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.remMixin</span>();</span><br></pre></td></tr></table></figure>
+
+<p>这里对less 的一个语法进行介绍：为了表示Javascript，必须用反引号包装代码。执行此操作时，Less讲计算表达式并讲结果作为字符串返回。它做到了“原样”返回。因此如果返回的是字符串的话，会带有引号。如果想将返回结果中的引号删除，可以在反引号前加上波浪号。<br>实际使用的时候，比如设置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">font-size: ~`vw2rem(&apos;3.2vw&apos;)`;</span><br></pre></td></tr></table></figure>
+
+<p>经过转换后：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">font-size: 0.75rem;</span><br></pre></td></tr></table></figure>
+
+<h4 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h4><p><a href="https://www.cnblogs.com/axl234/p/7753187.html" target="_blank" rel="noopener">https://www.cnblogs.com/axl234/p/7753187.html</a><br><a href="https://blog.csdn.net/weixin_34146986/article/details/91430581" target="_blank" rel="noopener">https://blog.csdn.net/weixin_34146986/article/details/91430581</a><br><a href="https://www.bennadel.com/blog/2638-executing-javascript-in-the-less-css-precompiler.htm" target="_blank" rel="noopener">https://www.bennadel.com/blog/2638-executing-javascript-in-the-less-css-precompiler.htm</a>   </p>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2020/02/08/【工作杂记】20200204/" class="next-post btn btn-default" title='【工作杂记】20200204'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">【工作杂记】20200204</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	
+    <div id="vcomments" class="valine"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+    <script>
+        new Valine({
+            av: AV,
+            el: '#vcomments',
+            appId: 'h86n5PYEWOScNNTc5l7r8Ma1-gzGzoHsz',
+            appKey: 'Sc1o9I3OBfSjWqmvxjFwvlbw',
+            placeholder: '说点什么吧',
+            notify: false,
+            verify: true,
+            avatar: 'mm',
+            meta: 'nick,mail'.split(','),
+            pageSize: '10',
+            path: window.location.pathname,
+            lang: ''.toLowerCase()
+        })
+    </script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">Table of Contents</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#现象"><span class="toc-text">现象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Android端解决办法"><span class="toc-text">Android端解决办法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#H5解决办法"><span class="toc-text">H5解决办法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#参考文章"><span class="toc-text">参考文章</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
